@@ -22,7 +22,8 @@ Derive from GitHub docs; do not duplicate long prose.
 | File | Purpose |
 |------|---------|
 | index.md | Repo summary, links to README/CONTRIBUTING/SECURITY/CHANGELOG, entry points |
-| architecture.md | High-level structure, main modules, key entry points (from README/codebase) |
+| product.md | Brand and product summary from PRD (brand strategy, key requirements) |
+| stack.md | Technology stack summary from Tech Plans (framework, language, infrastructure) |
 | conventions.md | Key conventions from CONTRIBUTING (branching, PR, style) |
 
 ## Template: README.md (minimal)
@@ -139,13 +140,172 @@ High-level structure; derived from README and codebase.
 - [Main executable, API entry, or config]
 ```
 
-## Mapping: GitHub docs → .cursor/docs/
+## Template: docs/architecture/README.md (Technical Docs Index)
 
-| GitHub doc | Use in .cursor/docs/ |
+```markdown
+# Architecture Documentation
+
+Overview of system architecture and design decisions.
+
+## Documents
+
+- [High-Level Design](high-level-design.md) — System-wide architecture, components, technology choices
+- [Architecture Decisions](decisions/) — ADRs documenting key architectural choices
+
+## Diagrams
+
+- [System Overview](diagrams/system-overview.mmd) — Component diagram showing major services and integrations
+
+## Related
+
+- [Component-level design](../design/) — Low-level implementation details for each component
+- [API Documentation](../api/) — API endpoint specifications
+```
+
+## Template: docs/architecture/high-level-design.md
+
+```markdown
+# High-Level Design: [Project Name]
+
+## 1. Executive Summary
+
+[Business context, value proposition, scope]
+
+## 2. System Overview
+
+### Architecture Pattern
+[Microservices, monolith, serverless, etc.]
+
+### Core Components
+- Component A: [Purpose and responsibility]
+- Component B: [Purpose and responsibility]
+
+### System Diagram
+[Mermaid diagram or link to diagram file]
+
+## 3. Technology Choices
+
+| Decision | Choice | Rationale |
+|----------|--------|-----------|
+| Frontend | [Technology] | [Why] |
+| Backend | [Technology] | [Why] |
+| Database | [Technology] | [Why] |
+
+## 4. Non-Functional Requirements
+
+- **Performance**: [Target metrics]
+- **Scalability**: [Strategy]
+- **Security**: [Principles]
+- **Availability**: [Target uptime]
+
+## 5. Integration Architecture
+
+[How components interact; data flow between systems]
+
+## 6. Deployment Strategy
+
+[High-level deployment approach; environments; CI/CD]
+
+## 7. Design Principles
+
+[Guiding principles for implementation decisions]
+```
+
+## Template: docs/design/components/[component-name].md (LLD)
+
+```markdown
+# Low-Level Design: [Component Name]
+
+## Overview
+
+[Component purpose, scope, and responsibilities]
+
+## Architecture
+
+### Class/Module Structure
+[Class diagram or module breakdown]
+
+### Key Interfaces
+```
+[Code/pseudocode showing main interfaces]
+```
+
+## Data Models
+
+### Entities
+[Tables, classes, or data structures]
+
+### Relationships
+[Foreign keys, references, dependencies]
+
+## API Specification
+
+### Endpoints (if applicable)
+- `GET /resource` — [Description]
+- `POST /resource` — [Description]
+
+[Link to detailed API docs in docs/api/]
+
+## Implementation Details
+
+### Algorithms
+[Key algorithms or logic flows]
+
+### Error Handling
+[How errors are handled and logged]
+
+### Dependencies
+[External libraries, services, or modules]
+
+## Testing Strategy
+
+[Unit test approach, integration test scenarios]
+```
+
+## Template: docs/api/[service-name].md
+
+```markdown
+# API Documentation: [Service Name]
+
+## Overview
+
+[API purpose and authentication requirements]
+
+## Endpoints
+
+### GET /endpoint
+
+**Description**: [What it does]
+
+**Request**:
+```json
+{
+  "param": "value"
+}
+```
+
+**Response (200 OK)**:
+```json
+{
+  "result": "value"
+}
+```
+
+**Error Responses**:
+- `400 Bad Request`: [When this occurs]
+- `401 Unauthorized`: [When this occurs]
+```
+
+## Mapping: GitHub docs + Technical docs → .cursor/docs/
+
+| Source doc | Use in .cursor/docs/ |
 |------------|----------------------|
-| README | index.md summary and links; architecture.md high-level structure |
-| CONTRIBUTING | index.md link; conventions.md key rules (branching, PR, style) |
+| README | index.md summary and links |
+| CONTRIBUTING | index.md link; conventions.md key rules |
 | SECURITY | index.md link |
 | CHANGELOG | index.md link |
+| docs/architecture/high-level-design.md | architecture.md summary; link to full HLD |
+| docs/design/* | architecture.md component list; links to detailed LLD |
+| docs/api/* | index.md link to API docs location |
 
-Keep `.cursor/docs/` as index and summaries; point to canonical GitHub docs for full text.
+Keep `.cursor/docs/` as index and summaries; point to canonical docs for full text.

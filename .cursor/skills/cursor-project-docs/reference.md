@@ -20,10 +20,40 @@ Use these when writing or updating GitHub repo docs. Consult the relevant page f
   https://docs.github.com/en/code-security/getting-started/adding-a-security-policy-to-your-repository  
   Supported versions; how to report vulnerabilities; where to place SECURITY.md (root, docs/, .github/).
 
+## Technical Design Documentation
+
+- **GitLab Architecture Design Documents**  
+  https://handbook.gitlab.com/handbook/engineering/architecture/design-documents  
+  How GitLab structures architecture design docs as version-controlled artifacts.
+
+- **GitLab Architecture Workflow**  
+  https://handbook.gitlab.com/handbook/engineering/architecture/workflow  
+  Process for creating and iterating on design documents.
+
+- **Microsoft Engineering Playbook: Documentation**  
+  https://microsoft.github.io/code-with-engineering-playbook/documentation/  
+  Best practices for engineering documentation, onboarding, and organization.
+
+- **High-Level vs Low-Level Design (GeeksforGeeks)**  
+  https://geeksforgeeks.org/system-design/difference-between-high-level-design-and-low-level-design  
+  Clear explanation of HLD vs LLD scope and content.
+
+- **System Design Handbook: HLD vs LLD**  
+  https://www.systemdesignhandbook.com/blog/low-level-design-vs-high-level-design/  
+  Practical guidance on when to use each level of design documentation.
+
 ## Optional / Further Reading
 
 - **Open source guides (GitHub)**  
   https://opensource.guide/  
   Broader open-source practices; can inform CONTRIBUTING, CODE_OF_CONDUCT, and community docs.
 
-When in doubt, prefer the official GitHub docs for README, CONTRIBUTING, and SECURITY structure and placement.
+- **GitBook: Documentation Structure Tips**  
+  https://docs.gitbook.com/guides/best-practices/documentation-structure-tips  
+  Information architecture best practices for technical documentation.
+
+When in doubt:
+- **For GitHub docs**: Prefer official GitHub docs for README, CONTRIBUTING, and SECURITY structure
+- **For PRDs**: Follow Atlassian/ProductPlan patterns for product requirements structure. PRD must include brand and brand strategy.
+- **For Tech Plans**: Follow GitLab/Microsoft patterns for implementation planning and folder structure
+- **Documentation order**: Always create PRD first (with brand strategy), then Tech Plans (LLDs). Do not create an intermediate HLD layer.

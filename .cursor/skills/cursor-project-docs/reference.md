@@ -1,6 +1,6 @@
 # Reputable Sources for Repository Documentation
 
-Use these when writing or updating GitHub repo docs. Consult the relevant page for structure, audience, and best practices.
+Use these when writing or updating docs. Consult the relevant page for structure, audience, and best practices.
 
 ## GitHub Docs (docs.github.com)
 
@@ -19,6 +19,27 @@ Use these when writing or updating GitHub repo docs. Consult the relevant page f
 - **Adding a security policy (SECURITY.md)**  
   https://docs.github.com/en/code-security/getting-started/adding-a-security-policy-to-your-repository  
   Supported versions; how to report vulnerabilities; where to place SECURITY.md (root, docs/, .github/).
+
+## Product Requirements Documents (PRDs)
+
+- **How to Write a PRD (Product School)**  
+  https://productschool.com/blog/product-management-2/how-to-write-prd  
+  Comprehensive guide on PRD structure, content, and best practices.
+
+- **Writing Great PRDs (Silicon Valley Product Group)**  
+  https://www.svpg.com/assets/Files/goodprd.pdf  
+  Marty Cagan's classic guide on effective product requirements.
+
+- **PRD Template (Atlassian)**  
+  https://www.atlassian.com/agile/product-management/requirements  
+  Practical PRD template and guidance from Atlassian.
+
+**Key PRD principles**:
+- Define the problem before the solution
+- Focus on user needs and business outcomes
+- Include measurable success criteria
+- Keep requirements testable (acceptance criteria)
+- Separate "what" (PRD) from "how" (technical design)
 
 ## Technical Design Documentation
 
@@ -52,27 +73,30 @@ Use these when writing or updating GitHub repo docs. Consult the relevant page f
   https://docs.gitbook.com/guides/best-practices/documentation-structure-tips  
   Information architecture best practices for technical documentation.
 
-## WHOOP Engineering Standards
-
-- **Doubling Down on Documentation**  
-  https://engineering.prod.whoop.com/tech-docs/  
-  WHOOP's approach to automated documentation generation, discoverability, and standardization.
-
-- **WHOOP Developer Platform**  
-  https://developer.whoop.com/docs/introduction  
-  Example of structured documentation: WHOOP 101 (concepts), Developing Your App (guides), Tutorials (examples), API Reference (specs).
-
-- **WHOOP API Design**  
-  https://engineering.whoop.com/dev-platform  
-  Principles for API documentation: stability, consistency, self-service documentation.
-
-**Key WHOOP Principles**:
-1. **Automation**: Couple documentation with code deployments
-2. **Discoverability**: Centralized portal, search, filtering
-3. **Standardization**: Uniform format across all documentation
-4. **Collaboration**: Direct links, easy sharing, version history
-
 When in doubt:
-- **Primary**: Follow [WinPodiums Documentation Standards](../../docs/standards/documentation-standards.md)
 - For GitHub docs: Prefer official GitHub docs for README, CONTRIBUTING, and SECURITY structure
-- For technical docs: Follow WHOOP-inspired patterns for PRD/Technical Plan/ADR structure
+- For PRDs: Focus on user needs and measurable outcomes; keep technical details out
+- For HLD: System-wide architecture; reference PRD requirements
+- For Tech Plans: Implementation details; reference HLD components
+
+## Document Workflow Summary
+
+```
+PRD (Product Requirements)
+    ↓ Defines WHAT and WHY
+    ↓ Stakeholder approval required
+    
+HLD (High-Level Design)
+    ↓ Defines HOW at system level
+    ↓ Architecture approval required
+    
+Tech Plans (Implementation Specs)
+    ↓ Defines HOW at component level
+    ↓ Engineering approval required
+    
+Implementation
+    ↓ Code follows Tech Plans
+    ↓ PRD acceptance criteria guide testing
+```
+
+**Never skip steps**: PRDs must exist before HLD. HLD must exist before Tech Plans.

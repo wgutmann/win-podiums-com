@@ -139,6 +139,131 @@ High-level structure; derived from README and codebase.
 - [Main executable, API entry, or config]
 ```
 
+## Template: docs/prd/[feature-name].md (PRD)
+
+```markdown
+# PRD: [Feature Name]
+
+**Status**: Draft | In Review | Approved | Implemented
+**Author**: [Name]
+**Last Updated**: YYYY-MM-DD
+**PRD ID**: PRD-XXX
+
+## 1. Problem Statement
+
+### Background
+[Context and why this feature is needed]
+
+### User Pain Points
+- [Pain point 1]
+- [Pain point 2]
+
+### Business Impact
+[Why this matters to the business]
+
+## 2. Target Users
+
+### Primary Persona
+- **Who**: [Description]
+- **Goals**: [What they want to achieve]
+- **Current Behavior**: [How they solve this today]
+
+### Secondary Personas
+[Other affected users]
+
+## 3. Requirements
+
+### Functional Requirements
+| ID | Requirement | Priority | Notes |
+|----|-------------|----------|-------|
+| FR-001 | [Requirement] | Must Have | |
+| FR-002 | [Requirement] | Should Have | |
+
+### Non-Functional Requirements
+| ID | Requirement | Target | Notes |
+|----|-------------|--------|-------|
+| NFR-001 | Performance | [Metric] | |
+| NFR-002 | Security | [Standard] | |
+
+## 4. User Stories
+
+### Epic: [Epic Name]
+
+**US-001**: As a [user type], I want to [action] so that [benefit].
+- **Acceptance Criteria**:
+  - [ ] [Criterion 1]
+  - [ ] [Criterion 2]
+
+**US-002**: As a [user type], I want to [action] so that [benefit].
+- **Acceptance Criteria**:
+  - [ ] [Criterion 1]
+  - [ ] [Criterion 2]
+
+## 5. Success Metrics
+
+| Metric | Current | Target | Measurement Method |
+|--------|---------|--------|-------------------|
+| [Metric] | [Value] | [Value] | [How measured] |
+
+## 6. Constraints & Assumptions
+
+### Constraints
+- [Technical, business, or resource constraints]
+
+### Assumptions
+- [Assumptions that must hold true]
+
+## 7. Out of Scope
+
+- [What this PRD explicitly does NOT cover]
+
+## 8. Open Questions
+
+- [ ] [Question needing resolution]
+
+## 9. References
+
+- [Link to related PRDs]
+- [Link to user research]
+- [Link to competitive analysis]
+```
+
+## Template: docs/prd/README.md (PRD Index)
+
+```markdown
+# Product Requirements Documents
+
+Index of all PRDs for the project.
+
+## Document Workflow
+
+PRDs follow this lifecycle:
+1. **Draft** — Initial creation, gathering requirements
+2. **In Review** — Stakeholder review and feedback
+3. **Approved** — Ready for technical design (HLD)
+4. **Implemented** — Feature has been built and released
+
+## Active PRDs
+
+| PRD ID | Title | Status | Owner | Last Updated |
+|--------|-------|--------|-------|--------------|
+| PRD-001 | [Feature Name] | Approved | [Name] | YYYY-MM-DD |
+
+## Completed PRDs
+
+| PRD ID | Title | Implemented | Release |
+|--------|-------|-------------|---------|
+| PRD-000 | [Feature Name] | YYYY-MM-DD | v1.0.0 |
+
+## Creating a New PRD
+
+1. Copy the template from `templates/prd-template.md`
+2. Assign the next PRD ID (PRD-XXX)
+3. Fill in all sections
+4. Submit for review
+5. Get stakeholder approval before proceeding to HLD
+```
+
 ## Template: docs/architecture/README.md (Technical Docs Index)
 
 ```markdown
@@ -210,55 +335,144 @@ Overview of system architecture and design decisions.
 [Guiding principles for implementation decisions]
 ```
 
-## Template: docs/design/components/[component-name].md (LLD)
+## Template: docs/tech-plans/components/[component-name].md (Tech Plan)
 
 ```markdown
-# Low-Level Design: [Component Name]
+# Tech Plan: [Component Name]
 
-## Overview
+**Status**: Draft | In Review | Approved | Implemented
+**Author**: [Name]
+**Last Updated**: YYYY-MM-DD
+**Tech Plan ID**: TP-XXX
+**Implements**: HLD Section [X], PRD-XXX
 
-[Component purpose, scope, and responsibilities]
+## 1. Overview
 
-## Architecture
+### Purpose
+[Component purpose and scope]
 
-### Class/Module Structure
+### References
+- PRD: [Link to PRD this implements]
+- HLD: [Link to HLD section this details]
+
+## 2. Architecture
+
+### Module Structure
 [Class diagram or module breakdown]
 
 ### Key Interfaces
-```
-[Code/pseudocode showing main interfaces]
+```typescript
+// Main interfaces and types
+interface Example {
+  // ...
+}
 ```
 
-## Data Models
+### Dependencies
+- [External library]: [Version] — [Purpose]
+- [Internal module]: [Purpose]
+
+## 3. Data Models
 
 ### Entities
-[Tables, classes, or data structures]
+[Tables, classes, or data structures with field definitions]
 
 ### Relationships
-[Foreign keys, references, dependencies]
+[Foreign keys, references, entity relationships]
 
-## API Specification
+## 4. API Specification
 
-### Endpoints (if applicable)
-- `GET /resource` — [Description]
-- `POST /resource` — [Description]
+### Endpoints
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| GET | /resource | [Description] | Required |
+| POST | /resource | [Description] | Required |
 
 [Link to detailed API docs in docs/api/]
 
-## Implementation Details
+## 5. Implementation Details
 
-### Algorithms
-[Key algorithms or logic flows]
+### Core Logic
+[Key algorithms, business logic, data transformations]
+
+### Sequence Diagrams
+[Detailed sequence diagrams for key flows]
 
 ### Error Handling
-[How errors are handled and logged]
+[Error types, handling strategies, user messages]
 
-### Dependencies
-[External libraries, services, or modules]
+### Edge Cases
+[Known edge cases and how they're handled]
 
-## Testing Strategy
+## 6. Security Considerations
 
-[Unit test approach, integration test scenarios]
+[Authentication, authorization, data protection specific to this component]
+
+## 7. Testing Strategy
+
+### Unit Tests
+[Key unit test scenarios]
+
+### Integration Tests
+[Integration test scenarios]
+
+### Test Data
+[Test data requirements]
+
+## 8. Deployment Notes
+
+[Component-specific deployment considerations]
+
+## 9. Open Questions
+
+- [ ] [Technical question needing resolution]
+```
+
+## Template: docs/tech-plans/README.md (Tech Plans Index)
+
+```markdown
+# Tech Plans
+
+Implementation specifications for each component. Tech Plans are created AFTER HLD approval.
+
+## Document Workflow
+
+Tech Plans follow this lifecycle:
+1. **Draft** — Initial technical design
+2. **In Review** — Engineering review
+3. **Approved** — Ready for implementation
+4. **Implemented** — Code complete
+
+## Relationship to Other Docs
+
+```
+PRD (What/Why) → HLD (System How) → Tech Plan (Component How) → Code
+```
+
+Each Tech Plan should:
+- Reference the PRD requirements it implements
+- Reference the HLD section it details
+- Be specific enough to guide implementation
+
+## Active Tech Plans
+
+| TP ID | Component | Status | Owner | HLD Section | PRD |
+|-------|-----------|--------|-------|-------------|-----|
+| TP-001 | [Component] | Draft | [Name] | 4.1 | PRD-001 |
+
+## By Component
+
+### Components
+- [simhub-plugin.md](components/simhub-plugin.md) — SimHub plugin implementation
+- [web-frontend.md](components/web-frontend.md) — Web application frontend
+- [api-workers.md](components/api-workers.md) — Cloudflare Workers API
+
+### Data Models
+- [database-schema.md](data-models/database-schema.md) — D1 database schema
+
+### Integrations
+- [discord-integration.md](integrations/discord-integration.md) — Discord OAuth2 integration
+- [simhub-telemetry.md](integrations/simhub-telemetry.md) — SimHub telemetry processing
 ```
 
 ## Template: docs/api/[service-name].md
@@ -295,7 +509,7 @@ Overview of system architecture and design decisions.
 - `401 Unauthorized`: [When this occurs]
 ```
 
-## Mapping: GitHub docs + Technical docs → .cursor/docs/
+## Mapping: All docs → .cursor/docs/
 
 | Source doc | Use in .cursor/docs/ |
 |------------|----------------------|
@@ -303,8 +517,31 @@ Overview of system architecture and design decisions.
 | CONTRIBUTING | index.md link; conventions.md key rules |
 | SECURITY | index.md link |
 | CHANGELOG | index.md link |
+| docs/prd/* | index.md link to PRD index |
 | docs/architecture/high-level-design.md | architecture.md summary; link to full HLD |
-| docs/design/* | architecture.md component list; links to detailed LLD |
+| docs/tech-plans/* | architecture.md component list; links to tech plans |
 | docs/api/* | index.md link to API docs location |
 
 Keep `.cursor/docs/` as index and summaries; point to canonical docs for full text.
+
+## Document Hierarchy Summary
+
+```
+docs/
+├── prd/                    # FIRST: What are we building and why?
+│   └── [feature].md        # Product requirements, user stories, acceptance criteria
+│
+├── architecture/           # SECOND: How does the system work?
+│   └── high-level-design.md # System architecture, components, technology choices
+│
+├── tech-plans/             # THIRD: How do we implement each component?
+│   ├── components/         # Component-specific implementation specs
+│   ├── data-models/        # Database schemas
+│   └── integrations/       # Integration specs
+│
+├── api/                    # Interface contracts (can be part of tech-plans)
+├── guides/                 # How-to documentation
+└── brand/                  # Design system and UX patterns
+```
+
+**Remember**: PRDs → HLD → Tech Plans → Code. Never skip steps.

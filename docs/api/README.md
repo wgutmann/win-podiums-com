@@ -12,6 +12,11 @@ The WinPodiums API provides endpoints for:
 - **User Profiles**: Member data, podium history, preferences
 - **Verification**: Race result validation and anti-cheat
 
+## OpenAPI (Swagger)
+
+The API surface is tracked in an OpenAPI spec for Swagger tooling:
+- [OpenAPI Spec](./openapi.yaml)
+
 ## Authentication
 
 All API endpoints (except authentication endpoints) require a valid Discord access token.

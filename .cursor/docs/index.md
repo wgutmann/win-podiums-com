@@ -82,7 +82,9 @@ See [AGENTS.md](../../AGENTS.md) for AI agent instructions.
 **Version**: 0.1.0-alpha  
 **Last Updated**: 2026-01-31
 
-Next steps:
-- Finalize HLD/LLD review
-- Set up repository structure
-- Begin Phase 1 implementation (Discord auth + basic plugin)
+**Next steps (do not deploy Terraform until a minimal Worker exists):**
+1. Close doc gaps (guides, API sub-docs, security LLD) — see [Next Steps](../../docs/architecture/next-steps.md)
+2. Define Phase 1 scope explicitly (MVP: auth, minimal API, basic plugin, static gate)
+3. Set up repository structure (Worker app + SimHub plugin projects)
+4. Implement Phase 1 (Discord auth + basic plugin + verification API stub)
+5. Then apply Terraform and deploy Worker (and plugin)

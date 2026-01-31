@@ -1,0 +1,260 @@
+openapi: 3.0.3
+info:
+  title: WinPodiums API
+  version: v1
+  description: >
+    REST API for WinPodiums, hosted on Cloudflare Workers. This OpenAPI
+    specification documents the current endpoint surface area and shared
+    response formats. As endpoints are implemented, update request/response
+    schemas to match real payloads.
+servers:
+  - url: https://winpodiums.com/api
+    description: Production
+  - url: http://localhost:8787/api
+    description: Local development (Wrangler)
+tags:
+  - name: Authentication
+    description: Discord OAuth2 flows and token handling
+  - name: Plugin
+    description: SimHub plugin integration endpoints
+  - name: Profile
+    description: User profile data and preferences
+paths:
+  /auth/discord/callback:
+    post:
+      tags:
+        - Authentication
+      summary: Web OAuth2 callback
+      description: Handles Discord OAuth2 callback for web sessions.
+      responses:
+        "200":
+          description: Successful authentication.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /auth/discord/exchange:
+    post:
+      tags:
+        - Authentication
+      summary: Plugin token exchange (PKCE)
+      description: Exchanges a plugin PKCE code for an access token.
+      responses:
+        "200":
+          description: Token exchange success.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /auth/qr-status/{sessionId}:
+    get:
+      tags:
+        - Authentication
+      summary: QR code polling
+      description: Polls for QR-based authentication status.
+      parameters:
+        - name: sessionId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: QR status result.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /auth/token-exchange:
+    post:
+      tags:
+        - Authentication
+      summary: Manual token validation
+      description: Validates a manually provided token and returns session info.
+      responses:
+        "200":
+          description: Token validation success.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /plugin/verify:
+    post:
+      tags:
+        - Plugin
+      summary: Submit race result for verification
+      description: Submits a telemetry payload for verification.
+      responses:
+        "200":
+          description: Verification accepted.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+  /plugin/heartbeat:
+    post:
+      tags:
+        - Plugin
+      summary: Plugin health check
+      description: Sends a plugin heartbeat to keep session active.
+      responses:
+        "200":
+          description: Heartbeat accepted.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /plugin/download/{type}:
+    get:
+      tags:
+        - Plugin
+      summary: Download plugin installer
+      description: Downloads a plugin installer by type.
+      parameters:
+        - name: type
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Plugin installer download.
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+  /profile/me:
+    get:
+      tags:
+        - Profile
+      summary: Current user's profile
+      description: Returns the authenticated user's profile.
+      responses:
+        "200":
+          description: Profile payload.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    patch:
+      tags:
+        - Profile
+      summary: Update user preferences
+      description: Updates preferences for the authenticated user.
+      responses:
+        "200":
+          description: Profile updated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /profile/{discordId}:
+    get:
+      tags:
+        - Profile
+      summary: Public profile
+      description: Returns a public profile if enabled.
+      parameters:
+        - name: discordId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Public profile payload.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+components:
+  schemas:
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          additionalProperties: true
+      required:
+        - success
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: string
+          example: error_code_snake_case
+        message:
+          type: string
+          example: Human-readable error message
+        details:
+          type: object
+          additionalProperties: true
+      required:
+        - success
+        - error
+        - message
+  responses:
+    BadRequest:
+      description: Invalid input or malformed request.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Unauthorized:
+      description: Missing or invalid authorization token.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Resource not found.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Conflict:
+      description: Resource state conflict.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"

@@ -1,0 +1,11 @@
+# Copy to terraform.tfvars and fill in (do not commit terraform.tfvars).
+# Required for local runs; CI uses GitHub Actions env (CLOUDFLARE_ACCOUNT_ID) and -var.
+
+cloudflare_account_id = "your-cloudflare-account-id"
+environment           = "dev"
+project_name          = "winpodiums"
+domain                 = "winpodiums.com"
+
+# Required for custom domain: add winpodiums.com to Cloudflare, then set zone_id (Dashboard → domain → Overview → Zone ID).
+# This creates Worker routes for winpodiums.com/* and www.winpodiums.com/*; attach your Worker via wrangler.toml.
+# zone_id = "your-zone-id"

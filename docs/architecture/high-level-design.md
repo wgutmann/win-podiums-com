@@ -142,6 +142,8 @@ See [Discord Integration LLD](../design/integrations/discord-integration.md) for
 - **Runtime**: Cloudflare Workers (JavaScript/TypeScript, V8 isolates)
 - **API**: RESTful HTTP endpoints (see [API Documentation](../api/))
 - **Constraints**: 50ms CPU time limit per request
+- **Caching**: Workers KV for user profiles (reduces D1 reads by 90%)
+- **Cost**: Free tier (100K requests/day) for MVP; $5/month paid plan for scale
 
 ### Desktop Application
 - **Language**: C# / .NET Framework 4.8 (SimHub SDK requirement)
@@ -151,8 +153,10 @@ See [Discord Integration LLD](../design/integrations/discord-integration.md) for
 
 ### Data Layer
 - **Database**: Cloudflare D1 (SQLite-based, edge-replicated)
-- **Storage**: Cloudflare R2 (S3-compatible object storage)
+- **Cache**: Workers KV (key-value cache for user profiles, reduces D1 reads)
+- **Storage**: Cloudflare R2 (S3-compatible object storage, plugin downloads, archived data)
 - **Encryption**: Workers Secrets for tokens, DPAPI for plugin storage
+- **Cost**: Free tier (5M reads/day, 100K writes/day, 5GB storage) for MVP
 
 ### External Services
 - **Identity**: Discord OAuth2 (Authorization Code + PKCE)
@@ -218,8 +222,11 @@ See [Integration Flows](../design/integrations/) for detailed sequence diagrams.
 ### Hosting
 - **Web/API**: Cloudflare Workers (edge compute, auto-scaling)
 - **Database**: Cloudflare D1 (edge-replicated SQLite)
-- **Storage**: Cloudflare R2 (global CDN distribution)
+- **Cache**: Workers KV (reduces D1 reads, improves performance)
+- **Storage**: Cloudflare R2 (global CDN distribution, plugin downloads, archived data)
+- **Background Jobs**: Cloudflare Cron Triggers (scheduled cleanup, free)
 - **Plugin**: Distributed via R2, installed locally by users
+- **Cost**: $0/month for MVP (free tier), $5/month for Phase 3 (100K users)
 
 ### Environments
 - **Local**: Wrangler dev server with `.dev.vars` for secrets
@@ -242,7 +249,7 @@ See [Deployment Guide](../guides/deployment.md) for detailed procedures.
 
 ### Scalability
 - **Initial Target**: 10,000 concurrent members
-- **Growth Path**: Cloudflare edge scales automatically; D1 migration to Postgres if >100K members
+- **Growth Path**: Cloudflare edge scales automatically; D1 can handle 50M users (500x initial target) - **No Postgres migration needed**
 
 ### Availability
 - **Target**: 99.9% uptime for web/API
@@ -278,6 +285,7 @@ See [Deployment Guide](../guides/deployment.md) for detailed procedures.
 - Simple verification API with signature validation
 - Static "Gate" landing page
 - Member state management (pending/verified)
+- **Cost**: $0/month (Cloudflare free tier sufficient)
 
 ### Phase 2: The Ceremony 🎯
 - Luxury UI implementation with brand guidelines
@@ -285,18 +293,22 @@ See [Deployment Guide](../guides/deployment.md) for detailed procedures.
 - Plugin status dashboard ("Scrutineering" tab)
 - Personal podium history gallery
 - Anti-cheat baseline (statistical validation)
+- Workers KV caching implementation (cost optimization)
+- **Cost**: $0/month (Cloudflare free tier sufficient)
 
 ### Phase 3: The Community 🚀
 - Discord role auto-assignment for verified members
 - Private Discord server integration
 - Leaderboards and achievement showcases
 - Social features (member directory, recent podiums)
+- **Cost**: $5/month (Workers paid plan minimum)
 
 ### Phase 4: Elite Features ⭐
-- Advanced anti-cheat (ML-based anomaly detection)
+- Advanced anti-cheat (ML-based anomaly detection via Workers AI)
 - Multi-sim support (iRacing, ACC, rFactor 2)
 - Sponsored championship tracking
 - Partnership integrations (hardware manufacturers)
+- **Cost**: $25-30/month (Workers paid plan + Workers AI)
 
 ## 12. Risk Analysis
 

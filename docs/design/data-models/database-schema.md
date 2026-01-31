@@ -1,12 +1,12 @@
 # Low-Level Design: Database Schema
 
-**Database**: Cloudflare D1 (SQLite)  
+**Database**: Cloudflare D1 (SQLite) + Workers KV (Caching)  
 **Version**: 1.0  
 **Last Updated**: 2026-01-31
 
 ## Overview
 
-WinPodiums uses Cloudflare D1 (SQLite-based edge database) for storing user profiles, authentication data, race results, and telemetry verification state.
+WinPodiums uses Cloudflare D1 (SQLite-based edge database) for storing user profiles, authentication data, race results, and telemetry verification state. **Workers KV** is used for caching frequently-read data to reduce D1 read operations and stay within free tier limits.
 
 ## Entity Relationship Diagram
 
@@ -442,11 +442,71 @@ wrangler d1 migrations apply DB_NAME --remote
 ### Disaster Recovery
 1. **Data loss**: Restore from most recent Cloudflare backup
 2. **Corruption**: Export to SQLite, repair with SQLite tools, re-import
-3. **Migration to Postgres**: Export schema + data, transform to PostgreSQL syntax, import
+3. **Scaling**: D1 can handle 50M users - no migration needed. If truly needed, could use Cloudflare Hyperdrive to connect to external Postgres (but breaks Cloudflare-only rule)
+
+## Caching Strategy (Cost Optimization)
+
+### Workers KV for User Profiles
+
+**Purpose**: Reduce D1 read operations by 90% to stay in free tier longer.
+
+**Pattern**: KV Cache → D1 Fallback → Update Cache
+
+```typescript
+// Cost-optimized user profile retrieval
+async function getUserProfile(discordId: string, env: Env): Promise<User | null> {
+  // Try KV cache first (free, fast)
+  const cached = await env.KV.get(`user:${discordId}`);
+  if (cached) {
+    return JSON.parse(cached);
+  }
+  
+  // Fallback to D1 (counts toward free tier)
+  const user = await env.DB.prepare('SELECT * FROM users WHERE discord_id = ?')
+    .bind(discordId)
+    .first<User>();
+  
+  // Cache for 1 hour (reduce future D1 reads)
+  if (user) {
+    await env.KV.put(`user:${discordId}`, JSON.stringify(user), {
+      expirationTtl: 3600 // 1 hour
+    });
+  }
+  
+  return user;
+}
+
+// Invalidate cache on user updates
+async function updateUserProfile(discordId: string, updates: Partial<User>, env: Env) {
+  await env.DB.prepare('UPDATE users SET ... WHERE discord_id = ?').bind(discordId).run();
+  
+  // Invalidate cache (force refresh on next read)
+  await env.KV.delete(`user:${discordId}`);
+}
+```
+
+**Cost Impact**:
+- **Before**: 50 D1 reads/user/day = 500K reads/day (10K users)
+- **After**: 5 D1 reads/user/day (90% cache hit rate) = 50K reads/day
+- **Savings**: 90% reduction = stays in free tier (5M reads/day) longer
+
+### What to Cache in KV
+
+**Cache** (Frequently read, rarely updated):
+- User profiles (`user:{discordId}`) - TTL: 1 hour
+- Rate limit counters (`ratelimit:{userId}:{endpoint}`) - TTL: 1 hour
+- Plugin version info (`plugin:latest`) - TTL: 24 hours
+
+**Don't Cache** (Frequently updated):
+- Race results (always fresh from D1)
+- Auth tokens (security-sensitive, always fresh)
+- QR sessions (short-lived, not worth caching)
 
 ## Related Documentation
 
 - [Cloudflare D1 Docs](https://developers.cloudflare.com/d1/)
+- [Workers KV Docs](https://developers.cloudflare.com/kv/)
 - [SQLite Documentation](https://www.sqlite.org/docs.html)
+- [Cost Optimization ADR](../../architecture/decisions/005-cost-optimized-cloudflare.md)
 - [Data Model Diagram](../diagrams/entity-relationship.mmd)
 - [API Data Contracts](../../api/) — Request/response schemas

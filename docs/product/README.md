@@ -1,0 +1,37 @@
+# Product Requirements Documents (PRDs)
+
+Product Requirements Documents define **what to build and why**. They are written for product managers, stakeholders, architects, and senior engineers.
+
+## Structure
+
+PRDs follow the [WinPodiums Documentation Standards](../standards/documentation-standards.md), which incorporate WHOOP principles:
+- **Automation**: Coupled with code changes
+- **Discoverability**: Clear structure, index files
+- **Standardization**: Uniform format
+- **Collaboration**: Direct links, traceability
+
+## Document Format
+
+Each PRD includes:
+- **Overview**: Problem statement, solution, success criteria
+- **User Stories**: As a... I want... So that...
+- **Requirements**: Functional (FR-XXX) and Non-Functional (NFR-XXX)
+- **Technical Constraints**: Limitations and dependencies
+- **Risks**: Risk assessment and mitigation
+- **Success Metrics**: Quantifiable success criteria
+- **Related Documentation**: Links to Technical Plans, ADRs, API specs
+
+## Feature Areas
+
+- [Telemetry Proof System](telemetry-proof-system/) - Multi-layered security system
+
+## Traceability
+
+PRDs trace to:
+- **Technical Plans** (`docs/tech-plans/`) - Implementation details
+- **ADRs** (`docs/architecture/decisions/`) - Architecture decisions
+- **API Specs** (`docs/api/`) - API endpoints
+
+## Standards
+
+See [Documentation Standards](../standards/documentation-standards.md) for complete format and structure requirements.

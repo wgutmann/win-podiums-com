@@ -6,16 +6,20 @@ System architecture and high-level design decisions for WinPodiums.
 
 - **[High-Level Design](high-level-design.md)** — Complete system architecture overview
 - **[Architecture Decisions](decisions/)** — ADRs documenting key architectural choices
+- **[Cost Optimization Summary](cost-optimization-summary.md)** — Cost-optimized architecture ($0 MVP, $5 Phase 3, $25-30 Phase 4)
 
 ## System Overview
 
-WinPodiums is a **microservices architecture** deployed on **Cloudflare Edge Network**, with three main components:
+WinPodiums is a **microservices architecture** deployed on **Cloudflare Edge Network**, optimized for cost:
 
 1. **Web/API** (Cloudflare Workers) — SSR frontend + REST API
 2. **SimHub Plugin** (.NET Framework 4.8) — Desktop telemetry monitor
 3. **Database** (Cloudflare D1) — User data and race results
+4. **Cache** (Workers KV) — Reduces D1 reads by 90% (cost optimization)
 
 **External Dependencies**: Discord OAuth2 (identity), SimHub SDK (telemetry)
+
+**Cost**: $0/month (MVP), $5/month (Phase 3), $25-30/month (Phase 4)
 
 ## Quick Links
 

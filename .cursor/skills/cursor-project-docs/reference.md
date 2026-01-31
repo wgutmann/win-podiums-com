@@ -52,8 +52,27 @@ Use these when writing or updating GitHub repo docs. Consult the relevant page f
   https://docs.gitbook.com/guides/best-practices/documentation-structure-tips  
   Information architecture best practices for technical documentation.
 
+## WHOOP Engineering Standards
+
+- **Doubling Down on Documentation**  
+  https://engineering.prod.whoop.com/tech-docs/  
+  WHOOP's approach to automated documentation generation, discoverability, and standardization.
+
+- **WHOOP Developer Platform**  
+  https://developer.whoop.com/docs/introduction  
+  Example of structured documentation: WHOOP 101 (concepts), Developing Your App (guides), Tutorials (examples), API Reference (specs).
+
+- **WHOOP API Design**  
+  https://engineering.whoop.com/dev-platform  
+  Principles for API documentation: stability, consistency, self-service documentation.
+
+**Key WHOOP Principles**:
+1. **Automation**: Couple documentation with code deployments
+2. **Discoverability**: Centralized portal, search, filtering
+3. **Standardization**: Uniform format across all documentation
+4. **Collaboration**: Direct links, easy sharing, version history
+
 When in doubt:
-- **For GitHub docs**: Prefer official GitHub docs for README, CONTRIBUTING, and SECURITY structure
-- **For PRDs**: Follow Atlassian/ProductPlan patterns for product requirements structure. PRD must include brand and brand strategy.
-- **For Tech Plans**: Follow GitLab/Microsoft patterns for implementation planning and folder structure
-- **Documentation order**: Always create PRD first (with brand strategy), then Tech Plans (LLDs). Do not create an intermediate HLD layer.
+- **Primary**: Follow [WinPodiums Documentation Standards](../../docs/standards/documentation-standards.md)
+- For GitHub docs: Prefer official GitHub docs for README, CONTRIBUTING, and SECURITY structure
+- For technical docs: Follow WHOOP-inspired patterns for PRD/Technical Plan/ADR structure

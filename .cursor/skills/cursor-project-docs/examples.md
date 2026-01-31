@@ -22,8 +22,7 @@ Derive from GitHub docs; do not duplicate long prose.
 | File | Purpose |
 |------|---------|
 | index.md | Repo summary, links to README/CONTRIBUTING/SECURITY/CHANGELOG, entry points |
-| product.md | Brand and product summary from PRD (brand strategy, key requirements) |
-| stack.md | Technology stack summary from Tech Plans (framework, language, infrastructure) |
+| architecture.md | High-level structure, main modules, key entry points (from README/codebase) |
 | conventions.md | Key conventions from CONTRIBUTING (branching, PR, style) |
 
 ## Template: README.md (minimal)

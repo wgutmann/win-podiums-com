@@ -1,4 +1,6 @@
-# Docker Dev Environment Examples
+# Docker Dev Environment — Examples and Templates
+
+Common templates aligned with official Docker best practices. See [reference.md](reference.md) for links to Docker and Compose docs.
 
 ## Minimal Dockerfile (Single Service)
 

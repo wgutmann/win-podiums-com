@@ -52,3 +52,13 @@ CodeCoverage/
 *.VisualState.xml
 TestResult.xml
 nunit-*.xml
+
+# Cloudflare (Wrangler / Workers / Pages)
+.dev.vars
+.dev.vars.*
+.wrangler/
+wrangler.toml.local
+.env
+.env.*
+.env.local
+.env.*.local

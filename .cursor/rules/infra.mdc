@@ -1,0 +1,12 @@
+---
+description: Terraform and infrastructure conventions; plan/validate only until Worker exists
+globs: "infra/**/*.tf"
+alwaysApply: false
+---
+
+# Infrastructure (Terraform) Rules
+
+- **Do not run or suggest `terraform apply`** until a minimal Cloudflare Worker exists that can bind to D1/R2/KV. See [docs/architecture/next-steps.md](../../docs/architecture/next-steps.md).
+- Use Terraform for **plan** and **validate** only (e.g. in PRs or locally). Keep `apply` for when the Worker app is in place.
+- Infra lives in `infra/terraform/`. Use `terraform.tfvars.example` as the template; real `terraform.tfvars` is gitignored.
+- When adding or changing resources, ensure outputs (e.g. D1 database name, R2 bucket name, KV namespace id) match what a future Worker `wrangler.toml` will need to bind.

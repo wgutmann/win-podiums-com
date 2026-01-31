@@ -1,0 +1,13 @@
+---
+description: Documentation hierarchy and conventions (PRD → HLD → Tech Plan)
+globs: "docs/**/*.md"
+alwaysApply: false
+---
+
+# Documentation Rules
+
+- Follow **PRD → HLD → Tech Plan**: product requirements first, then architecture, then implementation specs. Use the cursor-project-docs skill and [documentation-standards.md](../../docs/standards/documentation-standards.md).
+- Keep each doc focused on one subject. Use `README.md` as the index in each subdirectory.
+- **docs/product/** — PRDs (what and why). **docs/architecture/** — HLD and ADRs (how at system level). **docs/tech-plans/** — implementation specs (how at code level). **docs/design/** — component and integration design.
+- When adding or changing docs, maintain traceability: HLD sections reference PRD requirements; tech plans reference HLD components. Use consistent cross-references (e.g. PRD-001, ADR-002).
+- Do not duplicate content; link to the canonical doc. Do not populate `.cursor/docs/` with content that contradicts `docs/`.

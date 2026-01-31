@@ -6,9 +6,9 @@ A merit-based luxury community for elite sim racers, verified through real-time 
 
 ### Repository Documentation
 - [README](../../README.md) — Project overview and getting started
-- [CONTRIBUTING](../../CONTRIBUTING.md) — How to contribute (TBD)
-- [SECURITY](../../SECURITY.md) — Security policy (TBD)
-- [CHANGELOG](../../CHANGELOG.md) — Release history (TBD)
+- [CONTRIBUTING](../../CONTRIBUTING.md) — How to contribute (stub; full guidelines when implementation starts)
+- [SECURITY](../../SECURITY.md) — Security policy and vulnerability reporting (stub)
+- [CHANGELOG](../../CHANGELOG.md) — Release history
 
 ### Technical Documentation
 - [High-Level Design](../../docs/architecture/high-level-design.md) — System architecture overview
@@ -22,7 +22,7 @@ A merit-based luxury community for elite sim racers, verified through real-time 
 - [Brand Philosophy](../../docs/architecture/high-level-design.md#1-executive-summary) — "The Podium Invitation"
 
 ### Developer Guides
-- [Development Setup](../../docs/guides/development.md) — Local environment (TBD)
+- [Development Setup](../../docs/guides/development.md) — Docker-first dev (API in container); host option for API and plugin
 - [Deployment Guide](../../docs/guides/deployment.md) — Release process (TBD)
 
 ## Project Summary
@@ -42,15 +42,10 @@ A merit-based luxury community for elite sim racers, verified through real-time 
 
 ## Entry Points
 
-### Web Application
-- Main entry: `workers/web/index.ts` (TBD)
-- Routes: `workers/web/routes/` (TBD)
-- Components: `workers/web/components/` (TBD)
-
-### API
-- Main entry: `workers/api/index.ts` (TBD)
-- Auth endpoints: `workers/api/routes/auth.ts` (TBD)
-- Plugin endpoints: `workers/api/routes/plugin.ts` (TBD)
+### API (Cloudflare Worker)
+- Main entry: `apps/api/src/index.ts`
+- **Docker dev**: `docker compose up` — API at http://localhost:8787 (health: `/health`, Gate: `/` or `/gate`)
+- Config: `apps/api/wrangler.toml` (add D1/KV/R2 bindings when Terraform is applied)
 
 ### SimHub Plugin
 - Main entry: `plugin/Core/PluginMain.cs` (TBD)
@@ -68,13 +63,14 @@ A merit-based luxury community for elite sim racers, verified through real-time 
 ## Skills & Conventions
 
 This project uses [Cursor Skills](.cursor/skills/) for domain-specific tasks:
+- `cloudflare-workers` — Workers, D1, R2, KV, Wrangler; use when configuring or implementing Cloudflare edge/API
 - `simhub-plugin-builder` — SimHub plugin development
 - `discord-authentication` — Discord OAuth2 implementation
 - `docker-dev-environment` — Containerized development
 - `github-change-control` — GitHub workflow and secrets management
 - `cursor-project-docs` — Documentation structure and maintenance
 
-See [AGENTS.md](../../AGENTS.md) for AI agent instructions.
+Project rules in [.cursor/rules/](.cursor/rules/) apply when editing matching files (e.g. `infra.mdc` for Terraform, `docs.mdc` for docs). See [AGENTS.md](../../AGENTS.md) for AI agent instructions.
 
 ## Status
 

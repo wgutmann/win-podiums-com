@@ -176,8 +176,31 @@ static string Unprotect(byte[] cipher)
 }
 ```
 
-## Minimal Scopes
+## Minimal Scopes (User OAuth2)
 
 ```
 identify
+```
+
+## Bot Token Usage
+
+Use when the plugin acts as a bot (e.g. post to a channel). Get the token from the Discord Developer Portal → Application → Bot. Store it with DPAPI; never log or embed it.
+
+```csharp
+using System.Net.Http;
+using System.Threading.Tasks;
+
+static async Task<string> CallDiscordApiAsBotAsync(string botToken, string path)
+{
+    using (var http = new HttpClient())
+    {
+        http.DefaultRequestHeaders.TryAddWithoutValidation("Authorization", "Bot " + botToken);
+        var res = await http.GetAsync("https://discord.com/api/v10" + path);
+        res.EnsureSuccessStatusCode();
+        return await res.Content.ReadAsStringAsync();
+    }
+}
+
+// Example: get current bot user
+// var json = await CallDiscordApiAsBotAsync(botToken, "/users/@me");
 ```

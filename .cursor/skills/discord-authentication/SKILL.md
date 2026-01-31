@@ -53,10 +53,25 @@ Only request what the plugin truly needs. Prefer `identify` alone unless you nee
 - If token exchange fails, verify `code_verifier`, `redirect_uri`, and client ID.
 - If the user is repeatedly prompted, check refresh flow and token expiry.
 
+## Bot Token Flow (Separate from User OAuth2)
+
+Use **user OAuth2** when the plugin acts on behalf of a signed-in user (e.g. "Log in with Discord"). Use a **bot token** when the plugin acts as a bot (e.g. posting to a channel, managing a server). Do not mix the two: different identity, different permissions, different storage.
+
+**When to use bot token:** User asks for "bot", "post to Discord", "send messages as a bot", or server/channel management without a user login.
+
+**Bot token checklist:**
+
+- [ ] Create or use an existing application in the Discord Developer Portal.
+- [ ] In the application, open **Bot** and create a bot (or copy the existing token).
+- [ ] Copy the bot token once; treat it as a secret (like a password).
+- [ ] Store the token securely (e.g. DPAPI, user config); never embed in source or expose to the client.
+- [ ] Call the Discord API with `Authorization: Bot <token>` (not Bearer).
+- [ ] Request only the bot permissions the plugin needs (invite URL / OAuth2 URL with `bot` scope and minimal permissions).
+- [ ] Isolate bot token storage and usage from user OAuth2 tokens; use separate config/key names.
+
 ## Additional Notes
 
 - Always confirm current Discord OAuth2 endpoints and required parameters in the official docs.
-- If a bot token is requested, treat it as a separate flow and isolate it from user OAuth2.
 
 ## Additional Resources
 

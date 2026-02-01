@@ -192,7 +192,7 @@ export default {
 
     // API prefix
     if (path.startsWith("/api/")) {
-      const rest = path.slice(4).replace(/\/$/, "");
+      const rest = path.slice(5).replace(/\/$/, "");
 
       // POST /api/auth/discord/callback — server-side web callback (if frontend posts code)
       if (method === "POST" && rest === "auth/discord/callback") {

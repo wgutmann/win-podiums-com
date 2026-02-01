@@ -17,7 +17,7 @@ apps/plugin/
         └── AssemblyInfo.cs (optional)
 ```
 
-See [docs/design/components/simhub-plugin.md](docs/design/components/simhub-plugin.md) for full LLD.
+See [docs/design/components/simhub-plugin.md](docs/design/components/simhub-plugin.md) for full LLD. POC scope and tech plans: [PRD-001](docs/product/simhub-plugin-poc/001-simhub-plugin-poc.md), [TP-SPOC-001–005](docs/tech-plans/simhub-plugin-poc/README.md).
 
 ### Minimal plugin (generic, SDK-aligned)
 

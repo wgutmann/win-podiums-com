@@ -43,11 +43,16 @@ ContextStream builds its node graph from **indexed repo content**, **explicit li
 | **API README** | HLD, Phase 1 scope, Next Steps, OpenAPI spec, authentication.md, plugin.md, Design (database-schema, Discord LLD) |
 | **Design LLDs** (SimHub, Discord, DB schema, security) | HLD, Phase 1 scope, ADRs, API README, related LLDs, entity-relationship diagram |
 | **Guides** (development, deployment) | Each other, Next Steps, Phase 1 scope, API README, ContextStream mapping |
+| **SimHub POC PRD** ([docs/product/simhub-plugin-poc/001-simhub-plugin-poc.md](../product/simhub-plugin-poc/001-simhub-plugin-poc.md)) | Phase 1 scope, SimHub Plugin LLD, API plugin, authentication.md, ADR-002, ADR-003, SimHub POC tech plans ([docs/tech-plans/simhub-plugin-poc/](../tech-plans/simhub-plugin-poc/)) |
+| **Tech Plan (SimHub POC)** ([docs/tech-plans/simhub-plugin-poc/](../tech-plans/simhub-plugin-poc/)) | PRD-001 SimHub Plugin POC, SimHub Plugin LLD, API plugin, authentication.md, ADR-002, ADR-003 |
+
+**Knowledge graph**: So ContextStream’s graph links the PRD to its tech plans, the SimHub POC PRD and each tech plan include a ContextStream-friendly blurb at the top with stable IDs: **PRD-001** (SimHub Plugin POC) and **TP-SPOC-001** through **TP-SPOC-005** (docs/tech-plans/simhub-plugin-poc/). The PRD lists **Technical Plans**: TP-SPOC-001–005 with paths; each tech plan lists **Implements**: PRD-001 with path. Keep these blurbs and links so the knowledge graph can associate “PRD-001” and “TP-SPOC-XXX” with the correct nodes.
 
 ### Doc-to-code relationships
 
 - In **API README** and **Next Steps**: link to `apps/api/`, `apps/api/wrangler.toml`, `apps/api/migrations/`, `docs/api/openapi.yaml`.
 - In **Phase 1 scope** and **SimHub plugin LLD**: link to `apps/plugin/`, `apps/plugin/WinPodiums.Plugin/`.
+- In **SimHub POC PRD** and **SimHub POC tech plans**: link to `apps/plugin/`, `apps/plugin/WinPodiums.Plugin/`, and key files (`PluginMain.cs`, `Auth/TokenStorage.cs`, `Services/ApiClient.cs`).
 - When **capturing decisions** in ContextStream, include `code_refs` or at least **file path** (e.g. `apps/api/src/index.ts`, `docs/architecture/decisions/001-cloudflare-stack.md`) so the graph links the decision node to that file/module.
 
 ### READMEs as hubs

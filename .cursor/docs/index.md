@@ -71,6 +71,10 @@ This project uses [Cursor Skills](.cursor/skills/) for domain-specific tasks:
 - `docker-dev-environment` — Containerized development
 - `github-change-control` — GitHub workflow and secrets management
 - `cursor-project-docs` — Documentation structure and maintenance
+- `security` — Secrets, auth, CI security, test coverage (ADR-006)
+- `product-manager` — Product scope and phase alignment
+
+**Project subagents** ([.cursor/agents/](../../.cursor/agents/)): Testing, API contract, local bootstrap, deployment, telemetry proof, and CI are **subagents only** (not skills). Delegate to the matching subagent; do not add skills with those names. One subagent per domain; no duplicates. See [.cursor/agents/README.md](../../.cursor/agents/README.md).
 
 Project rules in [.cursor/rules/](.cursor/rules/) apply when editing matching files (e.g. `docs.mdc` for docs). See [AGENTS.md](../../AGENTS.md) for AI agent instructions. Terraform is out of scope until explicitly introduced as a feature.
 

@@ -2,11 +2,13 @@
 
 This directory contains the Product Requirements Document (PRD) for the SimHub plugin proof-of-concept. The POC validates plugin–API–auth integration and SimHub load before investing in full telemetry-proof and UI.
 
+**ContextStream**: PRD-001 and tech plans TP-SPOC-001–005 use stable IDs and **Related** / **Implements** for knowledge graph linking. See [ContextStream mapping](../guides/contextstream-mapping.md).
+
 ## Documents
 
-| Document | Status | Version | Description |
-|----------|--------|---------|-------------|
-| [PRD-001: SimHub Plugin POC](001-simhub-plugin-poc.md) | Draft | 1.0 | Minimal plugin: browser auth (PKCE) primary; manual token debug-only, feature-flagged; one verification API call (heartbeat) |
+| Document | Status | Version | Technical Plan | Description |
+|----------|--------|---------|----------------|-------------|
+| [PRD-001: SimHub Plugin POC](001-simhub-plugin-poc.md) | Draft | 1.0 | [TP-SPOC-001](../tech-plans/simhub-plugin-poc/001-plugin-skeleton-sdk-config.md)–[005](../tech-plans/simhub-plugin-poc/005-poc-testing-completion.md) | Minimal plugin: browser auth (PKCE) primary; manual token debug-only, feature-flagged; one verification API call (heartbeat) |
 
 ## Overview
 
@@ -23,5 +25,7 @@ Out of scope for the POC: full Scrutineering Panel UI, QR/browser auth in plugin
 - [Phase 1 MVP Scope](../phase-1-mvp-scope.md) — POC is part of Phase 1 “Basic SimHub plugin”
 - [SimHub Plugin LLD](../../design/components/simhub-plugin.md) — Plugin structure and target architecture
 - [API plugin](../../api/plugin.md) — Auth and heartbeat endpoints
-- [Architecture Decisions](../../architecture/decisions/) — ADRs (Discord OAuth, Hybrid Auth)
+- [Architecture README](../../architecture/README.md) — HLD, Next Steps, ADRs
+- [Tech plans (SimHub POC)](../../tech-plans/simhub-plugin-poc/README.md) — TP-SPOC-001–005 with Implements → PRD-001
+- [ContextStream mapping](../../guides/contextstream-mapping.md) — Doc IDs, Related/Implements, graph
 - [Documentation Standards](../../standards/documentation-standards.md) — Documentation format

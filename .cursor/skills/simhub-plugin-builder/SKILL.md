@@ -11,7 +11,13 @@ Use this skill when the user asks to build or maintain SimHub plugins. Follow th
 
 **This repo:** The plugin lives in `apps/plugin/` and is documented in [docs/design/components/simhub-plugin.md](docs/design/components/simhub-plugin.md).
 
-**ContextStream (when available):** Before scaffolding or changing the plugin, use ContextStream `search` for "SimHub", "plugin", "PluginMain", "DataUpdate", "GameData", "ApiClient", "heartbeat" to find existing structure in `apps/plugin/`. After SDK wiring or plugin structure decisions, capture in ContextStream (event_type=decision) with path to `apps/plugin/` or [simhub-plugin.md](docs/design/components/simhub-plugin.md).
+**ContextStream and doc layout:** SimHub POC docs use stable IDs and **Related** / **Implements** for knowledge graphing. Key IDs: **PRD-001** (SimHub Plugin POC), **TP-SPOC-001**–**TP-SPOC-005** (tech plans). See [ContextStream mapping](docs/guides/contextstream-mapping.md).
+
+- **PRD**: [docs/product/simhub-plugin-poc/001-simhub-plugin-poc.md](docs/product/simhub-plugin-poc/001-simhub-plugin-poc.md) — PRD-001
+- **Tech plans**: [docs/tech-plans/simhub-plugin-poc/](docs/tech-plans/simhub-plugin-poc/) — TP-SPOC-001 (skeleton/SDK/config), TP-SPOC-002 (auth/PKCE), TP-SPOC-003 (API client/heartbeat), TP-SPOC-004 (minimal UI), TP-SPOC-005 (testing)
+- **LLD**: [docs/design/components/simhub-plugin.md](docs/design/components/simhub-plugin.md) — lists Related to PRD-001 and TP-SPOC-001–005
+
+**ContextStream (when available):** Before scaffolding or changing the plugin, use ContextStream `search` for "SimHub", "plugin", "PluginMain", "DataUpdate", "GameData", "ApiClient", "heartbeat", "PRD-001", "TP-SPOC" to find existing structure in `apps/plugin/` and related docs. After SDK wiring or plugin structure decisions, capture in ContextStream (event_type=decision) with path to `apps/plugin/`, [simhub-plugin.md](docs/design/components/simhub-plugin.md), or the relevant tech plan (e.g. `docs/tech-plans/simhub-plugin-poc/001-plugin-skeleton-sdk-config.md`) so the graph links decisions to docs and code.
 
 ## New Plugin Workflow
 
@@ -63,3 +69,4 @@ See also **reference.md** for a short SimHub SDK reference (interfaces, lifecycl
 - For this repo, use the canonical SimHub path `C:\Program Files (x86)\SimHub` (plugins: `C:\Program Files (x86)\SimHub\Plugins`); see discord-authentication skill for consistency. If the plugin is not loaded, try deploy to install root and check SimHub docs.
 - Prefer step-by-step guidance with checklists.
 - **Discord OAuth in the plugin:** Use the discord-authentication skill; canonical SimHub paths match.
+- **Doc changes:** When adding or editing SimHub PRD/tech plan/LLD content, keep **Related** and **Implements** links and stable IDs (PRD-001, TP-SPOC-001–005) so ContextStream’s knowledge graph stays correct. See [ContextStream mapping](docs/guides/contextstream-mapping.md) and [documentation standards](docs/standards/documentation-standards.md).

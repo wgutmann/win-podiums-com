@@ -1,6 +1,7 @@
 # Low-Level Design: SimHub Plugin
 
-**Component**: WinPodiums SimHub Plugin  
+**Doc type**: LLD (Component) | **Component**: WinPodiums SimHub Plugin | **Related**: [PRD-001 SimHub Plugin POC](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md), [TP-SPOC-001](../../tech-plans/simhub-plugin-poc/001-plugin-skeleton-sdk-config.md)–[TP-SPOC-005](../../tech-plans/simhub-plugin-poc/005-poc-testing-completion.md), [API plugin](../../api/plugin.md), [ADR-002](../../architecture/decisions/002-discord-oauth.md), [ADR-003](../../architecture/decisions/003-hybrid-auth-paths.md)
+
 **Technology**: C# / .NET Framework 4.8 (WPF)  
 **Platform**: Windows 10/11  
 **Version**: 1.0
@@ -511,6 +512,10 @@ WPF XAML structure:
 
 ## Related Documentation
 
+- [PRD-001: SimHub Plugin POC](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md) — POC scope and success criteria
+- [Tech plans (SimHub POC)](../../tech-plans/simhub-plugin-poc/README.md) — TP-SPOC-001–005 (skeleton, auth, heartbeat, UI, testing)
 - [Discord Integration LLD](../integrations/discord-integration.md) — Detailed auth sequence diagrams
-- [API Documentation](../../api/plugin.md) — Plugin endpoint specs
+- [API plugin](../../api/plugin.md) — Plugin endpoint specs (auth, heartbeat)
+- [ADR-002 Discord OAuth](../../architecture/decisions/002-discord-oauth.md), [ADR-003 Hybrid Auth](../../architecture/decisions/003-hybrid-auth-paths.md)
+- [ContextStream mapping](../../guides/contextstream-mapping.md) — Doc IDs, Related/Implements, knowledge graph
 - [Deployment Guide](../../guides/deployment.md) — Release process

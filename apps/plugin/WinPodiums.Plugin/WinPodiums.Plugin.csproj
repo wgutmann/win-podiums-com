@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <RootNamespace>WinPodiums.Plugin</RootNamespace>
+    <AssemblyName>WinPodiums.Plugin</AssemblyName>
+    <OutputType>Library</OutputType>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <!-- Add SimHub SDK reference from your SimHub install, e.g.:
+  <ItemGroup>
+    <Reference Include="SimHubPlugin">
+      <HintPath>$(SIMHUB_INSTALL_DIR)\Plugins\SimHubPlugin.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  See README.md and docs/design/components/simhub-plugin.md -->
+</Project>

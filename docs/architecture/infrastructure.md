@@ -5,7 +5,7 @@
 
 ## Overview
 
-Cloudflare resources for WinPodiums are managed as **infrastructure as code** with Terraform. GitHub Actions runs `terraform plan` on pull requests and `terraform apply` on pushes to `main` (or via manual workflow with apply enabled).
+Cloudflare resources for WinPodiums are managed as **infrastructure as code** with Terraform. Terraform is run **locally only** (no GitHub Actions workflow); use `terraform plan` and `terraform apply` from your machine with `CLOUDFLARE_API_TOKEN` in env.
 
 This aligns with:
 
@@ -62,17 +62,9 @@ infra/terraform/
 
 4. **Outputs**: After apply, use `terraform output` to get D1 name, R2 bucket name, KV namespace ID for `wrangler.toml` bindings.
 
-## GitHub Actions
+## CI
 
-- **Trigger**: Changes under `infra/terraform/**` or `.github/workflows/terraform.yml` (push to `main` or open/update PR).
-- **Secrets** (repo or environment):
-  - `CLOUDFLARE_API_TOKEN` – API token with permissions for D1, R2, KV, Workers, Zone.
-  - `CLOUDFLARE_ACCOUNT_ID` – Cloudflare account ID.
-  - `CLOUDFLARE_ZONE_ID` (optional) – Zone ID for winpodiums.com; when set, Terraform creates Worker routes for winpodiums.com and www.winpodiums.com.
-- **Jobs**:
-  1. **Validate**: `terraform fmt -check`, `init -backend=false`, `validate`.
-  2. **Plan**: Full `terraform plan` with prod/dev env based on branch; on PR, plan artifact is uploaded.
-  3. **Apply**: Runs on **push to `main`** or **workflow_dispatch** with “Run terraform apply” enabled; uses `environment=prod`. Optionally protect the `production` environment with required reviewers.
+Terraform is **not** run in GitHub Actions. Run `terraform plan` and `terraform apply` locally with `CLOUDFLARE_API_TOKEN` (and optionally `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_ZONE_ID`) in your environment. See [infra/terraform/README.md](../../infra/terraform/README.md).
 
 ## Backend (State)
 
@@ -94,7 +86,7 @@ See comments in `infra/terraform/versions.tf` for placeholders.
      { pattern = "www.winpodiums.com/*", zone_id = "YOUR_ZONE_ID" }
    ]
    ```
-4. In CI: set repo secret **CLOUDFLARE_ZONE_ID** so plan/apply create the routes in prod.
+4. When running Terraform locally, set **CLOUDFLARE_ZONE_ID** in env or `terraform.tfvars` so plan/apply create the routes.
 
 ## Wrangler binding
 

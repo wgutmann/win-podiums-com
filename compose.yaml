@@ -1,0 +1,19 @@
+# WinPodiums — Docker dev environment (API / Worker)
+# Run: docker compose up
+# Build: docker compose build
+# Stop: docker compose down
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8787:8787"
+    volumes:
+      # Live reload: mount source only so node_modules stay from build
+      - ./apps/api/src:/app/src
+    environment:
+      - ENVIRONMENT=dev
+    # Optional: mount .dev.vars for secrets (do not commit)
+    # env_file:
+    #   - .dev.vars

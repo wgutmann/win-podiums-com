@@ -19,7 +19,7 @@
 | **API** | ⚠️ Partial | OpenAPI spec (`openapi.yaml`) exists; API README links to missing `authentication.md`, `plugin.md`, `user-profile.md` |
 | **Brand** | ✅ Present | Design system doc |
 | **Infrastructure (Terraform)** | ✅ Ready | D1, R2, KV, optional routes for winpodiums.com; GitHub Actions for plan/apply |
-| **Repo governance** | ⚠️ Partial | AGENTS.md, .gitignore, GitHub Actions for Terraform; no CONTRIBUTING, SECURITY, CHANGELOG, LICENSE |
+| **Repo governance** | ⚠️ Partial | AGENTS.md, .gitignore; no CONTRIBUTING, SECURITY, CHANGELOG, LICENSE; Terraform run locally only |
 
 ### What Does Not Exist Yet
 

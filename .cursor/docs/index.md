@@ -48,9 +48,9 @@ A merit-based luxury community for elite sim racers, verified through real-time 
 - Config: `apps/api/wrangler.toml` (add D1/KV/R2 bindings when Terraform is applied)
 
 ### SimHub Plugin
-- Main entry: `plugin/Core/PluginMain.cs` (TBD)
-- Auth module: `plugin/Auth/AuthenticationManager.cs` (TBD)
-- Telemetry monitor: `plugin/Core/TelemetryMonitor.cs` (TBD)
+- Main entry: `apps/plugin/WinPodiums.Plugin/Core/PluginMain.cs`
+- Project: `apps/plugin/WinPodiums.Plugin/WinPodiums.Plugin.csproj` (.NET Framework 4.8)
+- See `apps/plugin/README.md` and [SimHub Plugin LLD](../../docs/design/components/simhub-plugin.md)
 
 ## Development Workflow
 
@@ -78,9 +78,9 @@ Project rules in [.cursor/rules/](.cursor/rules/) apply when editing matching fi
 **Version**: 0.1.0-alpha  
 **Last Updated**: 2026-01-31
 
-**Next steps (do not deploy Terraform until a minimal Worker exists):**
-1. Close doc gaps (guides, API sub-docs, security LLD) — see [Next Steps](../../docs/architecture/next-steps.md)
-2. Define Phase 1 scope explicitly (MVP: auth, minimal API, basic plugin, static gate)
-3. Set up repository structure (Worker app + SimHub plugin projects)
-4. Implement Phase 1 (Discord auth + basic plugin + verification API stub)
-5. Then apply Terraform and deploy Worker (and plugin)
+**Next steps:**
+1. ~~Close doc gaps~~ (guides, API sub-docs, security LLD done)
+2. ~~Define Phase 1 scope~~ ([phase-1-mvp-scope.md](../../docs/product/phase-1-mvp-scope.md))
+3. ~~Set up repo structure~~ (Worker in `apps/api/`, plugin in `apps/plugin/`, wrangler.toml wired to Terraform outputs)
+4. Implement Phase 1 (auth + health + profile stub in Worker; plugin scaffold in place)
+5. Then apply Terraform and deploy Worker (and plugin) — see [Next Steps](../../docs/architecture/next-steps.md)

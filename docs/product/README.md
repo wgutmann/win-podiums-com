@@ -24,6 +24,7 @@ Each PRD includes:
 ## Feature Areas
 
 - [Cloudflare Security](cloudflare-security/) - Free Cloudflare security (DDoS, SSL, WAF, Bot Fight, Zero Trust, Worker rate limiting)
+- [SimHub Plugin POC](simhub-plugin-poc/) - Minimal plugin proof-of-concept (browser auth primary; manual token debug-only, feature-flagged; one verification API call)
 - [Telemetry Proof System](telemetry-proof-system/) - Multi-layered security system
 
 ## Traceability

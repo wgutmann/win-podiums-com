@@ -92,7 +92,9 @@ sequenceDiagram
     Plugin->>Plugin: Update UI to authenticated state
 ```
 
-### Plugin Manual Token Authentication
+### Plugin Manual Token (Debug Only, Feature-Flagged)
+
+Manual token is **not** a primary or user-facing auth option. It is for debugging only and must be enabled via a feature flag (e.g. debug mode). When enabled, the flow is:
 
 ```mermaid
 sequenceDiagram

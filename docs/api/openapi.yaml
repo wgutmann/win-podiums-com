@@ -105,8 +105,8 @@ paths:
     post:
       tags:
         - Authentication
-      summary: Manual token validation
-      description: Validates a manually provided token and returns session info.
+      summary: Manual token validation (debug only)
+      description: Validates a manually provided token and returns session info. For plugin debugging only; not a user-facing auth option. Plugin must expose this flow only when a feature flag (e.g. debug mode) is enabled.
       requestBody:
         content:
           application/json:
@@ -132,8 +132,8 @@ paths:
     post:
       tags:
         - Authentication
-      summary: Create one-time manual token
-      description: Creates a one-time token for the plugin. Requires session cookie (web login) or Bearer token.
+      summary: Create one-time manual token (debug only)
+      description: Creates a one-time token for the plugin. Used only when plugin manual-token auth is enabled (debug feature flag). Requires session cookie (web login) or Bearer token.
       security:
         - cookieAuth: []
         - bearerAuth: []

@@ -12,7 +12,7 @@ The SimHub plugin is a desktop application that monitors sim racing telemetry vi
 ### Responsibilities
 - Listen to SimHub telemetry events for race completion
 - Detect podium finishes (Position ≤ 3) in competitive sessions
-- Provide local authentication UI (3 methods: browser, QR, manual token)
+- Provide local authentication UI (primary: browser, QR; manual token **debug-only, feature-flagged**)
 - Build and sign telemetry payloads with HMAC-SHA256
 - Submit verified race results to API
 - Display real-time monitoring status ("Scrutineering Panel")
@@ -505,7 +505,7 @@ WPF XAML structure:
 ## Performance
 
 - **Telemetry Processing**: <50ms to detect podium finish
-- **Auth Flows**: Browser launch <5s, QR code polling <60s, manual token <10s
+- **Auth Flows**: Browser launch <5s, QR code polling <60s; manual token <10s (debug only, feature-flagged)
 - **API Submission**: <500ms round-trip time (with retries)
 - **UI Responsiveness**: All API calls async, UI never blocks
 

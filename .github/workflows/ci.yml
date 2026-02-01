@@ -1,5 +1,5 @@
-# CI: typecheck, lint, plugin build, lockfile check, OpenAPI validation.
-# Path filters per job keep runs focused; extended smoke tests run in worker-test.
+# CI: required (typecheck, lint, build, lockfile) run first; optional (OpenAPI) runs only after all required pass.
+# Workflow runs on every push/PR to main; each job runs only when its paths change (path filter below).
 name: CI
 
 on:
@@ -7,21 +7,41 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
-    paths:
-      - "apps/api/**"
-      - "apps/plugin/**"
-      - "docs/api/**"
-      - ".github/workflows/ci.yml"
 
 jobs:
-  api-typecheck:
-    name: TypeScript typecheck
+  paths:
+    name: Path filter
+    runs-on: ubuntu-latest
+    outputs:
+      api: ${{ steps.filters.outputs.api }}
+      plugin: ${{ steps.filters.outputs.plugin }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: dorny/paths-filter@v3
+        id: filters
+        with:
+          filters: |
+            api:
+              - 'apps/api/**'
+              - 'docs/api/**'
+            plugin:
+              - 'apps/plugin/**'
+
+  # --- Required: must pass before any optional job runs ---
+  api-check:
+    needs: paths
+    if: needs.paths.outputs.api == 'true'
+    name: TypeScript typecheck + ESLint (required)
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: apps/api
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -30,39 +50,26 @@ jobs:
           cache: "npm"
           cache-dependency-path: apps/api/package-lock.json
 
-      - name: Install and typecheck
+      - name: Install and inline OpenAPI
         run: |
           npm ci
           node scripts/inline-openapi.js ../../docs/api/openapi.yaml src/openapi-spec.ts
-          npm run typecheck
 
-  api-lint:
-    name: ESLint
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/api
-    steps:
-      - uses: actions/checkout@v4
+      - name: Typecheck
+        run: npm run typecheck
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: apps/api/package-lock.json
-
-      - name: Install and lint
-        run: |
-          npm ci
-          node scripts/inline-openapi.js ../../docs/api/openapi.yaml src/openapi-spec.ts
-          npm run lint
+      - name: Lint
+        run: npm run lint
 
   plugin-build:
-    name: Plugin build
+    needs: paths
+    if: needs.paths.outputs.plugin == 'true'
+    name: Plugin build (required)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -76,13 +83,17 @@ jobs:
           dotnet build --configuration Release --no-restore
 
   api-lockfile:
-    name: Lockfile check
+    needs: paths
+    if: needs.paths.outputs.api == 'true'
+    name: Lockfile check (required)
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: apps/api
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -97,11 +108,16 @@ jobs:
         run: git diff --exit-code apps/api/package-lock.json
         working-directory: ${{ github.workspace }}
 
+  # --- Optional: runs only after all required jobs pass (or are skipped by path filter) ---
   openapi-validate:
-    name: OpenAPI validation
+    needs: [paths, api-check, api-lockfile, plugin-build]
+    if: always() && needs.paths.outputs.api == 'true' && (needs.api-check.result == 'success' || needs.api-check.result == 'skipped') && (needs.api-lockfile.result == 'success' || needs.api-lockfile.result == 'skipped') && (needs.plugin-build.result == 'success' || needs.plugin-build.result == 'skipped')
+    name: OpenAPI validation (optional)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Validate OpenAPI spec
         run: npx @stoplight/spectral-cli@latest lint docs/api/openapi.yaml --fail-severity=error

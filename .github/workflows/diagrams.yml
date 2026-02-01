@@ -1,33 +1,45 @@
-# Validate Mermaid diagram files (.mmd and .md with Mermaid blocks).
-# On merge to main: intended behavior is to delete changed diagrams from ContextStream
-# and re-create them. ContextStream does not yet expose an API for diagram list/delete/create;
-# when it does, uncomment or add the sync step and set CONTEXTSTREAM_API_KEY in repo secrets.
+# Diagrams: validate Mermaid files only when diagram paths change; optional sync on push to main.
+# Workflow runs on every push/PR to main; validate job runs only when diagram paths change.
 name: Diagrams
 
 on:
   push:
     branches: [main]
-    paths:
-      - "docs/architecture/diagrams/**"
-      - "docs/design/diagrams/**"
-      - ".github/workflows/diagrams.yml"
   pull_request:
     branches: [main]
-    paths:
-      - "docs/architecture/diagrams/**"
-      - "docs/design/diagrams/**"
-      - ".github/workflows/diagrams.yml"
 
 concurrency:
   group: diagrams-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
+  paths:
+    name: Path filter
+    runs-on: ubuntu-latest
+    outputs:
+      diagrams: ${{ steps.filters.outputs.diagrams }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: dorny/paths-filter@v3
+        id: filters
+        with:
+          filters: |
+            diagrams:
+              - 'docs/architecture/diagrams/**'
+              - 'docs/design/diagrams/**'
+              - '.github/workflows/diagrams.yml'
+
   validate:
+    needs: paths
+    if: needs.paths.outputs.diagrams == 'true'
     name: Validate Mermaid diagrams
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Validate .mmd files
         run: |
@@ -50,15 +62,12 @@ jobs:
             fi
           done
 
-  # On merge to main: sync diagrams to ContextStream (delete changed ones, re-create).
-  # Blocked: ContextStream has no public API for diagram list/delete/create.
-  # When available: add CONTEXTSTREAM_API_KEY and CONTEXTSTREAM_DIAGRAM_API_URL (or equivalent)
-  # in repo secrets, then for each CHANGED_DIAGRAMS: call API to delete by id/path, then create.
+  # --- Optional: sync on push to main when diagrams changed ---
   sync-contextstream-diagrams:
-    name: Sync diagrams to ContextStream (delete changed, re-create)
+    name: Sync diagrams to ContextStream
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: validate
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main' && needs.paths.outputs.diagrams == 'true'
+    needs: [paths, validate]
     steps:
       - uses: actions/checkout@v4
         with:

@@ -1,6 +1,5 @@
-# Worker test: build Docker, start API, run smoke test against it.
-# Validates (1) Docker and Worker config match (health ok, env=dev),
-# (2) API documentation loads (Swagger UI and OpenAPI spec reachable).
+# Worker test: required (unit tests) run first; optional (smoke test) runs only after required pass.
+# Workflow runs on every push/PR to main; test job runs only when api/Docker paths change.
 name: Worker test
 
 on:
@@ -8,11 +7,6 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
-    paths:
-      - "apps/api/**"
-      - "Dockerfile"
-      - "compose.yaml"
-      - ".github/workflows/worker-test.yml"
   workflow_dispatch:
 
 concurrency:
@@ -20,23 +14,48 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  paths:
+    name: Path filter
+    runs-on: ubuntu-latest
+    outputs:
+      api_or_docker: ${{ steps.filters.outputs.api_or_docker }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: dorny/paths-filter@v3
+        id: filters
+        with:
+          filters: |
+            api_or_docker:
+              - 'apps/api/**'
+              - 'Dockerfile'
+              - 'compose.yaml'
+              - '.github/workflows/worker-test.yml'
+
   test:
+    needs: paths
+    if: needs.paths.outputs.api_or_docker == 'true'
+    name: Unit tests + Smoke test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Create .dev.vars for CI
         run: |
-          # Compose needs apps/api/.dev.vars to exist (env_file). Use placeholders; health check doesn't need real secrets.
-          cp apps/api/.dev.vars.example apps/api/.dev.vars || true
+          cp apps/api/.dev.vars.example apps/api/.dev.vars 2>/dev/null || true
           if [ ! -f apps/api/.dev.vars ]; then
             printf 'DISCORD_CLIENT_ID=\nDISCORD_CLIENT_SECRET=\nSESSION_SECRET=ci-placeholder-at-least-32-chars-here\n' > apps/api/.dev.vars
           fi
 
-      - name: Start API (Docker)
+      - name: Build and start API (Docker)
+        env:
+          DOCKER_BUILDKIT: 1
+          COMPOSE_DOCKER_CLI_BUILD: 1
         run: |
           docker compose up -d --build
-          # Wait for API to be ready
           n=0
           until curl -sf http://localhost:8787/api/health >/dev/null; do
             n=$((n+1))
@@ -44,15 +63,17 @@ jobs:
             sleep 2
           done
 
-      - name: Run unit tests (in container)
+      - name: Unit tests (required)
         run: docker compose exec -T api npm run test:unit
 
       - name: Setup Node for smoke test
+        if: success()
         uses: actions/setup-node@v4
         with:
           node-version: "20"
 
-      - name: Run smoke test
+      - name: Smoke test (optional)
+        if: success()
         run: node apps/api/test/smoke.js
 
       - name: Show API logs on failure

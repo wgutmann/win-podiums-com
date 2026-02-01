@@ -1,5 +1,5 @@
-# Security: secret scanning, dependency audits, and code scanning (SAST).
-# Runs on push to main and on pull requests; blocks merge if critical issues are found.
+# Security: required (secret scan) and optional (deps, CodeQL) run only when code/infra paths change.
+# Workflow runs on every push/PR to main; jobs run only when their paths change.
 # When any check fails on push to main, opens a PR to revert the offending commit (safety net).
 name: Security
 
@@ -19,11 +19,12 @@ permissions:
   actions: read
 
 jobs:
-  # --- Path filter: skip dependency/CodeQL jobs when only unrelated files change ---
+  # --- Path filter: run jobs only when relevant paths change ---
   filter:
     name: Path filter
     runs-on: ubuntu-latest
     outputs:
+      code_or_infra: ${{ steps.paths.outputs.code_or_infra }}
       api: ${{ steps.paths.outputs.api }}
       plugin: ${{ steps.paths.outputs.plugin }}
       code: ${{ steps.paths.outputs.code }}
@@ -36,6 +37,10 @@ jobs:
         id: paths
         with:
           filters: |
+            code_or_infra:
+              - 'apps/**'
+              - 'infra/**'
+              - '.github/workflows/security.yml'
             api:
               - 'apps/api/package.json'
               - 'apps/api/package-lock.json'
@@ -46,12 +51,14 @@ jobs:
               - 'apps/api/**'
               - 'apps/plugin/**'
 
-  # --- Secret scanning (commits and working tree) ---
+  # --- Required when code/infra change ---
   secrets:
+    needs: filter
+    if: needs.filter.outputs.code_or_infra == 'true'
     name: Secret scan
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
@@ -61,14 +68,16 @@ jobs:
           path: ./
           extra_args: --only-verified
 
-  # --- Dependency vulnerability checks ---
+  # --- Optional: run only when their paths change ---
   deps-npm:
     name: npm audit
     runs-on: ubuntu-latest
-    needs: [filter]
+    needs: [filter, secrets]
     if: needs.filter.outputs.api == 'true'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Setup Node
         uses: actions/setup-node@v6
@@ -85,10 +94,12 @@ jobs:
   deps-dotnet:
     name: .NET vulnerable packages
     runs-on: ubuntu-latest
-    needs: [filter]
+    needs: [filter, secrets]
     if: needs.filter.outputs.plugin == 'true'
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
@@ -109,11 +120,10 @@ jobs:
             exit 1
           fi
 
-  # --- Code scanning (SAST) with CodeQL ---
   codeql:
     name: CodeQL
     runs-on: ubuntu-latest
-    needs: [filter]
+    needs: [filter, secrets]
     if: needs.filter.outputs.code == 'true'
     permissions:
       security-events: write
@@ -124,7 +134,9 @@ jobs:
       matrix:
         language: [javascript-typescript, csharp]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
@@ -153,8 +165,8 @@ jobs:
   revert-on-failure:
     name: Open revert PR
     runs-on: ubuntu-latest
-    needs: [secrets, deps-npm, deps-dotnet, codeql]
-    if: failure() && github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: [filter, secrets, deps-npm, deps-dotnet, codeql]
+    if: failure() && github.ref == 'refs/heads/main' && github.event_name == 'push' && needs.filter.outputs.code_or_infra == 'true'
     permissions:
       contents: write
       pull-requests: write

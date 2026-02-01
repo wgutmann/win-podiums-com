@@ -1,46 +1,67 @@
-# Doc check: markdown lint, internal link check, Mermaid diagram validation.
-# Ensures docs have no syntax/formatting errors and diagrams/READMEs load.
+# Doc check: required (markdown lint, link check) run only when doc paths change; optional (Mermaid, OpenAPI) when their paths change.
+# Workflow runs on every push/PR to main; each job runs only when its paths change.
 name: Doc check
 
 on:
   push:
     branches: [main]
-    paths:
-      - "docs/**"
-      - "README.md"
-      - "AGENTS.md"
-      - "CONTRIBUTING.md"
-      - "SECURITY.md"
-      - ".markdownlint.jsonc"
-      - ".lycheeignore"
-      - ".github/workflows/doc-check.yml"
   pull_request:
     branches: [main]
-    paths:
-      - "docs/**"
-      - "README.md"
-      - "AGENTS.md"
-      - "CONTRIBUTING.md"
-      - "SECURITY.md"
-      - ".markdownlint.jsonc"
-      - ".lycheeignore"
-      - ".github/workflows/doc-check.yml"
 
 jobs:
+  paths:
+    name: Path filter
+    runs-on: ubuntu-latest
+    outputs:
+      docs: ${{ steps.filters.outputs.docs }}
+      mermaid: ${{ steps.filters.outputs.mermaid }}
+      openapi: ${{ steps.filters.outputs.openapi }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: dorny/paths-filter@v3
+        id: filters
+        with:
+          filters: |
+            docs:
+              - 'docs/**'
+              - 'README.md'
+              - 'AGENTS.md'
+              - 'CONTRIBUTING.md'
+              - 'SECURITY.md'
+              - '.markdownlint.jsonc'
+              - '.lycheeignore'
+              - '.github/workflows/doc-check.yml'
+            mermaid:
+              - 'docs/architecture/diagrams/**'
+              - 'docs/design/diagrams/**'
+            openapi:
+              - 'docs/api/**'
+
+  # --- Required when doc paths change ---
   markdown-lint:
+    needs: paths
+    if: needs.paths.outputs.docs == 'true'
     name: Markdown lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Lint markdown
         run: npx markdownlint-cli@latest "docs/**/*.md" "README.md" "AGENTS.md" "CONTRIBUTING.md" "SECURITY.md" "apps/plugin/README.md" "infra/terraform/README.md" --config .markdownlint.jsonc
 
   link-check:
+    needs: paths
+    if: needs.paths.outputs.docs == 'true'
     name: Link check
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Link checker
         uses: lycheeverse/lychee-action@v2
@@ -48,11 +69,16 @@ jobs:
           args: --verbose --no-progress --cache --cache-max-age 1d "./docs/**/*.md" "./README.md" "./AGENTS.md" "./CONTRIBUTING.md" "./SECURITY.md" "./apps/plugin/README.md" "./infra/terraform/README.md"
           fail: true
 
+  # --- Optional: run only when diagram paths change ---
   mermaid-validate:
-    name: Mermaid diagrams
+    needs: paths
+    if: needs.paths.outputs.mermaid == 'true'
+    name: Mermaid diagrams (optional)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -69,10 +95,14 @@ jobs:
           done
 
   openapi-docs:
-    name: OpenAPI (docs)
+    needs: paths
+    if: needs.paths.outputs.openapi == 'true'
+    name: OpenAPI (docs) (optional)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
 
       - name: Validate OpenAPI spec
         run: npx @stoplight/spectral-cli@latest lint docs/api/openapi.yaml --fail-severity=error

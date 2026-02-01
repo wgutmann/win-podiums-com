@@ -118,7 +118,7 @@ sequenceDiagram
 
 | Risk | Mitigation |
 |------|------------|
-| Port in use | Use random port in range or try next; document required firewall/antivirus for loopback. |
+| Port in use | Document canonical port 54321; if in use on a dev machine, document the override (e.g. config) and ensure that exact redirect URI is registered in the Discord app for that environment. |
 | API contract drift | Align request/response with OpenAPI; add contract tests. |
 
 ## Success Criteria

@@ -48,6 +48,10 @@ flowchart LR
 - **Surfaces**: Plugin must appear in SimHub’s plugin list/settings and be usable from the SimHub UI (per NFR-001). Use SimHub SDK UI hooks (e.g. properties, actions, or settings panel) as required by the SDK so the plugin is discoverable and the above controls are accessible.
 - **Technology**: WPF or SimHub-supported UI mechanism per [SimHub Plugin LLD](../../design/components/simhub-plugin.md). POC: minimal controls and status only; no full Scrutineering Panel layout or polish.
 
+### Brand voice (post-POC)
+
+- Final button/status copy may be aligned with [Brand Voice & Messaging](../../brand/design-system.md#brand-voice--messaging) (e.g. “Link your Discord” for button, “Link your Discord to begin monitoring” for tooltip). POC keeps minimal copy; leaves room for later polish.
+
 ### Out of Scope
 
 - Full Scrutineering Panel UI, design polish, telemetry monitoring display, race submission UI, position detection UI, installer/updater UI.

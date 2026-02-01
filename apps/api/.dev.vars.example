@@ -1,0 +1,6 @@
+# WinPodiums API — local secrets (do not commit)
+# Copy this file to .dev.vars and fill in real values. See docs/guides/development.md.
+
+DISCORD_CLIENT_ID=your_discord_application_client_id
+DISCORD_CLIENT_SECRET=your_discord_application_client_secret
+SESSION_SECRET=your_session_secret_min_32_characters_for_jwt

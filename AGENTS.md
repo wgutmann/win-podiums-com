@@ -28,7 +28,8 @@ Project-level guidance for AI agents working in this repo.
 
 ## Conventions
 
-- **Git branch agnostic:** Do not assume or depend on the user's current git branch. Do not run `git branch`, `git status`, or infer branch for context unless the user explicitly asks. Treat branch as unspecified; give branch-neutral advice (e.g. "before pushing" not "before pushing to main").
+
+- **Leveragable lessons:** See [docs/guides/leveragable-lessons.md](docs/guides/leveragable-lessons.md) for the 12 project lessons. Apply them when making changes.
 - Prefer skills in `.cursor/skills` for domain-specific tasks.
 - **ContextStream (when MCP enabled):** See [.cursor/rules/contextstream.mdc](.cursor/rules/contextstream.mdc) for bootstrap, search-first, decisions, graph, and lessons. If ContextStream is unavailable, fall back to this file and [docs/architecture/next-steps.md](docs/architecture/next-steps.md). See [development guide](docs/guides/development.md#ai-tooling-optional).
 - **Documentation**: Use the cursor-project-docs skill; canonical docs in `docs/`. Follow PRD → HLD → Tech Plan.

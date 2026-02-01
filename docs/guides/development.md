@@ -257,6 +257,7 @@ To disable the hook for this repo: `git config --unset core.hooksPath`.
 
 ## Related
 
+- [Leveragable lessons](leveragable-lessons.md) — 12 project lessons for agents and contributors
 - [Deployment](deployment.md) — Deploy Worker with Wrangler
 - [Next Steps](../architecture/next-steps.md) — Recommended order of work (test locally, deploy)
 - [Phase 1 scope](../product/phase-1-mvp-scope.md) — MVP deliverables and trace to docs

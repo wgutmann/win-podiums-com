@@ -66,7 +66,7 @@ A merit-based luxury community for elite sim racers, verified through real-time 
 
 ## Skills & Conventions
 
-This project uses [Cursor Skills](.cursor/skills/) for domain-specific tasks:
+Skills are loaded from this repo's **`.cursor/skills/`** (works in worktrees). This project uses [Cursor Skills](.cursor/skills/) for domain-specific tasks:
 - `cloudflare-workers` — Workers, D1, R2, KV, Wrangler; use when configuring or implementing Cloudflare edge/API
 - `simhub-plugin-builder` — SimHub plugin development
 - `discord-authentication` — Discord OAuth2 implementation

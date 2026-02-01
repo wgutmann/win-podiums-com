@@ -12,8 +12,8 @@ Use this skill when the user asks for **product review**, **scope alignment**, *
 ## Quick Start
 
 1. **When invoked**: Adopt the [product manager personality](../../../docs/brand/product-manager-personality.md) — role, brand alignment, behaviors, boundaries.
-2. **ContextStream (if available)**: At the start of your turn, call **context_smart(user_message=<current message>)** so the PM has project/product context. If ContextStream is unavailable or returns nothing useful, fall back to reading the PM personality doc and [Phase 1 scope](../../../docs/product/phase-1-mvp-scope.md) (and [next-steps](../../../docs/architecture/next-steps.md) if needed).
-3. **PR review**: Use the [PM review checklist](../../../docs/brand/product-manager-personality.md#review-process) (phase alignment, user value, brand voice, doc hierarchy).
+2. **ContextStream (if available)**: At the start of your turn, call **context**(user_message=<current message>, format=minified, max_tokens=400). Use the exact tool name your MCP client exposes (docs may say context_smart). If ContextStream is unavailable or returns nothing useful, fall back to reading the PM personality doc and [Phase 1 scope](../../../docs/product/phase-1-mvp-scope.md) (and [next-steps](../../../docs/architecture/next-steps.md) if needed).
+3. **PR review**: Use the [PM review checklist](../../../docs/brand/product-manager-personality.md#review-process) (phase alignment, user value, brand voice, doc hierarchy). Expect **Traceability** and **Doc links** in the PR body; optionally remind the author to add traceability labels from [.github/labels.yaml](../../../.github/labels.yaml) and to capture an implementation event (with paths from [.github/traceability-mapping.yaml](../../../.github/traceability-mapping.yaml)) so the knowledge graph shows PR ↔ TP ↔ PRD.
 4. **Output**: Requirements, acceptance criteria, product copy, tradeoffs; no code or infra. Escalate security to ADR-006 and the security skill.
 
 ## When to Use (Invoke This Subagent)
@@ -33,7 +33,7 @@ ContextStream is most impactful when the PM uses it: product decisions, scope, a
 
 ### At the start of every PM turn
 
-- Call **context_smart(user_message=<current message>)** so the PM has up-to-date context (phase scope, PRDs, ADRs, tech plans, recent decisions). Do not skip this when ContextStream is available.
+- Call **context**(user_message=<current message>, format=minified, max_tokens=400) so the PM has up-to-date context (phase scope, PRDs, ADRs, tech plans, recent decisions). Use the exact tool name your MCP client exposes (docs may say context_smart). Do not skip this when ContextStream is available.
 - If ContextStream is unavailable or returns no useful context, fall back to reading [product-manager-personality](../../../docs/brand/product-manager-personality.md), [Phase 1 scope](../../../docs/product/phase-1-mvp-scope.md), and [next-steps](../../../docs/architecture/next-steps.md) as needed.
 
 ### Before answering product questions
@@ -43,7 +43,7 @@ ContextStream is most impactful when the PM uses it: product decisions, scope, a
 
 ### After product decisions
 
-- When the PM makes or records a **product decision** (e.g. scope ruling, tradeoff recommendation, phase boundary): capture it in ContextStream with **session(action="capture", event_type="decision", ...)**. Include a short title, one-line content, and the **file path** (e.g. `docs/product/phase-1-mvp-scope.md`, `docs/architecture/decisions/006-security-choices.md`) or doc ID (PRD-XXX, ADR-XXX) so the graph and recall stay aligned. See [ContextStream mapping](../../../docs/guides/contextstream-mapping.md): PRD ≈ plans + decisions; link to `docs/product/` and use stable IDs (PRD-XXX, ADR-XXX, TP-XXX).
+- When the PM makes or records a **product decision** (e.g. scope ruling, tradeoff recommendation, phase boundary): capture it in ContextStream with **session(action="capture", event_type="decision", ...)**. Include a short title, one-line content, and **file path** or **code_refs** (e.g. `docs/product/phase-1-mvp-scope.md`, `docs/architecture/decisions/006-security-choices.md`) so the knowledge graph links the decision to the doc. Use stable doc IDs (PRD-XXX, ADR-XXX) in content. See [ContextStream mapping](../../../docs/guides/contextstream-mapping.md): PRD ≈ plans + decisions; link to `docs/product/` and use stable IDs.
 
 ### Optional: impact and dependencies
 

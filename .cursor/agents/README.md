@@ -8,7 +8,7 @@ Custom subagents are stored in **`.cursor/agents/`** (project-level). Each file 
 - `local-bootstrap` — First-time setup, run API + plugin locally
 - `deployment-wrangler` — Deploy Worker with Wrangler, D1 remote migrations, production secrets
 - `telemetry-proof-domain` — PRD-001–005, TP-001–005 (Phase 2+ Telemetry Proof)
-- `ci-github-actions` — Workflows (ci, doc-check, security, diagrams)
+- `ci-github-actions` — Recommended GitHub Actions (CI, doc-check, security, diagrams); repo does not ship workflows by default
 
 **No duplicate skills or subagents**:
 - **Reserved names (subagents only)** — Do not add skills under `.cursor/skills/` with these names: `testing-pre-push`, `api-contract-openapi`, `local-bootstrap`, `deployment-wrangler`, `telemetry-proof-domain`, `ci-github-actions`. Remove any such skill folders if present.

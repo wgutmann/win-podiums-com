@@ -78,7 +78,7 @@ If the API is not running, `npm test` will fail with a clear message: "Start Doc
 
 `apps/api/test/smoke.js` runs against the Dockerized API and validates: (1) Docker and Worker config match — `GET /api/health` returns `{ ok: true, env: "dev" }`; (2) error shapes — 404 for unknown routes (`GET /api/nonexistent`) and 401 for protected routes without auth (`POST /api/plugin/verify`); (3) **API documentation loads** — `GET /api-docs` and `GET /api-docs/openapi.yaml` are reachable (Swagger UI and valid OpenAPI 3 spec). Each API endpoint is documented in `docs/api/openapi.yaml` and surfaced in Swagger.
 
-**CI**: GitHub Actions runs typecheck, lint, plugin build, lockfile check, OpenAPI validation, and security checks on push/PR to `main`. Run API smoke and unit tests locally (Docker + `npm test` / `npm run test:unit`).
+**Local checks**: Run API smoke and unit tests locally (Docker + `npm test` / `npm run test:unit`). We **recommend** adding GitHub Actions under `.github/workflows/` for CI (typecheck, lint, plugin build, lockfile, OpenAPI, security) on push/PR; see [Recommended GitHub Actions](#recommended-github-actions) below.
 
 ### API quality checks (typecheck, lint)
 
@@ -87,7 +87,7 @@ In `apps/api` you can run:
 - **Typecheck**: `npm run typecheck` — runs `tsc --noEmit` to catch type errors.
 - **Lint**: `npm run lint` — runs ESLint on `src/**/*.ts` (config in `apps/api/.eslintrc.cjs`).
 
-**CI**: The workflow `.github/workflows/ci.yml` runs typecheck, lint, plugin build, lockfile check, and OpenAPI validation on push/PR to `main` when `apps/api/`, `apps/plugin/`, or `docs/api/` change. See [CI](#ci-workflows) below.
+We **recommend** adding a CI workflow under `.github/workflows/` to run typecheck, lint, plugin build, lockfile check, and OpenAPI validation on push/PR when relevant paths change. See [Recommended GitHub Actions](#recommended-github-actions) below.
 
 ## Config alignment (Docker and Worker)
 
@@ -100,7 +100,7 @@ Do not commit `.dev.vars`. Create it from `.dev.vars.example`.
 
 ## SimHub plugin (no Docker)
 
-The plugin targets .NET Framework 4.8 and SimHub on Windows. Build and run on the host (Visual Studio or MSBuild). Deploy the built DLL to `C:\Program Files (x86)\SimHub\Plugins`. Point the plugin at `http://localhost:8787` when the API is running in Docker. See `apps/plugin/README.md`. Official SimHub docs sometimes refer to the SimHub install root for plugin DLLs; this repo uses the `Plugins` subfolder unless your SimHub version requires otherwise.
+The plugin targets .NET Framework 4.8 and SimHub on Windows. Build and run on the host (Visual Studio or MSBuild). **To install the plugin** (build, copy DLL to SimHub Plugins folder, restart SimHub), see [Installation](../apps/plugin/README.md#installation) in the plugin README. Deploy the built DLL to `C:\Program Files (x86)\SimHub\Plugins`. Point the plugin at `http://localhost:8787` when the API is running in Docker. Official SimHub docs sometimes refer to the SimHub install root for plugin DLLs; this repo uses the `Plugins` subfolder unless your SimHub version requires otherwise.
 
 ### SimHub Plugin POC — development handoff
 
@@ -158,7 +158,7 @@ Tests (`npm test`) still expect the API at `http://localhost:8787`; start either
 
 ### Setup
 
-- **Option A (project MCP):** Copy `.cursor/mcp.json.example` to `.cursor/mcp.json`, then replace `PASTE_YOUR_CONTEXTSTREAM_API_KEY_HERE` with your key from [ContextStream](https://contextstream.io) (Account → API Keys). **`.cursor/mcp.json` is in `.gitignore`** so it is never committed; the repo only has the example file. If a real key was ever committed in the past, rotate it in the ContextStream dashboard. On Windows, if Cursor is started from a shortcut, it may not inherit shell env vars; using `mcp.json` with your key avoids that.
+- **Option A (project MCP):** Copy `.cursor/mcp.json.example` to `.cursor/mcp.json`, then replace `PASTE_YOUR_CONTEXTSTREAM_API_KEY_HERE` with your key from [ContextStream](https://contextstream.io) (Account → API Keys). **`.cursor/mcp.json` is in `.gitignore`** so it is never committed; the repo only has the example file. If a real key was ever committed in the past, rotate it in the ContextStream dashboard. On Windows, if Cursor is started from a shortcut, it may not inherit shell env vars; using `mcp.json` with your key avoids that. **In a worktree,** use the same `.cursor/mcp.json` (or a copy) so ContextStream uses the same project/workspace; avoid committing the key.
 - **Option B (wizard):** Run `npx -y @contextstream/mcp-server setup` and add ContextStream to your global Cursor MCP config; no project file change needed.
 
 Restart Cursor after adding or changing MCP config.
@@ -171,7 +171,7 @@ After connecting ContextStream, run **project(action="ingest_local")** once so t
 
 After ContextStream is connected, you can bootstrap project memory once so new sessions have context:
 
-1. In a Cursor chat, run **session_init** with `folder_path` = repo root and a short `context_hint` (e.g. "WinPodiums Phase 1 MVP: Worker + SimHub plugin; Docker and Worker 1:1").
+1. In a Cursor chat, run **init** (session_init) with `folder_path` = repo root and a short `context_hint` (e.g. "WinPodiums Phase 1 MVP: Worker + SimHub plugin; Docker and Worker 1:1"). Use the exact tool name your MCP client exposes.
 2. Use **session(action="capture", event_type="decision", ...)** to capture key decisions. Point to the doc path in the content so ContextStream can relate decisions to code.
 
 **Suggested decisions to capture** (one per capture, include file path in content):
@@ -203,23 +203,27 @@ This is optional; do it once per workspace if you want shared memory from day on
 
 ### Optional: editor rule
 
-A Cursor rule in `.cursor/rules/` tells the AI to use ContextStream when available (session_init/context_smart for project context, ContextStream search before broad Grep/Read, graph for dependencies/impact). No change needed unless you want to adjust that behavior.
+A Cursor rule in `.cursor/rules/` tells the AI to use ContextStream when available (init/context for project context, ContextStream search before broad Grep/Read, graph for dependencies/impact). No change needed unless you want to adjust that behavior.
 
 ### Optional: Router mode and integrations
 
 - **Router mode:** If you use many MCP servers or hit context limits, set `CONTEXTSTREAM_PROGRESSIVE_MODE=true` in the ContextStream MCP env in `.cursor/mcp.json` to use Router mode (~2 meta-tools). See [ContextStream docs](https://contextstream.io/docs/mcp).
-- **Pro integrations:** Pro users can connect GitHub and Slack so `context_smart` surfaces relevant issues, PRs, and discussions (see [ContextStream](https://contextstream.io)).
+- **Pro integrations:** Pro users can connect GitHub and Slack so **context** surfaces relevant issues, PRs, and discussions (see [ContextStream](https://contextstream.io)).
 
 ContextStream is **optional** for contributors and is not required for CI or build.
 
-## CI workflows
+## Recommended GitHub Actions
 
-GitHub Actions run on push and pull requests to `main` (path filters apply so only relevant jobs run):
+The repository does **not** ship workflow files by default. We **recommend** adding workflows under `.github/workflows/` for teams that want automated CI on push/PR:
 
-| Workflow | Purpose |
-|----------|---------|
-| **security** (`.github/workflows/security.yml`) | Secret scanning (TruffleHog), npm and .NET dependency audits, CodeQL (TypeScript + C#). |
-| **CI** (`.github/workflows/ci.yml`) | TypeScript typecheck, ESLint, plugin build (.NET), lockfile check (`apps/api/package-lock.json`), OpenAPI validation (Spectral). Triggered when `apps/api/`, `apps/plugin/`, or `docs/api/` change. |
+| Recommended workflow | Purpose |
+|----------------------|---------|
+| **CI** | TypeScript typecheck, ESLint, plugin build (.NET), lockfile check (`apps/api/package-lock.json`), OpenAPI validation (Spectral). Trigger when `apps/api/`, `apps/plugin/`, or `docs/api/` change. |
+| **security** | Secret scanning (e.g. TruffleHog), npm and .NET dependency audits, CodeQL (TypeScript + C#). |
+| **doc-check** | Markdown lint, link check (e.g. Lychee), Mermaid diagram validation, OpenAPI (Spectral) for `docs/`. |
+| **diagrams** | Mermaid `.mmd` validation for `docs/architecture/diagrams/` and `docs/design/diagrams/`. |
+
+Use path filters so only relevant jobs run. Local pre-push checks (see below) remain the primary gate; GitHub Actions are optional automation.
 
 ## Run tests before push
 
@@ -233,7 +237,7 @@ Run the same checks CI runs (from repo root unless noted):
 4. **Worker smoke** — `docker compose up -d` (wait for `http://localhost:8787/api/health`), then `cd apps/api && npm ci && npm test`
 5. **OpenAPI validation** — `npx @stoplight/spectral-cli@latest lint docs/api/openapi.yaml --fail-severity=error`
 
-Optional: lockfile check — after `npm ci` in `apps/api`, run `git diff --exit-code apps/api/package-lock.json` from repo root. Doc check (markdown lint, Mermaid) — see [CI workflows](#ci-workflows) and `.github/workflows/doc-check.yml`.
+Optional: lockfile check — after `npm ci` in `apps/api`, run `git diff --exit-code apps/api/package-lock.json` from repo root. Doc check (markdown lint, Mermaid) — see [Recommended GitHub Actions](#recommended-github-actions); you can add a `doc-check` workflow under `.github/workflows/`.
 
 Count passing steps vs total run; require ≥80% (e.g. 4 of 5, or 5 of 6 if including lockfile) before pushing.
 

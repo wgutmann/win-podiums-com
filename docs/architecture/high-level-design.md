@@ -236,7 +236,7 @@ See [Integration Flows](../design/integrations/) for detailed sequence diagrams.
 - **Production**: `winpodiums.com` with protected main branch
 
 ### CI/CD
-- GitHub Actions: **security** (secrets, audits, CodeQL), **CI** (typecheck, lint, plugin build, lockfile, OpenAPI validation)
+- **Recommended**: GitHub Actions under `.github/workflows/` for **security** (secrets, audits, CodeQL) and **CI** (typecheck, lint, plugin build, lockfile, OpenAPI validation). The repo does not ship workflows by default; see [Development Guide](../guides/development.md#recommended-github-actions).
 - Automated deployment on merge to `main` (Workers)
 - Plugin releases via GitHub Releases + R2 upload
 

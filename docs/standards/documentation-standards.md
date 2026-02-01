@@ -282,12 +282,12 @@ Each directory must have a `README.md` that:
 
 ## Automation
 
-**CI (Doc check)**: [.github/workflows/doc-check.yml](../../.github/workflows/doc-check.yml) runs on push/PR when `docs/`, key READMEs, or the workflow change. It:
+**Recommended (Doc check)**: We **recommend** adding a `doc-check` workflow under `.github/workflows/` to run on push/PR when `docs/`, key READMEs, or the workflow change:
 
 - **Markdown lint**: Syntax and formatting for `docs/**/*.md`, root READMEs, plugin and Terraform READMEs (config: [.markdownlint.jsonc](../../.markdownlint.jsonc)).
-- **Link check**: [lychee](https://github.com/lycheeverse/lychee-action) validates links in those files; fails on broken links.
-- **Mermaid diagrams**: Validates `.mmd` files in `docs/architecture/diagrams/` and `docs/design/diagrams/` so diagrams render.
-- **OpenAPI**: Validates `docs/api/openapi.yaml` (Spectral, fail on error).
+- **Link check**: e.g. [lychee](https://github.com/lycheeverse/lychee-action) to validate links in those files; fail on broken links.
+- **Mermaid diagrams**: Validate `.mmd` files in `docs/architecture/diagrams/` and `docs/design/diagrams/` so diagrams render.
+- **OpenAPI**: Validate `docs/api/openapi.yaml` (Spectral, fail on error).
 
 ### Future Enhancements
 - Automated PRD → Technical Plan → Implementation tracking

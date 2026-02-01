@@ -1,0 +1,83 @@
+# ContextStream rules integrity: single source of truth, tool names, and key patterns.
+# Runs when ContextStream-related rules, docs, or skills change.
+name: ContextStream integrity
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".cursorrules"
+      - "AGENTS.md"
+      - ".cursor/rules/contextstream.mdc"
+      - ".cursor/rules/*.mdc"
+      - ".cursor/skills/product-manager/**"
+      - ".cursor/skills/cursor-project-docs/**"
+      - "docs/guides/contextstream-mapping.md"
+      - "docs/guides/development.md"
+      - ".github/workflows/contextstream-integrity.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - ".cursorrules"
+      - "AGENTS.md"
+      - ".cursor/rules/contextstream.mdc"
+      - ".cursor/rules/*.mdc"
+      - ".cursor/skills/product-manager/**"
+      - ".cursor/skills/cursor-project-docs/**"
+      - "docs/guides/contextstream-mapping.md"
+      - "docs/guides/development.md"
+      - ".github/workflows/contextstream-integrity.yml"
+
+concurrency:
+  group: contextstream-integrity-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  integrity:
+    name: ContextStream rules
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Canonical rule exists
+        run: |
+          [ -f .cursor/rules/contextstream.mdc ] || { echo "Missing .cursor/rules/contextstream.mdc"; exit 1; }
+
+      - name: .cursorrules points to contextstream.mdc (no long duplicate bootstrap)
+        run: |
+          grep -q 'contextstream.mdc' .cursorrules || { echo ".cursorrules must reference .cursor/rules/contextstream.mdc"; exit 1; }
+          grep -q '\*\*init\*\*' .cursorrules || { echo ".cursorrules must mention init (tool name)"; exit 1; }
+          grep -q '\*\*context\*\*' .cursorrules || { echo ".cursorrules must mention context (tool name)"; exit 1; }
+          # Fail if .cursorrules reverted to long bootstrap (session_init with folder_path in .cursorrules)
+          if grep -q 'session_init(folder_path' .cursorrules; then
+            echo "::error ::.cursorrules must not duplicate bootstrap; point to contextstream.mdc instead"
+            exit 1
+          fi
+
+      - name: AGENTS.md points to contextstream.mdc
+        run: |
+          grep -q 'contextstream.mdc' AGENTS.md || { echo "AGENTS.md must reference .cursor/rules/contextstream.mdc"; exit 1; }
+
+      - name: contextstream.mdc has required patterns
+        run: |
+          f=.cursor/rules/contextstream.mdc
+          grep -q '\*\*init\*\*' "$f" || { echo "contextstream.mdc must document init (tool name)"; exit 1; }
+          grep -q '\*\*context\*\*' "$f" || { echo "contextstream.mdc must document context (tool name)"; exit 1; }
+          grep -qE 'code_refs|file path' "$f" || { echo "contextstream.mdc must require file path or code_refs in captures"; exit 1; }
+          grep -q 'index_status' "$f" || { echo "contextstream.mdc must mention index_status"; exit 1; }
+          grep -q 'fall back immediately' "$f" || { echo "contextstream.mdc must say fall back immediately (no retry)"; exit 1; }
+
+      - name: contextstream-mapping §5 tool list uses init/context
+        run: |
+          # Tool reference in §5 must list (init, context, ...) not (session_init, context_smart, ...)
+          if grep 'Tool reference' docs/guides/contextstream-mapping.md | grep -q 'session_init, context_smart'; then
+            echo "::error ::contextstream-mapping.md §5 Tool reference must use (init, context, ...) not (session_init, context_smart, ...)"
+            exit 1
+          fi
+          grep -q 'init, context, search' docs/guides/contextstream-mapping.md || { echo "contextstream-mapping.md §5 should list init, context, search in tool reference"; exit 1; }
+
+      - name: .cursorrules ContextStream block is concise
+        run: |
+          # Between BEGIN and END ContextStream, expect at most 15 lines (avoids re-expansion of bootstrap)
+          n=$(sed -n '/<!-- BEGIN ContextStream -->/,/<!-- END ContextStream -->/p' .cursorrules | wc -l)
+          [ "$n" -le 15 ] || { echo "::error ::.cursorrules ContextStream block should stay concise (<=15 lines); got $n"; exit 1; }

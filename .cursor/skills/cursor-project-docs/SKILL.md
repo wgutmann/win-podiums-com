@@ -13,7 +13,7 @@ Use this skill when the user asks to **document the repo**, **create PRDs**, **c
 
 **Consistency**: Apply the [Consistency checklist](#consistency-checklist-when-creating-or-updating-docs) for every new or updated PRD, ADR, tech plan, or key guide (Related/Implements, optional Doc type | ID, bootstrap table, diagram READMEs). Align to [documentation-standards](../../../docs/standards/documentation-standards.md).
 
-**ContextStream (when available):** Before creating or editing docs, use ContextStream `search` to find related PRDs, ADRs, tech plans. After adding or updating a key doc (PRD, ADR, tech plan), capture a short decision in ContextStream with title and path. If it's a key decision, add it to "Suggested decisions to capture" in [docs/guides/development.md](../../../docs/guides/development.md#optional-one-time-bootstrap). See [ContextStream mapping](../../../docs/guides/contextstream-mapping.md).
+**ContextStream (when available):** Follow [.cursor/rules/contextstream.mdc](../../../.cursor/rules/contextstream.mdc) for tool names (use **init**, **context**, **search**, **session**, **project**, **graph** as exposed by your MCP client; docs may say session_init, context_smart). Before creating or editing docs, use **search**(mode=hybrid or semantic) to find related PRDs, ADRs, tech plans. After adding or updating a key doc (PRD, ADR, tech plan), capture with **session(action="capture", event_type="decision", ...)** and include **file path** or **code_refs** in content so the knowledge graph links the decision to the doc. If it's a key decision, add it to "Suggested decisions to capture" in [docs/guides/development.md](../../../docs/guides/development.md#optional-one-time-bootstrap). See [ContextStream mapping](../../../docs/guides/contextstream-mapping.md). When documenting PR flow or traceability: reference the [PR template](../../../.github/PULL_REQUEST_TEMPLATE.md), [traceability mapping](../../../.github/traceability-mapping.yaml), and [labels as code](../../../.github/labels.yaml); state that PRs must include template + Doc links + traceability labels so ContextStream can link PR ↔ TP ↔ PRD.
 
 ## Scope
 
@@ -228,7 +228,7 @@ To keep documentation consistent across the repo and with ContextStream:
 
 4. **Diagrams**: Place Mermaid `.mmd` files in `docs/architecture/diagrams/` or `docs/design/diagrams/`. List them in the diagram folder README; add direct links from [docs/architecture/README.md](../../../docs/architecture/README.md#diagrams). For the D1 schema, link from [database-schema.md](../../../docs/design/data-models/database-schema.md) to `entity-relationship.mmd`.
 
-5. **Plans and roadmaps**: For next-steps or implementation roadmaps, use ContextStream `session(action="capture_plan", ...)` so the plan appears in ContextStream; reference the repo doc path in the plan description.
+5. **Plans and roadmaps**: For next-steps or implementation roadmaps, use **session**(action="capture_plan", ...) so the plan appears in ContextStream; reference the repo doc path in the plan description. Use the exact tool names your MCP client exposes (see [contextstream.mdc](../../../.cursor/rules/contextstream.mdc) or [contextstream-mapping §4](../../../docs/guides/contextstream-mapping.md#4-contextstream-tool-reference)).
 
 ## ContextStream parallels (optional)
 
@@ -236,12 +236,12 @@ When ContextStream MCP is enabled, repo docs map to ContextStream memory for bet
 
 | Repo | ContextStream | Usage |
 |------|---------------|--------|
-| **PRD** | Plans + decisions | Capture key product decisions as `event_type="decision"`; optional `capture_plan` with steps; link content to `docs/product/`. |
-| **ADR / Tech Plan** | Decisions + implementation | After writing/updating an ADR or tech plan, capture a short decision (title + path to doc). If it's a key decision, add to development.md "Suggested decisions to capture" table. |
+| **PRD** | Plans + decisions | Capture key product decisions with **session**(action="capture", event_type="decision", ...); include **file path** or **code_refs** in content so the knowledge graph links the decision. Optional **session**(action="capture_plan", ...) with steps; link content to `docs/product/`. |
+| **ADR / Tech Plan** | Decisions + implementation | After writing/updating an ADR or tech plan, capture with **session**(action="capture", event_type="decision", ...) and include **file path** or **code_refs** to the doc so the graph links the decision. If it's a key decision, add to development.md "Suggested decisions to capture" table. |
 | **Technical docs** | Indexed repo + memory | Use **Related** / **Implements** and stable IDs (PRD-XXX, ADR-XXX, TP-XXX) in every doc so ContextStream can relate content. |
-| **Diagrams** (Mermaid, .mmd) | Indexed + decision | Place in architecture/diagrams/ or design/diagrams/; list in READMEs. Optionally capture a decision that references diagram paths so they surface in context_smart. |
-| **Lessons** (mistakes) | ContextStream only | Use `capture_lesson` for "don't repeat this"; keep procedures in `docs/guides/`. |
-| **To-dos / tasks** | Tasks + reminders | Repo checklist = human source; ContextStream tasks/reminders or `capture_plan` for roadmaps. |
+| **Diagrams** (Mermaid, .mmd) | Indexed + decision | Place in architecture/diagrams/ or design/diagrams/; list in READMEs. Optionally capture a decision that references diagram paths (with file path or code_refs) so they surface in **context**. |
+| **Lessons** (mistakes) | ContextStream only | Use **session**(action="capture_lesson", ...) for "don't repeat this"; keep procedures in `docs/guides/`. |
+| **To-dos / tasks** | Tasks + reminders | Repo checklist = human source; ContextStream **memory**(action="create_task", ...) / reminders or **session**(action="capture_plan", ...) for roadmaps. |
 
 See [ContextStream mapping](../../../docs/guides/contextstream-mapping.md) for full parallels, graph usage (ingest_local, dependencies, impact), and tagging guidance.
 

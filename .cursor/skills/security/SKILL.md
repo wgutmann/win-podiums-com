@@ -1,6 +1,6 @@
 ---
 name: security
-description: Applies security-minded thinking and test-coverage expectations for WinPodiums. Use when implementing auth, handling secrets, adding API endpoints, configuring Cloudflare security, writing or reviewing CI, or ensuring tests cover security-sensitive code. References ADR-006 (security choices), SECURITY.md, PRD-006, and CI workflows.
+description: Applies security-minded thinking and test-coverage expectations for WinPodiums. Use when implementing auth, handling secrets, adding API endpoints, configuring Cloudflare security, writing or reviewing CI, or ensuring tests cover security-sensitive code. References ADR-006 (security choices), SECURITY.md, PRD-006; GitHub Actions are recommended, not shipped by default.
 ---
 
 # Security and Test Coverage
@@ -25,8 +25,8 @@ Use this skill when the user asks about **security**, **secrets**, **auth**, **r
 1. **Secrets and credentials** — Never commit; .gitignore; rotate if exposed; CI placeholders only.
 2. **Edge and application security** — Cloudflare free only (proxy, SSL, WAF, Bot Fight, Security Level); rate limiting in Workers; HTTPS only; OAuth least-privilege.
 3. **Deferred (Phase 2+)** — Full anti-cheat, Telemetry Proof.
-4. **CI security** — TruffleHog, npm/dotnet audits, CodeQL.
-5. **Test coverage** — Smoke tests for API; tests required for auth, token, profile, heartbeat; CI must pass.
+4. **Recommended CI security** — We recommend adding a security workflow (TruffleHog, npm/dotnet audits, CodeQL); repo does not ship workflows by default.
+5. **Test coverage** — Smoke tests for API; tests required for auth, token, profile, heartbeat; local pre-push must pass; if you add GitHub Actions, they should pass before merge.
 
 When in doubt, align to ADR-006. When you add a new security choice, update ADR-006 (and SECURITY.md or PRD-006 if applicable).
 
@@ -52,14 +52,14 @@ When in doubt, align to ADR-006. When you add a new security choice, update ADR-
 
 ### CI and merge
 
-- [ ] [.github/workflows/security.yml](../../../.github/workflows/security.yml) runs: TruffleHog (secrets), npm audit (API), dotnet vulnerable packages (plugin), CodeQL (JS/TS + C#). Do not disable these for convenience.
+- [ ] We **recommend** adding a security workflow under `.github/workflows/` with: TruffleHog (secrets), npm audit (API), dotnet vulnerable packages (plugin), CodeQL (JS/TS + C#). Do not disable these for convenience if you add them.
 - [ ] If CI fails on secrets: remove the secret from history and rotate the key; do not “fix” by excluding paths unless justified and documented.
 
 ## Test Coverage Checklist
 
 - [ ] **API**: Smoke test exists ([apps/api/test/smoke.js](../../../apps/api/test/smoke.js), `npm test`). Run locally with Docker. New security-sensitive routes (auth, token exchange, profile, heartbeat) must be covered by smoke or unit tests.
 - [ ] **Plugin**: Security-sensitive code (token storage, API client, auth flows) should have unit or integration tests before production. Phase 1 may have minimal tests; add as we add features.
-- [ ] **Do not merge** without tests for new auth, token, or profile/heartbeat logic. CI (Security + CI workflows) must pass.
+- [ ] **Do not merge** without tests for new auth, token, or profile/heartbeat logic. Local pre-push checks must pass; if you add GitHub Actions, they should pass before merge.
 - [ ] **Before pushing to a remote branch:** Run local tests; **at least 80% of tests must pass** before pushing. Run locally: `docker compose up -d && cd apps/api && npm test` plus typecheck, lint, plugin build, OpenAPI validation per [Run tests before push](../../../docs/guides/development.md#run-tests-before-push). Block or warn on push if the threshold is not met.
 
 ## Related Docs and Skills
@@ -73,7 +73,7 @@ When in doubt, align to ADR-006. When you add a new security choice, update ADR-
 | [ADR-002 Discord OAuth](../../../docs/architecture/decisions/002-discord-oauth.md) | OAuth as sole identity provider |
 | [github-change-control](../../github-change-control/SKILL.md) | Secret hygiene, .gitignore, PR governance |
 | [discord-authentication](../../discord-authentication/SKILL.md) | OAuth2 implementation, scopes |
-| [.github/workflows/security.yml](../../../.github/workflows/security.yml) | CI: secret scan, deps, CodeQL |
+| [SECURITY.md](../../../SECURITY.md) (Recommended automation) | Secret scan, deps, CodeQL (add workflow under .github/workflows/) |
 
 ## Anti-Patterns
 

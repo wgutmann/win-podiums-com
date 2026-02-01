@@ -46,7 +46,7 @@ infra/terraform/
 
 ## Local Usage
 
-1. **Prerequisites**: [Terraform](https://www.terraform.io/downloads) >= 1.5, Cloudflare API token with appropriate permissions.
+1. **Prerequisites**: [Terraform](https://developer.hashicorp.com/terraform) >= 1.5, Cloudflare API token with appropriate permissions.
 2. **Secrets**: Never commit `.tfvars` with credentials. Use env or a local `terraform.tfvars` (gitignored):
 
    ```bash
@@ -68,7 +68,7 @@ infra/terraform/
 
 ## CI
 
-GitHub Actions run **security** (secrets, dependency audits, CodeQL) and **CI** (typecheck, lint, plugin build, lockfile check, OpenAPI validation). See [Development Guide](../../docs/guides/development.md#ci-workflows).
+We **recommend** adding GitHub Actions under `.github/workflows/` for **security** (secrets, dependency audits, CodeQL) and **CI** (typecheck, lint, plugin build, lockfile check, OpenAPI validation). See [Development Guide](../../docs/guides/development.md#recommended-github-actions). The repo does not ship workflows by default.
 
 Terraform is **not** run in GitHub Actions. Run `terraform plan` and `terraform apply` locally with `CLOUDFLARE_API_TOKEN` (and optionally `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_ZONE_ID`) in your environment. See [infra/terraform/README.md](../../infra/terraform/README.md).
 
@@ -76,8 +76,8 @@ Terraform is **not** run in GitHub Actions. Run `terraform plan` and `terraform 
 
 Default is **local** backend. For team or CI stability:
 
-- **Terraform Cloud**: Configure `backend "remote"` in `versions.tf` and set `TF_CLOUD_ORGANIZATION` (and workspace) in GitHub Actions.
-- **R2 (S3-compatible)**: Use `backend "s3"` with your R2 bucket and key; store credentials in GitHub Secrets and expose in the workflow.
+- **Terraform Cloud**: Configure `backend "remote"` in `versions.tf` and set `TF_CLOUD_ORGANIZATION` (and workspace); if you add GitHub Actions, expose in the workflow.
+- **R2 (S3-compatible)**: Use `backend "s3"` with your R2 bucket and key; store credentials in GitHub Secrets and expose in the workflow if you add one.
 
 See comments in `infra/terraform/versions.tf` for placeholders.
 

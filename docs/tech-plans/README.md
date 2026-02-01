@@ -24,6 +24,8 @@ Each Technical Plan includes:
 
 ## Feature Areas
 
+- [ContextStream and Agents](contextstream-agents/) — ContextStream rule, bootstrap, search-first, decisions/lessons (PRD-009, TP-009)
+- [GitHub Traceability](github-traceability/) — Labels as code, traceability mapping, PR template (PRD-008, TP-008)
 - [SimHub Plugin POC](simhub-plugin-poc/) — Plugin skeleton, auth (PKCE), API client/heartbeat, minimal UI, POC testing (PRD-001, TP-SPOC-001–005)
 - [Telemetry Proof System](telemetry-proof-system/) — Multi-layered security implementation
 

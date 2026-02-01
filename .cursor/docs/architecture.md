@@ -75,6 +75,7 @@ See [Database Schema](../../docs/design/data-models/database-schema.md) for full
 - [ADR-001: Cloudflare Stack](../../docs/architecture/decisions/001-cloudflare-stack.md)
 - [ADR-002: Discord OAuth](../../docs/architecture/decisions/002-discord-oauth.md)
 - [ADR-003: Hybrid Auth Paths](../../docs/architecture/decisions/003-hybrid-auth-paths.md)
+- [ADR-007: Dev/Cloud Parity](../../docs/architecture/decisions/007-dev-cloud-parity-local-first.md)
 
 ## Related Documentation
 

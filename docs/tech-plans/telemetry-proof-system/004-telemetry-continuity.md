@@ -1,4 +1,6 @@
-# Technical Plan: Telemetry Continuity Validation
+# TP-004: Telemetry Continuity Validation
+
+**Doc type**: Tech Plan | **ID**: TP-004 | **Implements**: [PRD-004: Telemetry Continuity Validation](../../product/telemetry-proof-system/004-telemetry-continuity.md) | **Related**: [TP-001: Heartbeat System](001-heartbeat-system.md), [TP-002: Heartbeat Validation](002-heartbeat-validation.md), [TP-003: Race Submission Requirements](003-race-submission-requirements.md)
 
 **Status**: Draft  
 **Version**: 1.0  

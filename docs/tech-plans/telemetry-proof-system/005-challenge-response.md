@@ -1,4 +1,6 @@
-# Technical Plan: Challenge-Response System
+# TP-005: Challenge-Response System
+
+**Doc type**: Tech Plan | **ID**: TP-005 | **Implements**: [PRD-005: Challenge-Response System](../../product/telemetry-proof-system/005-challenge-response.md) | **Related**: [TP-001: Heartbeat System](001-heartbeat-system.md), [TP-003: Race Submission Requirements](003-race-submission-requirements.md), [API Specification](../../api/plugin.md#challenge-response)
 
 **Status**: Draft  
 **Version**: 1.0  

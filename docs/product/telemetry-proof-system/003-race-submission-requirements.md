@@ -1,5 +1,7 @@
 # PRD-003: Race Submission Requirements
 
+**Doc type**: PRD | **ID**: PRD-003 | **Related**: [TP-003](../../tech-plans/telemetry-proof-system/003-race-submission-requirements.md), [PRD-001: Heartbeat System](001-heartbeat-system.md), [PRD-002: Heartbeat Validation](002-heartbeat-validation.md)
+
 **Status**: Draft  
 **Version**: 1.0  
 **Date**: 2026-01-31  

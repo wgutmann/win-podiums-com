@@ -4,13 +4,13 @@ This directory contains Product Requirements Documents (PRDs) for the Telemetry 
 
 ## Documents
 
-| Document | Status | Version | Description |
-|----------|--------|---------|-------------|
-| [PRD-001: Telemetry Heartbeat System](001-heartbeat-system.md) | Draft | 1.0 | Continuous heartbeat system proving active SimHub connection |
-| [PRD-002: Heartbeat Validation](002-heartbeat-validation.md) | Draft | 1.0 | Server-side validation of heartbeat authenticity |
-| [PRD-003: Race Submission Requirements](003-race-submission-requirements.md) | Draft | 1.0 | Require active heartbeat for race submissions |
-| [PRD-004: Telemetry Continuity Validation](004-telemetry-continuity.md) | Draft | 1.0 | Validate race telemetry aligns with heartbeat sequence |
-| [PRD-005: Challenge-Response System](005-challenge-response.md) | Draft | 1.0 | Challenge-response for podium finishes |
+| Document | Status | Version | Technical Plan | Description |
+|----------|--------|---------|----------------|-------------|
+| [PRD-001: Telemetry Heartbeat System](001-heartbeat-system.md) | Draft | 1.0 | [TP-001](../../tech-plans/telemetry-proof-system/001-heartbeat-system.md) | Continuous heartbeat system proving active SimHub connection |
+| [PRD-002: Heartbeat Validation](002-heartbeat-validation.md) | Draft | 1.0 | [TP-002](../../tech-plans/telemetry-proof-system/002-heartbeat-validation.md) | Server-side validation of heartbeat authenticity |
+| [PRD-003: Race Submission Requirements](003-race-submission-requirements.md) | Draft | 1.0 | [TP-003](../../tech-plans/telemetry-proof-system/003-race-submission-requirements.md) | Require active heartbeat for race submissions |
+| [PRD-004: Telemetry Continuity Validation](004-telemetry-continuity.md) | Draft | 1.0 | [TP-004](../../tech-plans/telemetry-proof-system/004-telemetry-continuity.md) | Validate race telemetry aligns with heartbeat sequence |
+| [PRD-005: Challenge-Response System](005-challenge-response.md) | Draft | 1.0 | [TP-005](../../tech-plans/telemetry-proof-system/005-challenge-response.md) | Challenge-response for podium finishes |
 
 ## Overview
 

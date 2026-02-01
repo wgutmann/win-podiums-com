@@ -58,6 +58,24 @@ Each major area should have a **README** that lists documents and diagrams with 
 - `docs/design/` — has a README listing Components, Data Models, Integrations, Diagrams, Security LLD with links.
 - `docs/product/README.md`, `docs/tech-plans/README.md`, `docs/api/README.md` — list sibling docs and cross-link to architecture/design.
 
+### 1.2 Graph node types and PRD/tech docs
+
+ContextStream’s knowledge graph uses node types such as **document**, **decision**, and **task**. PRDs and tech plans map as follows:
+
+- **document / doc**: Ingested repo files; each PRD and tech plan markdown becomes a **document** node. **Related** and **Implements** markdown links in those files create edges between these nodes. So PRD↔tech plan links in the repo become doc↔doc edges in the graph.
+- **decision**: Captured via session (e.g. `event_type="decision"`). Including file paths to both a PRD and its tech plan links the decision node to both document nodes and reinforces PRD↔TP in the graph.
+- **task**: Implementation tasks; when they reference a tech plan (or PRD) doc, they tie into the same doc subgraph.
+
+### 1.3 Checklist: PRD and tech plan graph linking
+
+Use this checklist so PRDs and tech plans stay linked and indexed as desired:
+
+- **Stable IDs in titles**: Use **PRD-XXX** and **TP-XXX** in document titles (e.g. `# TP-001: Telemetry Heartbeat System`).
+- **Related / Implements in every doc**: Every PRD lists **Related** including the corresponding tech plan(s). Every tech plan lists **Implements** to the PRD and **Related** to sibling TPs, API spec, and design LLDs as needed.
+- **Index READMEs**: Product area README (e.g. `docs/product/telemetry-proof-system/README.md`) lists PRDs with a **Technical Plan** column linking to each TP. Tech-plans area README lists TPs with an **Implements** column linking to each PRD.
+- **After adding or changing PRDs/tech plans**: Run **project(action="ingest_local")** (or equivalent) so the graph is updated.
+- **Optionally**: When capturing a decision that connects a PRD to its tech plan, include both doc paths in the capture so a decision node links to both document nodes in the graph.
+
 ---
 
 ## 2. Leveraging the ContextStream Graph

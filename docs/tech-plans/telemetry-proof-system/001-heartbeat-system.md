@@ -1,4 +1,6 @@
-# Technical Plan: Telemetry Heartbeat System
+# TP-001: Telemetry Heartbeat System
+
+**Doc type**: Tech Plan | **ID**: TP-001 | **Implements**: [PRD-001: Telemetry Heartbeat System](../../product/telemetry-proof-system/001-heartbeat-system.md) | **Related**: [API Specification](../../api/plugin.md#heartbeat-endpoint), [SimHub Plugin LLD](../../design/components/simhub-plugin.md)
 
 **Status**: Draft  
 **Version**: 1.0  

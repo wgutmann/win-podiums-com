@@ -10,6 +10,8 @@ prds:
   PRD-005: docs/product/telemetry-proof-system/004-telemetry-continuity.md
   PRD-006: docs/product/telemetry-proof-system/005-challenge-response.md
   PRD-007: docs/product/cloudflare-security/001-free-cloudflare-security.md
+  PRD-008: docs/product/github-traceability/001-github-labels-pr-traceability.md
+  PRD-009: docs/product/contextstream-agents/001-contextstream-agent-cursor-interactions.md
 
 tech_plans:
   TP-SPOC-001: docs/tech-plans/simhub-plugin-poc/001-plugin-skeleton-sdk-config.md
@@ -22,3 +24,5 @@ tech_plans:
   TP-003: docs/tech-plans/telemetry-proof-system/003-race-submission-requirements.md
   TP-004: docs/tech-plans/telemetry-proof-system/004-telemetry-continuity.md
   TP-005: docs/tech-plans/telemetry-proof-system/005-challenge-response.md
+  TP-008: docs/tech-plans/github-traceability/001-labels-and-traceability.md
+  TP-009: docs/tech-plans/contextstream-agents/001-contextstream-and-cursor-rules.md

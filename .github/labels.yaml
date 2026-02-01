@@ -24,6 +24,12 @@
 - name: prd:PRD-007
   color: '0E8A16'
   description: Free Cloudflare Security Integration
+- name: prd:PRD-008
+  color: '0E8A16'
+  description: GitHub Labels and PR Traceability
+- name: prd:PRD-009
+  color: '0E8A16'
+  description: ContextStream and Agent/Cursor Interactions
 
 # Tech plans (SimHub POC)
 - name: tech-plan:TP-SPOC-001
@@ -58,3 +64,9 @@
 - name: tech-plan:TP-005
   color: '1D76DB'
   description: Challenge-Response System
+- name: tech-plan:TP-008
+  color: '1D76DB'
+  description: Labels and Traceability
+- name: tech-plan:TP-009
+  color: '1D76DB'
+  description: ContextStream and Cursor Rules

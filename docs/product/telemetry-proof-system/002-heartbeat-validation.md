@@ -1,5 +1,7 @@
 # PRD-002: Heartbeat Validation
 
+**Doc type**: PRD | **ID**: PRD-002 | **Related**: [TP-002](../../tech-plans/telemetry-proof-system/002-heartbeat-validation.md), [PRD-001: Heartbeat System](001-heartbeat-system.md)
+
 **Status**: Draft  
 **Version**: 1.0  
 **Date**: 2026-01-31  

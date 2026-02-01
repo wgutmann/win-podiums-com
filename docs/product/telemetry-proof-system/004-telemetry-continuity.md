@@ -1,5 +1,7 @@
 # PRD-004: Telemetry Continuity Validation
 
+**Doc type**: PRD | **ID**: PRD-004 | **Related**: [TP-004](../../tech-plans/telemetry-proof-system/004-telemetry-continuity.md), [PRD-001: Heartbeat System](001-heartbeat-system.md), [PRD-002: Heartbeat Validation](002-heartbeat-validation.md), [PRD-003: Race Submission Requirements](003-race-submission-requirements.md)
+
 **Status**: Draft  
 **Version**: 1.0  
 **Date**: 2026-01-31  

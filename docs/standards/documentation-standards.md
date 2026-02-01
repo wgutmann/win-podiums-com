@@ -110,7 +110,7 @@ This document defines the documentation standards for WinPodiums, inspired by WH
 
 **Structure**:
 ```markdown
-# Technical Plan: [Feature Name]
+# TP-XXX: [Feature Name]
 
 **Status**: [Draft | Review | Approved | Implemented]  
 **Version**: [Semantic version]  
@@ -249,8 +249,9 @@ All documents must include:
 
 Consistent IDs and cross-links help AI tools (e.g. [ContextStream](https://contextstream.io)) index and relate content. Use:
 
-- **Stable document IDs** in titles and in Related/Implements: `PRD-XXX`, `ADR-XXX`, `TP-XXX`.
+- **Stable document IDs** in titles and in Related/Implements: `PRD-XXX`, `ADR-XXX`, `TP-XXX`. Tech plan document titles should use the form **TP-XXX: [Feature Name]** (e.g. `# TP-001: Telemetry Heartbeat System`) so tools can associate the ID with the path.
 - **Related / Implements** in every PRD, ADR, and Technical Plan so related docs are one hop away.
+- **Optional one-line blurb** at the top of key docs (after the title) for clearer graph labeling. Example for a tech plan: `**Doc type**: Tech Plan | **ID**: TP-001 | **Implements**: [PRD-001](../product/.../001-feature.md) | **Related**: [TP-002](002-other.md), [API spec](../../api/plugin.md)`.
 - **Index READMEs** in each major area that list documents and diagrams with short descriptions.
 - **Diagram labels**: clear filenames or headings (e.g. `system-overview.mmd`, `## System Overview Diagram`) and links from the architecture or design README.
 

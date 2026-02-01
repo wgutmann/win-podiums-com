@@ -1,5 +1,7 @@
 # PRD-001: Telemetry Heartbeat System
 
+**Doc type**: PRD | **ID**: PRD-001 | **Related**: [TP-001](../../tech-plans/telemetry-proof-system/001-heartbeat-system.md)
+
 **Status**: Draft  
 **Version**: 1.0  
 **Date**: 2026-01-31  

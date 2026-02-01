@@ -1,4 +1,6 @@
-# Technical Plan: Heartbeat Validation
+# TP-002: Heartbeat Validation
+
+**Doc type**: Tech Plan | **ID**: TP-002 | **Implements**: [PRD-002: Heartbeat Validation](../../product/telemetry-proof-system/002-heartbeat-validation.md) | **Related**: [TP-001: Heartbeat System](001-heartbeat-system.md), [API Specification](../../api/plugin.md#heartbeat-validation)
 
 **Status**: Draft  
 **Version**: 1.0  

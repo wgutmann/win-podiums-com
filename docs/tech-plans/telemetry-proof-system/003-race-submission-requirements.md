@@ -1,4 +1,6 @@
-# Technical Plan: Race Submission Requirements
+# TP-003: Race Submission Requirements
+
+**Doc type**: Tech Plan | **ID**: TP-003 | **Implements**: [PRD-003: Race Submission Requirements](../../product/telemetry-proof-system/003-race-submission-requirements.md) | **Related**: [TP-001: Heartbeat System](001-heartbeat-system.md), [TP-002: Heartbeat Validation](002-heartbeat-validation.md), [API Specification](../../api/plugin.md#race-submission-validation)
 
 **Status**: Draft  
 **Version**: 1.0  

@@ -1,6 +1,6 @@
 # ContextStream Knowledge Ingest API Reference
 
-**Related**: [PRD-010: ContextStream Knowledge Ingest (GitHub API)](../product/contextstream-agents/002-contextstream-knowledge-ingest.md), [ContextStream knowledge ingest guide](../guides/contextstream-ingest.md)
+**Related**: [PRD-011: ContextStream Knowledge Ingest (GitHub API)](../product/contextstream-agents/002-contextstream-knowledge-ingest.md), [ContextStream knowledge ingest guide](../guides/contextstream-ingest.md)
 
 ## Overview
 
@@ -73,18 +73,18 @@ Content-Length: 2345
     "source": "github",
     "repository": "owner/repo",
     "ref": "main",
-    "path": "docs/product/prd-010.md",
-    "doc_id": "PRD-010",
+    "path": "docs/product/prd-011.md",
+    "doc_id": "PRD-011",
     "doc_type": "PRD",
     "related_ids": ["TP-010"],
     "implements_ids": [],
     "related_paths": ["docs/tech-plans/tp-010.md"],
-    "source_url": "https://github.com/owner/repo/blob/main/docs/product/prd-010.md",
-    "raw_url": "https://raw.githubusercontent.com/owner/repo/main/docs/product/prd-010.md",
+    "source_url": "https://github.com/owner/repo/blob/main/docs/product/prd-011.md",
+    "raw_url": "https://raw.githubusercontent.com/owner/repo/main/docs/product/prd-011.md",
     "content_sha256": "abc123...",
     "content_bytes": 1234
   },
-  "content": "# PRD-010: ContextStream Knowledge Ingest\n\n...",
+  "content": "# PRD-011: ContextStream Knowledge Ingest\n\n...",
   "encoding": "utf-8"
 }
 ```
@@ -302,7 +302,7 @@ The script reads configuration from environment variables:
 
 ## Related Documentation
 
-- [PRD-010: ContextStream Knowledge Ingest (GitHub API)](../product/contextstream-agents/002-contextstream-knowledge-ingest.md)
-- [TP-010: ContextStream Knowledge Ingest Implementation](../tech-plans/contextstream-agents/002-contextstream-knowledge-ingest-implementation.md)
+- [PRD-011: ContextStream Knowledge Ingest (GitHub API)](../product/contextstream-agents/002-contextstream-knowledge-ingest.md)
+- [TP-011: ContextStream Knowledge Ingest Implementation](../tech-plans/contextstream-agents/002-contextstream-knowledge-ingest-implementation.md)
 - [ContextStream knowledge ingest guide](../guides/contextstream-ingest.md)
 - [ContextStream ingest architecture](../architecture/contextstream-ingest-architecture.md)

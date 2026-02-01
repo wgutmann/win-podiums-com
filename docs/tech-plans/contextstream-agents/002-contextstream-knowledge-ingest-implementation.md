@@ -1,6 +1,6 @@
-# TP-010: ContextStream Knowledge Ingest Implementation
+# TP-011: ContextStream Knowledge Ingest Implementation
 
-**Doc type**: Technical Plan | **ID**: TP-010 | **Implements**: [PRD-010: ContextStream Knowledge Ingest (GitHub API)](../../product/contextstream-agents/002-contextstream-knowledge-ingest.md) | **Related**: [ContextStream mapping](../../guides/contextstream-mapping.md), [ContextStream knowledge ingest guide](../../guides/contextstream-ingest.md), [PRD-009: ContextStream and Agent/Cursor Interactions](../../product/contextstream-agents/001-contextstream-agent-cursor-interactions.md)
+**Doc type**: Technical Plan | **ID**: TP-011 | **Implements**: [PRD-011: ContextStream Knowledge Ingest (GitHub API)](../../product/contextstream-agents/002-contextstream-knowledge-ingest.md) | **Related**: [ContextStream mapping](../../guides/contextstream-mapping.md), [ContextStream knowledge ingest guide](../../guides/contextstream-ingest.md), [PRD-009: ContextStream and Agent/Cursor Interactions](../../product/contextstream-agents/001-contextstream-agent-cursor-interactions.md)
 
 **Status**: Draft  
 **Version**: 1.0  
@@ -9,7 +9,7 @@
 
 ## Overview
 
-This Technical Plan implements PRD-010: a GitHub-API-based ingestion system that automatically fetches repository documents and uploads them to ContextStream (or any Knowledge Center) with metadata that enables knowledge graph linking (PR ↔ Tech Plan ↔ PRD).
+This Technical Plan implements PRD-011: a GitHub-API-based ingestion system that automatically fetches repository documents and uploads them to ContextStream (or any Knowledge Center) with metadata that enables knowledge graph linking (PR ↔ Tech Plan ↔ PRD).
 
 ## Architecture
 
@@ -172,7 +172,7 @@ After merge to `main`, workflow will run automatically on next push (if secrets 
 
 ## Related Documentation
 
-- [PRD-010: ContextStream Knowledge Ingest (GitHub API)](../../product/contextstream-agents/002-contextstream-knowledge-ingest.md)
+- [PRD-011: ContextStream Knowledge Ingest (GitHub API)](../../product/contextstream-agents/002-contextstream-knowledge-ingest.md)
 - [ContextStream knowledge ingest guide](../../guides/contextstream-ingest.md)
 - [ContextStream mapping](../../guides/contextstream-mapping.md)
 - [PRD-009: ContextStream and Agent/Cursor Interactions](../../product/contextstream-agents/001-contextstream-agent-cursor-interactions.md)

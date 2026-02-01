@@ -1,6 +1,6 @@
 # ContextStream Knowledge Ingest Architecture
 
-**Related**: [PRD-010: ContextStream Knowledge Ingest (GitHub API)](../product/contextstream-agents/002-contextstream-knowledge-ingest.md), [TP-010: ContextStream Knowledge Ingest Implementation](../tech-plans/contextstream-agents/002-contextstream-knowledge-ingest-implementation.md), [ContextStream knowledge ingest guide](../guides/contextstream-ingest.md)
+**Related**: [PRD-011: ContextStream Knowledge Ingest (GitHub API)](../product/contextstream-agents/002-contextstream-knowledge-ingest.md), [TP-011: ContextStream Knowledge Ingest Implementation](../tech-plans/contextstream-agents/002-contextstream-knowledge-ingest-implementation.md), [ContextStream knowledge ingest guide](../guides/contextstream-ingest.md)
 
 ## Overview
 
@@ -306,7 +306,7 @@ interface DocumentMetadata {
 
 ## Related Documentation
 
-- [PRD-010: ContextStream Knowledge Ingest (GitHub API)](../product/contextstream-agents/002-contextstream-knowledge-ingest.md)
-- [TP-010: ContextStream Knowledge Ingest Implementation](../tech-plans/contextstream-agents/002-contextstream-knowledge-ingest-implementation.md)
+- [PRD-011: ContextStream Knowledge Ingest (GitHub API)](../product/contextstream-agents/002-contextstream-knowledge-ingest.md)
+- [TP-011: ContextStream Knowledge Ingest Implementation](../tech-plans/contextstream-agents/002-contextstream-knowledge-ingest-implementation.md)
 - [ContextStream knowledge ingest guide](../guides/contextstream-ingest.md)
 - [ContextStream mapping](../guides/contextstream-mapping.md)

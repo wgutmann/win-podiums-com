@@ -18,6 +18,19 @@
 - **`apps/api/`** — Cloudflare Worker (API + static Gate). Run via Docker; tests run against the Dockerized API.
 - **`apps/plugin/`** — SimHub plugin (C# / .NET Framework 4.8). Build and run on host; no container yet.
 
+## Prepare fresh environment
+
+Use this when you want a clean, runnable Docker dev environment (e.g. after clone, after Dockerfile/compose changes, or to reset local state).
+
+1. **Already running?** If a container is already running (`docker compose ps`), stop it first so the next `up` uses the new image and avoids port conflicts: `docker compose down`. Then continue with the steps below.
+2. **Secrets** — Create `apps/api/.dev.vars` from `apps/api/.dev.vars.example` and set `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `SESSION_SECRET`. Compose requires this file; do not commit it.
+3. **Optional: full clean** — To reset containers and local D1 state: `docker compose down --volumes`. Omit if you want to keep existing container data.
+4. **Build** — Rebuild so the image has the latest startup sequence (OpenAPI inline → **D1 migrations apply** → wrangler dev). Required after any Dockerfile change: `docker compose build api`.
+5. **Start** — `docker compose up -d api` (or `docker compose up api` for foreground logs). Prepare env includes starting the stack so the app is running when done. On first start you should see in logs: `Migrations to be applied: 0001_initial_schema.sql` → `25 commands executed successfully` → `0001_initial_schema.sql ✅`, then `Ready on http://0.0.0.0:8787`.
+6. **Verify** — Open **http://localhost:8787/api/health** (expect `{ "ok": true, "env": "dev" }`). Use **http://localhost:8787/auth/discord** for Discord login (redirect is normalized to `localhost` in dev so it matches Discord’s configured redirect).
+
+**Recent behavior:** The container CMD runs D1 migrations at startup, so you do not need to run `wrangler d1 migrations apply` manually for a fresh DB. OAuth in dev uses `http://localhost:8787/auth/callback` so it matches Discord’s redirect list even if you open the app via `http://127.0.0.1:8787`.
+
 ## Running the API (Docker)
 
 1. Create secrets file so Docker and Worker config match:
@@ -108,17 +121,16 @@ The plugin targets .NET Framework 4.8 and SimHub on Windows. Build and run on th
 
 ## D1 initial schema (create empty tables)
 
-Run migrations from the host (or once inside the container). Local D1 state is in the container; to persist it you can use a volume (optional). For a fresh schema in the container:
-
-```bash
-cd apps/api
-npx wrangler d1 migrations apply winpodiums-dev-db --local
-```
-
-To run the same migration inside the running container:
+**Docker:** Migrations run automatically when the container starts (see Dockerfile CMD). You do not need to run them manually for a fresh env. If you need to re-apply inside a running container:
 
 ```bash
 docker compose exec api npx wrangler d1 migrations apply winpodiums-dev-db --local
+```
+
+**Host (no Docker):** Run from `apps/api`:
+
+```bash
+npx wrangler d1 migrations apply winpodiums-dev-db --local
 ```
 
 Schema SQL lives in `apps/api/migrations/`. See [database schema](../design/data-models/database-schema.md).
@@ -253,6 +265,7 @@ To disable the hook for this repo: `git config --unset core.hooksPath`.
 
 ## Related
 
+- [Leveragable lessons](leveragable-lessons.md) — 12 project lessons for agents and contributors
 - [Deployment](deployment.md) — Deploy Worker with Wrangler
 - [Next Steps](../architecture/next-steps.md) — Recommended order of work (test locally, deploy)
 - [Phase 1 scope](../product/phase-1-mvp-scope.md) — MVP deliverables and trace to docs

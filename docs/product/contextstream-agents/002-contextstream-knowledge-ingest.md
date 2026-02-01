@@ -1,6 +1,6 @@
-# PRD-010: ContextStream Knowledge Ingest (GitHub API)
+# PRD-011: ContextStream Knowledge Ingest (GitHub API)
 
-**Doc type**: PRD | **ID**: PRD-010 | **Related**: [PRD-009: ContextStream and Agent/Cursor Interactions](001-contextstream-agent-cursor-interactions.md), [ContextStream mapping](../../guides/contextstream-mapping.md), [ContextStream knowledge ingest guide](../../guides/contextstream-ingest.md) | **Technical Plans**: [TP-010](../../tech-plans/contextstream-agents/002-contextstream-knowledge-ingest-implementation.md)
+**Doc type**: PRD | **ID**: PRD-011 | **Related**: [PRD-009: ContextStream and Agent/Cursor Interactions](001-contextstream-agent-cursor-interactions.md), [ContextStream mapping](../../guides/contextstream-mapping.md), [ContextStream knowledge ingest guide](../../guides/contextstream-ingest.md) | **Technical Plans**: [TP-011](../../tech-plans/contextstream-agents/002-contextstream-knowledge-ingest-implementation.md)
 
 **Status**: Draft  
 **Version**: 1.0  
@@ -159,7 +159,7 @@ Automate document ingestion via GitHub REST API:
 
 ## Related Documentation
 
-- [TP-010: ContextStream Knowledge Ingest Implementation](../../tech-plans/contextstream-agents/002-contextstream-knowledge-ingest-implementation.md)
+- [TP-011: ContextStream Knowledge Ingest Implementation](../../tech-plans/contextstream-agents/002-contextstream-knowledge-ingest-implementation.md)
 - [ContextStream knowledge ingest guide](../../guides/contextstream-ingest.md)
 - [ContextStream mapping](../../guides/contextstream-mapping.md)
 - [PRD-009: ContextStream and Agent/Cursor Interactions](001-contextstream-agent-cursor-interactions.md)

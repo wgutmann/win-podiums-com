@@ -75,6 +75,7 @@ apps/api/src/openapi-spec.ts
 # Cloudflare (Wrangler / Workers / Pages)
 .dev.vars
 .dev.vars.*
+!.dev.vars.example
 .wrangler/
 wrangler.toml.local
 

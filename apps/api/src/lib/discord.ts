@@ -42,6 +42,20 @@ export async function exchangeCodeWeb(
     code,
     redirect_uri: redirectUri,
   });
+  // #region agent log
+  fetch("http://127.0.0.1:7242/ingest/1d72bcc7-cc87-407b-8d82-421bf27576d3", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      location: "discord.ts:exchangeCodeWeb",
+      message: "about to fetch token URL",
+      data: { url: DISCORD_TOKEN_URL },
+      timestamp: Date.now(),
+      sessionId: "debug-session",
+      hypothesisId: "A",
+    }),
+  }).catch(() => {});
+  // #endregion
   const res = await fetch(DISCORD_TOKEN_URL, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -82,6 +96,20 @@ export async function exchangeCodePKCE(
 
 /** Fetch Discord user with access token. */
 export async function getDiscordUser(accessToken: string): Promise<DiscordUser> {
+  // #region agent log
+  fetch("http://127.0.0.1:7242/ingest/1d72bcc7-cc87-407b-8d82-421bf27576d3", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      location: "discord.ts:getDiscordUser",
+      message: "about to fetch user URL",
+      data: { url: DISCORD_ME_URL },
+      timestamp: Date.now(),
+      sessionId: "debug-session",
+      hypothesisId: "A",
+    }),
+  }).catch(() => {});
+  // #endregion
   const res = await fetch(DISCORD_ME_URL, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });

@@ -12,7 +12,8 @@ prds:
   PRD-007: docs/product/cloudflare-security/001-free-cloudflare-security.md
   PRD-008: docs/product/github-traceability/001-github-labels-pr-traceability.md
   PRD-009: docs/product/contextstream-agents/001-contextstream-agent-cursor-interactions.md
-  PRD-010: docs/product/contextstream-agents/002-contextstream-knowledge-ingest.md
+  PRD-010: docs/product/brand/001-brand-and-design.md
+  PRD-011: docs/product/contextstream-agents/002-contextstream-knowledge-ingest.md
 
 tech_plans:
   TP-SPOC-001: docs/tech-plans/simhub-plugin-poc/001-plugin-skeleton-sdk-config.md
@@ -27,4 +28,5 @@ tech_plans:
   TP-005: docs/tech-plans/telemetry-proof-system/005-challenge-response.md
   TP-008: docs/tech-plans/github-traceability/001-labels-and-traceability.md
   TP-009: docs/tech-plans/contextstream-agents/001-contextstream-and-cursor-rules.md
-  TP-010: docs/tech-plans/contextstream-agents/002-contextstream-knowledge-ingest-implementation.md
+  TP-010: docs/tech-plans/brand/001-brand-alignment.md
+  TP-011: docs/tech-plans/contextstream-agents/002-contextstream-knowledge-ingest-implementation.md

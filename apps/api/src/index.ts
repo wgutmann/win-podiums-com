@@ -114,7 +114,12 @@ export default {
         });
       }
       const state = generateState();
-      const redirectUri = `${baseUrl}/auth/callback`;
+      // In dev, use localhost for redirect_uri so it matches Discord's configured redirect (127.0.0.1 ≠ localhost for OAuth)
+      const authBase =
+        env.ENVIRONMENT === "dev" && url.hostname === "127.0.0.1"
+          ? `http://localhost:${url.port || "8787"}`
+          : baseUrl;
+      const redirectUri = `${authBase}/auth/callback`;
       if (env.CACHE) {
         await env.CACHE.put(`auth:state:${state}`, redirectUri, { expirationTtl: 600 });
       }
@@ -178,6 +183,20 @@ export default {
           },
         });
       } catch (e) {
+        // #region agent log
+        fetch("http://127.0.0.1:7242/ingest/1d72bcc7-cc87-407b-8d82-421bf27576d3", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            location: "index.ts:auth/callback catch",
+            message: "callback auth failed",
+            data: { error: e instanceof Error ? e.message : String(e) },
+            timestamp: Date.now(),
+            sessionId: "debug-session",
+            hypothesisId: "A",
+          }),
+        }).catch(() => {});
+        // #endregion
         const msg = e instanceof Error ? e.message : "Auth failed";
         return Response.redirect(`${baseUrl}/gate?error=auth&message=${encodeURIComponent(msg)}`, 302);
       }

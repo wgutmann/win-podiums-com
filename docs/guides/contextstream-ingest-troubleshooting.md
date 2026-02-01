@@ -1,6 +1,6 @@
 # ContextStream Knowledge Ingest Troubleshooting
 
-**Related**: [ContextStream knowledge ingest guide](contextstream-ingest.md), [PRD-010: ContextStream Knowledge Ingest (GitHub API)](../product/contextstream-agents/002-contextstream-knowledge-ingest.md)
+**Related**: [ContextStream knowledge ingest guide](contextstream-ingest.md), [PRD-011: ContextStream Knowledge Ingest (GitHub API)](../product/contextstream-agents/002-contextstream-knowledge-ingest.md)
 
 ## Common Issues
 
@@ -31,12 +31,12 @@
 **Solutions**:
 1. **Add doc ID to document**: Add to document header:
    ```markdown
-   **Doc type**: PRD | **ID**: PRD-010 | ...
+   **Doc type**: PRD | **ID**: PRD-011 | ...
    ```
 2. **Add to traceability mapping**: Add entry to `.github/traceability-mapping.yaml`:
    ```yaml
    prds:
-     PRD-010: docs/product/contextstream-agents/002-contextstream-knowledge-ingest.md
+     PRD-011: docs/product/contextstream-agents/002-contextstream-knowledge-ingest.md
    ```
 3. **Check path**: Ensure document path matches mapping exactly
 
@@ -48,7 +48,7 @@
 ### Issue: Doc ID Mismatch
 
 **Symptoms**:
-- Script logs: `Doc ID mismatch for docs/product/prd-010.md: mapping=PRD-010 content=PRD-011`
+- Script logs: `Doc ID mismatch for docs/product/prd-011.md: mapping=PRD-011 content=PRD-012`
 
 **Solutions**:
 1. **Fix mapping**: Update `.github/traceability-mapping.yaml` to match document content
@@ -169,7 +169,7 @@ console.log(`Extracted metadata for ${filePath}:`, JSON.stringify(metadata, null
 
 2. **Single file test**: Temporarily modify script to process only one file:
    ```javascript
-   const filtered = candidates.filter((item) => item.path === 'docs/product/prd-010.md');
+   const filtered = candidates.filter((item) => item.path === 'docs/product/prd-011.md');
    ```
 
 3. **Check metadata extraction**: Review logs to see what metadata is extracted
@@ -180,7 +180,7 @@ Test GitHub API directly:
 
 ```bash
 curl -H "Authorization: Bearer $GITHUB_TOKEN" \
-  "https://api.github.com/repos/owner/repo/contents/docs/product/prd-010.md?ref=main"
+  "https://api.github.com/repos/owner/repo/contents/docs/product/prd-011.md?ref=main"
 ```
 
 ### Check Knowledge Center Endpoint

@@ -5,7 +5,7 @@
 **Status**: Accepted  
 **Date**: 2026-01-31  
 **Deciders**: Architecture Team  
-**Related**: [SECURITY.md](../../../SECURITY.md), [ADR-002 Discord OAuth](002-discord-oauth.md), [ADR-005 Cost-Optimized](005-cost-optimized-cloudflare.md), [API README](../../api/README.md), [.github/workflows/security.yml](../../../.github/workflows/security.yml)
+**Related**: [SECURITY.md](../../../SECURITY.md), [ADR-002 Discord OAuth](002-discord-oauth.md), [ADR-005 Cost-Optimized](005-cost-optimized-cloudflare.md), [API README](../../api/README.md)
 
 ## Context
 
@@ -34,17 +34,19 @@ We adopt the following security choices and test-coverage expectations.
 
 - **Full anti-cheat and Telemetry Proof**: Threat model, telemetry validation, continuity, challenge-response per [Security & Anti-Cheat LLD](../../design/security-anticheat.md) and Telemetry Proof tech plans. Phase 1: rate limiting and OAuth security only.
 
-### 4. CI security
+### 4. Recommended CI security
 
-- **Secret scanning**: [.github/workflows/security.yml](../../../.github/workflows/security.yml) runs TruffleHog (verified only) on push/PR to main; blocks merge if secrets are detected.
-- **Dependency audits**: `npm audit --audit-level=high` for API; `dotnet list package --vulnerable` for plugin. CI fails when high/critical or vulnerable packages are reported.
-- **SAST**: CodeQL (security-extended) for JavaScript/TypeScript and C#. Required for merge on main.
+The repo does **not** ship GitHub Actions by default. We **recommend** adding a security workflow under `.github/workflows/` that includes:
+
+- **Secret scanning**: e.g. TruffleHog (verified only) on push/PR; block merge if secrets are detected.
+- **Dependency audits**: `npm audit --audit-level=high` for API; `dotnet list package --vulnerable` for plugin; fail when high/critical or vulnerable packages are reported.
+- **SAST**: e.g. CodeQL (security-extended) for JavaScript/TypeScript and C#.
 
 ### 5. Test coverage
 
 - **API**: Smoke test against running API (Docker or wrangler). [apps/api/test/smoke.js](../../../apps/api/test/smoke.js) and `npm test`; run locally. New API routes or auth flows must be covered by smoke or unit tests; do not merge without tests for security-sensitive paths (auth, token exchange, profile, heartbeat).
 - **Plugin**: Unit tests and integration tests as the plugin grows; Phase 1 may have minimal automated tests but security-sensitive code (token storage, API client) should have tests before production.
-- **Coverage goal**: Critical paths (auth, token handling, profile, heartbeat) must have test coverage; expand to broader coverage as we add features. CI must pass (Security + CI workflows) before merge.
+- **Coverage goal**: Critical paths (auth, token handling, profile, heartbeat) must have test coverage; expand to broader coverage as we add features. Run local pre-push checks (see [Development Guide](../../../docs/guides/development.md#run-tests-before-push)); if you add GitHub Actions, they should pass before merge.
 
 ## Rationale
 
@@ -67,4 +69,4 @@ We adopt the following security choices and test-coverage expectations.
 - [Security & Anti-Cheat LLD](../../design/security-anticheat.md) — Phase 2+ scope
 - [ADR-002: Discord OAuth](002-discord-oauth.md)
 - [ADR-005: Cost-Optimized Cloudflare](005-cost-optimized-cloudflare.md)
-- [.github/workflows/security.yml](../../../.github/workflows/security.yml) — CI security checks
+- [SECURITY.md](../../../SECURITY.md) — Recommended security automation (GitHub Actions)

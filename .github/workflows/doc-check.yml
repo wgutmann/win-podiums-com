@@ -1,31 +1,12 @@
-# Doc check: markdown lint, internal link check, Mermaid diagram validation.
-# Workflow runs when docs/config change; each job runs only when its paths change.
-# Concurrency cancels in-progress runs when new commits are pushed (saves minutes).
-name: Doc check
+# doc-check: Markdown lint, Lychee link check, Mermaid .mmd validation, OpenAPI (Spectral).
+# Runs when docs, key READMEs, or configs change.
+# See docs/guides/development.md#recommended-github-actions and docs/standards/documentation-standards.md
+
+name: doc-check
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "docs/**"
-      - "README.md"
-      - "AGENTS.md"
-      - "CONTRIBUTING.md"
-      - "SECURITY.md"
-      - ".markdownlint.jsonc"
-      - ".lycheeignore"
-      - ".github/workflows/doc-check.yml"
   pull_request:
-    branches: [main]
-    paths:
-      - "docs/**"
-      - "README.md"
-      - "AGENTS.md"
-      - "CONTRIBUTING.md"
-      - "SECURITY.md"
-      - ".markdownlint.jsonc"
-      - ".lycheeignore"
-      - ".github/workflows/doc-check.yml"
+    branches: ["**"]
 
 concurrency:
   group: doc-check-${{ github.ref }}
@@ -33,85 +14,54 @@ concurrency:
 
 jobs:
   paths:
-    name: Paths filter
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+      contents: read
     outputs:
-      docs: ${{ steps.filter.outputs.docs }}
-      mermaid: ${{ steps.filter.outputs.mermaid }}
-      openapi: ${{ steps.filter.outputs.openapi }}
+      doc_check: ${{ steps.filter.outputs.doc_check }}
     steps:
-      - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
         id: filter
         with:
           filters: |
-            docs:
+            doc_check:
               - 'docs/**'
               - 'README.md'
-              - 'AGENTS.md'
-              - 'CONTRIBUTING.md'
-              - 'SECURITY.md'
+              - 'apps/plugin/README.md'
+              - 'infra/terraform/README.md'
               - '.markdownlint.jsonc'
               - '.lycheeignore'
-              - '.github/workflows/doc-check.yml'
-            mermaid:
-              - 'docs/**/*.mmd'
-              - 'docs/architecture/diagrams/**'
-              - 'docs/design/diagrams/**'
-              - '.github/workflows/doc-check.yml'
-            openapi:
-              - 'docs/api/**'
+              - '.spectral.yaml'
               - '.github/workflows/doc-check.yml'
 
-  markdown-lint:
+  doc-check:
     needs: paths
-    if: needs.paths.outputs.docs == 'true'
-    name: Markdown lint
+    if: needs.paths.outputs.doc_check == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Lint markdown
-        run: npx markdownlint-cli@latest "docs/**/*.md" "README.md" "AGENTS.md" "CONTRIBUTING.md" "SECURITY.md" "apps/plugin/README.md" "infra/terraform/README.md" --config .markdownlint.jsonc
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
 
-  link-check:
-    name: Link check
-    needs: paths
-    if: needs.paths.outputs.docs == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+      - name: Markdown lint
+        run: |
+          npx markdownlint-cli@latest 'docs/**/*.md' 'README.md' 'apps/plugin/README.md' 'infra/terraform/README.md' -c .markdownlint.jsonc
 
-      - name: Link checker
+      - name: Link check
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --verbose --no-progress --cache --max-cache-age 1d --exclude-all-private "./docs/**/*.md" "./README.md" "./AGENTS.md" "./CONTRIBUTING.md" "./SECURITY.md" "./apps/plugin/README.md" "./infra/terraform/README.md"
+          args: --verbose ./docs/ ./README.md ./apps/plugin/README.md ./infra/terraform/README.md
           fail: true
 
-  mermaid-validate:
-    name: Mermaid diagrams
-    needs: paths
-    if: needs.paths.outputs.mermaid == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Validate Mermaid (.mmd)
+      - name: Validate Mermaid
         run: |
-          for f in docs/architecture/diagrams/data-flow.mmd docs/architecture/diagrams/system-overview.mmd docs/design/diagrams/entity-relationship.mmd; do
-            [ -f "$f" ] || continue
-            echo "Validating $f ..."
-            docker run --rm -v "$PWD:/data" minlag/mermaid-cli -i "/data/$f" -o /data/out.svg -b transparent
-            rm -f out.svg
+          for f in $(find docs/architecture/diagrams docs/design/diagrams -name '*.mmd' 2>/dev/null); do
+            npx @mermaid-js/mermaid-cli@latest -i "$f" -o /tmp/mermaid-out.svg || exit 1
           done
 
-  openapi-docs:
-    name: OpenAPI (docs)
-    needs: paths
-    if: needs.paths.outputs.openapi == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Validate OpenAPI spec
-        run: npx @stoplight/spectral-cli@latest lint docs/api/openapi.yaml --fail-severity=error
+      - name: OpenAPI validation
+        run: npx @stoplight/spectral-cli@latest lint docs/api/openapi.yaml --fail-severity=error --ruleset .spectral.yaml

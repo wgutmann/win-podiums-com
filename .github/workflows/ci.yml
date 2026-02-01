@@ -1,54 +1,39 @@
-# CI: typecheck, lint, plugin build, lockfile check, OpenAPI validation.
-# Workflow runs when api/plugin/docs-api change; each job runs only when its paths change.
-# Concurrency cancels in-progress runs when new commits are pushed (saves minutes).
+# CI: TypeScript typecheck, ESLint, OpenAPI (Spectral).
+# Runs when apps/api, docs/api, or this workflow change.
+# See docs/guides/development.md#recommended-github-actions
+
 name: CI
 
 on:
-  push:
-    branches: [main]
   pull_request:
-    branches: [main]
-    paths:
-      - "apps/api/**"
-      - "apps/plugin/**"
-      - "docs/api/**"
-      - ".github/workflows/ci.yml"
+    branches: ["**"]
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  # Disabled: CI checks turned off (remove if: false to re-enable)
   paths:
-    name: Paths filter
-    if: false
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+      contents: read
     outputs:
-      api: ${{ steps.filter.outputs.api }}
-      plugin: ${{ steps.filter.outputs.plugin }}
+      ci_api: ${{ steps.filter.outputs.ci_api }}
     steps:
-      - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
         id: filter
         with:
           filters: |
-            api:
+            ci_api:
               - 'apps/api/**'
               - 'docs/api/**'
               - '.github/workflows/ci.yml'
-            plugin:
-              - 'apps/plugin/**'
-              - '.github/workflows/ci.yml'
 
-  api-validate:
+  ci:
     needs: paths
-    if: false
-    name: API (typecheck, lint, lockfile, OpenAPI)
+    if: needs.paths.outputs.ci_api == 'true'
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/api
     steps:
       - uses: actions/checkout@v4
 
@@ -59,41 +44,21 @@ jobs:
           cache: "npm"
           cache-dependency-path: apps/api/package-lock.json
 
-      - name: Install and inline OpenAPI
-        run: |
-          npm ci
-          node scripts/inline-openapi.js ../../docs/api/openapi.yaml src/openapi-spec.ts
+      - name: Install dependencies
+        working-directory: apps/api
+        run: npm ci
+
+      - name: Inline OpenAPI
+        working-directory: apps/api
+        run: node scripts/inline-openapi.js ../../docs/api/openapi.yaml src/openapi-spec.ts
 
       - name: Typecheck
+        working-directory: apps/api
         run: npm run typecheck
 
       - name: Lint
+        working-directory: apps/api
         run: npm run lint
 
-      - name: Lockfile check
-        run: git diff --exit-code apps/api/package-lock.json
-        working-directory: ${{ github.workspace }}
-
       - name: OpenAPI validation
-        run: npx @stoplight/spectral-cli@latest lint docs/api/openapi.yaml --fail-severity=error
-        working-directory: ${{ github.workspace }}
-
-  plugin-build:
-    name: Plugin build
-    needs: paths
-    if: false
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: "8.0.x"
-
-      - name: Restore and build
-        run: |
-          cd apps/plugin/WinPodiums.Plugin
-          dotnet restore
-          dotnet build --configuration Release --no-restore
-
+        run: npx @stoplight/spectral-cli@latest lint docs/api/openapi.yaml --fail-severity=error --ruleset .spectral.yaml

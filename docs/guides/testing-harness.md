@@ -2,21 +2,17 @@
 
 **Last updated**: 2026-02-01
 
-This doc describes how tests are triggered and how the security gate works so you get fast feedback on push and controlled, “run when I say” security checks before merge.
+This doc describes how tests are triggered and how the security gate works so branch protection required checks run on every PR and merge is unblocked when they pass.
 
 ---
 
 ## Design
 
-1. **On every push / PR**: Run **only unit tests (and related checks) for the modified portion** of the app. Path-filtered: API changes → API typecheck, lint, unit tests; plugin changes → plugin build. No security runs automatically.
+1. **On every push / PR** (path-filtered): **CI** runs unit tests and related checks for the changed app (API or plugin). **Security** runs on the same path filter (apps/api, apps/plugin, docs/api) so Secret scan, dependency audits, and CodeQL report status on the PR. **Lockfile check** and **OpenAPI validation** run as separate CI jobs so branch protection sees those names.
 
-2. **Merge protection**: You **cannot merge** without security checks passing. Those checks **do not run automatically**; they run only when explicitly requested.
+2. **Merge protection**: Branch protection can require the individual check names (e.g. Secret scan, npm audit, CodeQL, Lockfile check, OpenAPI validation). All of these run automatically on PR when the path filter matches, so PRs are mergeable once the workflows complete and pass.
 
-3. **How to “run these tests”**:
-   - **Button**: In the Actions tab, run the **Security** workflow via “Run workflow” (choose branch and run). The run is attached to that ref, so the PR sees the status.
-   - **Comment**: On a PR, comment **`/run-security`** to trigger the Security workflow on that PR’s head. The run reports status back to the PR.
-
-So: lightweight, path-filtered CI on every push; security only on demand (button or comment); branch protection requires the security gate to pass before merge.
+3. **Optional manual trigger**: You can still run **Security** on demand via “Run workflow” in the Actions tab or by commenting **`/run-security`** on a PR (e.g. to re-run security without pushing a new commit).
 
 **Diagram:** [PR and testing flow](../architecture/diagrams/pr-testing-flow.md) — Mermaid flowchart of PR events, automatic CI, manual Security trigger, and merge gate.
 
@@ -26,9 +22,9 @@ So: lightweight, path-filtered CI on every push; security only on demand (button
 
 | Trigger | What runs |
 |--------|-----------|
-| **Push / PR** (path-filtered) | **CI**: Unit tests (and typecheck/lint) for the changed app only. API path → API job; plugin path → plugin build. No security. |
-| **Manual “Run workflow”** (Security) | **Security**: Secret scan, dependency audits, CodeQL. Run on the branch you select. Use for “run these tests” before merge. |
-| **Comment `/run-security`** on a PR | **Security**: Same as above, but runs on the PR’s head commit so the PR gets the status. |
+| **Push / PR** (path-filtered) | **CI**: Lockfile check, OpenAPI validation, API job (typecheck, lint, unit tests), plugin build when paths match. **Security**: Secret scan, npm audit, .NET vulnerable packages, CodeQL (when paths match). All report status so branch protection required checks are satisfied. |
+| **Manual “Run workflow”** (Security) | **Security**: Same checks; run on the branch you select (e.g. to re-run without pushing). |
+| **Comment `/run-security`** on a PR | **Security**: Same as above, on the PR’s head commit so the PR gets the status. |
 
 ---
 
@@ -51,24 +47,21 @@ Comment parsing is case-insensitive for the command (e.g. `/Run-Security` works)
 
 ## Branch protection setup
 
-To enforce “cannot merge without security checks”:
+To enforce “cannot merge without required checks”:
 
 1. **Settings → Branches → Branch protection** for `main`.
-2. **Require status checks before merging**: enable and add **`security-gate`** (the job name; the full status check may appear as **Security / security-gate** in the UI).
+2. **Require status checks before merging**: enable and add the checks you want (e.g. **Lockfile check**, **OpenAPI validation**, **Secret scan**, **npm audit**, **.NET vulnerable packages**, **CodeQL**, **CodeQL (csharp)**, **CodeQL (javascript-typescript)**, or the single gate **Security / security-gate**).
 3. Save.
 
-After that, a PR will only be mergeable when at least one Security run for that branch has completed and **Security / security-gate** passed. Because Security runs only on workflow_dispatch or `/run-security`, someone must explicitly run it (button or comment) before merge.
+CI and Security run automatically on pull requests when `apps/api`, `apps/plugin`, or `docs/api` (or the workflow files) change, so those required checks are reported and PRs become mergeable when they pass.
 
 ---
 
 ## Workflow summary
 
-- **CI** (`.github/workflows/ci.yml`): Runs on push/PR when `apps/**`, `docs/api/**`, or the workflow file change. Path filter runs only the jobs for changed areas (API vs plugin). No security.
-- **Security** (`.github/workflows/security.yml`): Runs **only** on:
-  - **workflow_dispatch**: “Run workflow” in the Actions tab (choose branch).
-  - **issue_comment**: Comment on a PR containing `/run-security`; runs on that PR’s head.
-  - When triggered by comment, a **get-ref** job resolves the PR head ref; all other jobs checkout that ref so the run is tied to the PR.
-- **PR test instructions** (`.github/workflows/pr-test-instructions.yml`): Runs on every PR (opened, sync, reopened). Posts or updates a single comment on the PR explaining how to run the tests required for merge (Security) that are not triggered automatically.
+- **CI** (`.github/workflows/ci.yml`): Runs on push/PR when `apps/**`, `docs/api/**`, or the workflow file change. Includes jobs **Lockfile check** and **OpenAPI validation** (so branch protection can require them by name), plus API (typecheck, lint, tests) and plugin build.
+- **Security** (`.github/workflows/security.yml`): Runs on **pull_request** and **push** to main (path-filtered like CI), plus **workflow_dispatch** and **issue_comment** (`/run-security`). Reports Secret scan, npm audit, .NET vulnerable packages, CodeQL (csharp / javascript-typescript), and **security-gate**.
+- **PR test instructions** (`.github/workflows/pr-test-instructions.yml`): Runs on every PR. Posts or updates a comment with instructions; Security now runs automatically on PR, so the comment is mainly for manual re-runs.
 
 ---
 

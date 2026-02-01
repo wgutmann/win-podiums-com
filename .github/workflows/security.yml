@@ -1,12 +1,24 @@
 # Security: secret scanning, dependency audits, and code scanning (SAST).
-# Does NOT run automatically. Trigger via:
-#   - Actions tab → "Run workflow" (workflow_dispatch), or
-#   - Comment "/run-security" on a PR (issue_comment).
-# Branch protection can require "Security / security-gate" so merge is blocked until Security is run and passes.
+# Runs on every PR (path-filtered) so branch protection required checks are reported.
+# Also: workflow_dispatch ("Run workflow") and comment "/run-security" on a PR.
 # See docs/guides/testing-harness.md.
 name: Security
 
 on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/api/**"
+      - "apps/plugin/**"
+      - "docs/api/**"
+      - ".github/workflows/security.yml"
+  push:
+    branches: [main]
+    paths:
+      - "apps/api/**"
+      - "apps/plugin/**"
+      - "docs/api/**"
+      - ".github/workflows/security.yml"
   workflow_dispatch:
     inputs:
       branch:
@@ -16,7 +28,7 @@ on:
     types: [created]
 
 concurrency:
-  group: security-${{ github.event_name }}-${{ github.event.issue.number || github.ref }}
+  group: security-${{ github.event_name }}-${{ github.event.pull_request.number || github.event.issue.number || github.ref }}
   cancel-in-progress: true
 
 permissions:

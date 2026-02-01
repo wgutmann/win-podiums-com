@@ -1,5 +1,5 @@
-# On every PR, post or update a comment explaining how to run the tests required for merge
-# that are NOT triggered automatically by GitHub Actions (e.g. Security).
+# On every PR, post or update a comment with instructions for re-running Security if needed.
+# CI and Security run automatically on PR (path-filtered); this comment explains manual re-run.
 # See docs/guides/testing-harness.md.
 name: PR test instructions
 
@@ -21,26 +21,19 @@ jobs:
         with:
           script: |
             const marker = '<!-- pr-required-tests-instructions -->';
-            const body = `## How to run tests required for merge
+            const body = `## Tests required for merge
 
-            The following checks are **required for merge** but **do not run automatically** on push or PR. You must trigger them manually.
+            **CI** and **Security** run automatically on this PR when \`apps/api\`, \`apps/plugin\`, or \`docs/api\` change. Wait for the checks to finish; when they pass, you can merge (if branch protection is satisfied).
 
-            ### Security checks (required status: \`security-gate\`)
+            ### Re-run Security manually
+
+            To re-run Security without pushing a new commit:
 
             **Option 1 — Comment on this PR**  
-            Comment exactly:
-            \`\`\`
-            /run-security
-            \`\`\`
-            The Security workflow will run on this PR's branch and report status here.
+            Comment: \`/run-security\`
 
             **Option 2 — Actions tab**  
-            1. Open the **Actions** tab.  
-            2. Select the **Security** workflow.  
-            3. Click **Run workflow**, choose this PR's branch, then **Run workflow**.  
-            4. The run will appear as a status check on this PR.
-
-            After Security passes, the **security-gate** check will be satisfied and you can merge (if branch protection is configured to require it).
+            Actions → **Security** → **Run workflow**, choose this PR's branch → **Run workflow**.
 
             ${marker}`;
 

@@ -1,0 +1,43 @@
+# Ingest repo documents into ContextStream (or another Knowledge Center).
+# Uses GitHub REST API to fetch content and streams docs to the ingest endpoint.
+
+name: ContextStream ingest
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Skip uploads (log only)"
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: contextstream-ingest-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Ingest docs into knowledge center
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CONTEXTSTREAM_API_KEY: ${{ secrets.CONTEXTSTREAM_API_KEY }}
+          CONTEXTSTREAM_API_URL: ${{ secrets.CONTEXTSTREAM_API_URL }}
+          KNOWLEDGE_API_KEY: ${{ secrets.KNOWLEDGE_API_KEY }}
+          KNOWLEDGE_API_URL: ${{ secrets.KNOWLEDGE_API_URL }}
+          KNOWLEDGE_UPLOAD_MODE: stream
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: node scripts/contextstream-ingest.js

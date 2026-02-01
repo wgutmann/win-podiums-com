@@ -1,0 +1,115 @@
+# PR Description Sync: when a PR is opened or updated, if the branch has a
+# .github/PR_DESCRIPTION_<branch>.md file (branch name with / replaced by _),
+# set the PR body to that file so ContextStream traceability and template are applied automatically.
+# Also extracts Implements/PRD/design doc IDs and adds labels for filtering and ContextStream.
+name: PR description sync
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    branches: [main]
+
+jobs:
+  update-body:
+    name: Set PR body from description file
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve PR description file
+        id: pr_file
+        run: |
+          BRANCH="${GITHUB_HEAD_REF//\//_}"
+          FILE=".github/PR_DESCRIPTION_${BRANCH}.md"
+          if [ -f "$FILE" ]; then
+            echo "path=$FILE" >> $GITHUB_OUTPUT
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Update PR body from file
+        if: steps.pr_file.outputs.exists == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = '${{ steps.pr_file.outputs.path }}';
+            const body = fs.readFileSync(path, 'utf8');
+            await github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              body
+            });
+            core.notice('Updated PR body from ' + path);
+
+  extract-traceability:
+    name: Extract traceability and add labels
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve PR description file
+        id: pr_file
+        run: |
+          BRANCH="${GITHUB_HEAD_REF//\//_}"
+          FILE=".github/PR_DESCRIPTION_${BRANCH}.md"
+          if [ -f "$FILE" ]; then
+            echo "path=$FILE" >> $GITHUB_OUTPUT
+            echo "exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Extract traceability and add labels
+        if: steps.pr_file.outputs.exists == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = '${{ steps.pr_file.outputs.path }}';
+            const content = fs.readFileSync(path, 'utf8');
+            const prNumber = context.payload.pull_request.number;
+            const labels = new Set();
+
+            // Implements (Tech Plan): TP-XXX or none
+            const implementsMatch = content.match(/\*\*Implements \(Tech Plan\):\*\*\s*(?:none|([^—\n]+))/i);
+            if (implementsMatch) {
+              const val = (implementsMatch[1] || 'none').trim().toLowerCase();
+              if (val === 'none') labels.add('tech-plan:none');
+              else val.split(/[\s,]+/).filter(Boolean).forEach(t => labels.add('tech-plan:' + t.trim()));
+            }
+
+            // PRD: PRD-XXX or none
+            const prdMatch = content.match(/\*\*PRD:\*\*\s*(?:none|([^—\n]+))/i);
+            if (prdMatch) {
+              const val = (prdMatch[1] || 'none').trim().toLowerCase();
+              if (val === 'none') labels.add('prd:none');
+              else val.split(/[\s,]+/).filter(Boolean).forEach(p => labels.add('prd:' + p.trim()));
+            }
+
+            // Design doc IDs (DC-DS, DC-WP, etc.)
+            const dcMatches = content.match(/\*\*DC-[A-Z0-9-]+\*\*/g);
+            if (dcMatches) dcMatches.forEach(dc => labels.add('design:' + dc.replace(/\*\*/g, '')));
+
+            if (labels.size === 0) return;
+            const labelArray = [...labels];
+            try {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                labels: labelArray
+              });
+              core.notice('Added labels: ' + labelArray.join(', '));
+            } catch (err) {
+              if (err.status === 422) core.warning('Labels not added (create tech-plan:none, prd:none, design:DC-DS, design:DC-WP in repo for ContextStream filtering)');
+              else throw err;
+            }

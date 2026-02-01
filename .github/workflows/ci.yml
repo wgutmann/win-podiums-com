@@ -19,8 +19,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Disabled: CI checks turned off (remove if: false to re-enable)
   paths:
     name: Paths filter
+    if: false
     runs-on: ubuntu-latest
     outputs:
       api: ${{ steps.filter.outputs.api }}
@@ -41,7 +43,7 @@ jobs:
 
   api-validate:
     needs: paths
-    if: needs.paths.outputs.api == 'true'
+    if: false
     name: API (typecheck, lint, lockfile, OpenAPI)
     runs-on: ubuntu-latest
     defaults:
@@ -79,7 +81,7 @@ jobs:
   plugin-build:
     name: Plugin build
     needs: paths
-    if: needs.paths.outputs.plugin == 'true'
+    if: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

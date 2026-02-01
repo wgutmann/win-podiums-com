@@ -3,6 +3,9 @@
 # Use Debian-based image so Wrangler's workerd binary (linux64) runs correctly
 FROM node:20-bookworm-slim
 
+# Ensure CA certificates are present and up to date so outbound fetch() to Discord (HTTPS) trusts TLS
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 # Copy dependency manifests and install (cache layer)
@@ -19,6 +22,8 @@ COPY apps/api/migrations ./migrations
 
 # Wrangler reads .dev.vars from project dir; use env_file in compose and CLOUDFLARE_INCLUDE_PROCESS_ENV so env matches
 ENV CLOUDFLARE_INCLUDE_PROCESS_ENV=true
+# So workerd trusts TLS for outbound fetch (e.g. Discord OAuth) in Docker
+ENV NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
 
 EXPOSE 8787
 

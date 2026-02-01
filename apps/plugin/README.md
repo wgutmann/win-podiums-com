@@ -5,14 +5,14 @@
 
 ## Overview
 
-SimHub plugin for WinPodiums: monitors telemetry, detects podium finishes, and submits verified results to the API. Phase 1 scope: position detection, minimal auth (browser or manual token), one verification API call (or stub).
+SimHub plugin for WinPodiums: monitors telemetry, detects podium finishes, and submits verified results to the API. Phase 1 scope: position detection deferred; minimal auth (browser primary; manual token **debug-only, feature-flagged**), one verification API call (heartbeat).
 
 ## Layout
 
 - `WinPodiums.Plugin/` — Main class library
-  - `Core/PluginMain.cs` — Entry point; manual token auth + heartbeat (SimHub SDK interfaces when reference added)
+  - `Core/PluginMain.cs` — Entry point; browser auth (PKCE) + heartbeat (SimHub SDK interfaces when reference added); manual token only when debug flag on
   - `Auth/TokenStorage.cs` — DPAPI-protected storage for access token and Discord ID
-  - `Services/ApiClient.cs` — API client: token exchange, heartbeat
+  - `Services/ApiClient.cs` — API client: PKCE exchange, token exchange (debug), heartbeat
 
 ## Prerequisites
 
@@ -25,17 +25,19 @@ SimHub plugin for WinPodiums: monitors telemetry, detects podium finishes, and s
 2. From this directory: `dotnet build WinPodiums.Plugin/WinPodiums.Plugin.csproj`
 3. Deploy the built DLL to `C:\Program Files (x86)\SimHub\Plugins` and restart SimHub. (Official SimHub docs sometimes refer to the install root; this repo uses the Plugins subfolder unless your SimHub version requires otherwise.)
 
-## Phase 1: manual token + heartbeat
+## Phase 1: browser auth (PKCE) + heartbeat
 
-1. **Get a token**: Log in at https://winpodiums.com (or http://localhost:8787), open **Generate plugin token** (`/auth/token`), click **Generate token**, copy the 8-character code.
-2. **In plugin** (when SimHub SDK is wired): Set the manual token string, then call `AuthenticateWithManualTokenAsync(tokenCode)`. Tokens are stored with DPAPI.
-3. **Heartbeat**: Call `SendHeartbeatAsync(pluginVersion)` to send one verification flow; uses stored Bearer token.
+1. **Primary auth**: In plugin, use browser (PKCE) flow: plugin opens browser → user signs in with Discord → callback returns to plugin → plugin exchanges code and stores tokens with DPAPI.
+2. **Heartbeat**: Call `SendHeartbeatAsync(pluginVersion)` to send one verification flow; uses stored Bearer token.
+
+**Debug only** (feature-flagged): When manual token is enabled (e.g. debug mode), get a token from https://winpodiums.com (or http://localhost:8787) at `/auth/token`, then in plugin call `AuthenticateWithManualTokenAsync(tokenCode)`. Do not expose as a user-facing option.
 
 ```csharp
 var plugin = new PluginMain();
 plugin.Init();
 plugin.SetApiBaseUrl("http://localhost:8787");  // or https://winpodiums.com
-bool ok = await plugin.AuthenticateWithManualTokenAsync("AB12CD34");
+// Primary: browser (PKCE). Debug-only: AuthenticateWithManualTokenAsync("AB12CD34") when flag on.
+bool ok = await plugin.AuthenticateWithBrowserAsync();  // or AuthenticateWithManualTokenAsync(token) if debug
 if (ok) await plugin.SendHeartbeatAsync("1.0.0");
 ```
 

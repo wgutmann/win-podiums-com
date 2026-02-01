@@ -115,7 +115,7 @@ Schema SQL lives in `apps/api/migrations/`. See [database schema](../design/data
 
 - **Secrets** (in `apps/api/.dev.vars`): `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `SESSION_SECRET` (min 32 chars for JWT). Copy from `apps/api/.dev.vars.example`.
 - **Web flow**: Visit `/auth/discord` → Discord → callback → session cookie. Gate at `/` or `/gate`.
-- **Plugin manual token**: Log in on web, then open `/auth/token`, generate token, paste in plugin. Plugin calls `POST /api/auth/token-exchange` then `POST /api/plugin/heartbeat`.
+- **Plugin auth**: Primary flow is browser (PKCE). Manual token is **debug-only** (feature-flagged): when enabled, log in on web, open `/auth/token`, generate token, paste in plugin; plugin calls `POST /api/auth/token-exchange` then `POST /api/plugin/heartbeat`.
 
 ## Alternative: run API on host (no Docker)
 

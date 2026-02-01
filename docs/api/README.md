@@ -7,7 +7,7 @@ REST API for WinPodiums, hosted on Cloudflare Workers.
 ## Overview
 
 The WinPodiums API provides endpoints for:
-- **Authentication**: Discord OAuth2 flows (web, plugin browser, plugin QR, plugin manual token)
+- **Authentication**: Discord OAuth2 flows (web, plugin browser, plugin QR; plugin manual token is debug-only, feature-flagged)
 - **Plugin Integration**: Telemetry submission, heartbeat, version checking
 - **User Profiles**: Member data, podium history, preferences
 - **Verification**: Race result validation and anti-cheat
@@ -38,7 +38,7 @@ Discord OAuth2 integration for all authentication methods.
 - `POST /auth/discord/callback` — Web OAuth2 callback
 - `POST /auth/discord/exchange` — Plugin token exchange (PKCE)
 - `GET /auth/qr-status/:sessionId` — QR code polling
-- `POST /auth/token-exchange` — Manual token validation
+- `POST /auth/token-exchange` — Manual token validation (debug only; feature-flagged in plugin)
 
 📄 [Full Authentication API Spec](./authentication.md)
 

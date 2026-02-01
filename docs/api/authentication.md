@@ -13,7 +13,7 @@ All auth flows use **Discord OAuth2**. Web uses session cookies; plugin uses Bea
 | POST | `/api/auth/discord/callback` | Web OAuth2 callback |
 | POST | `/api/auth/discord/exchange` | Plugin token exchange (PKCE) |
 | GET | `/api/auth/qr-status/:sessionId` | QR code polling |
-| POST | `/api/auth/token-exchange` | Manual token validation |
+| POST | `/api/auth/token-exchange` | Manual token validation (debug only) |
 
 ## Web flow
 
@@ -23,8 +23,8 @@ All auth flows use **Discord OAuth2**. Web uses session cookies; plugin uses Bea
 
 ## Plugin flows
 
-- **Browser / QR**: Plugin opens browser or shows QR; user completes Discord auth; plugin polls `GET /api/auth/qr-status/:sessionId` or exchanges code via `POST /api/auth/discord/exchange`.
-- **Manual**: User pastes token; `POST /api/auth/token-exchange` validates and returns session info.
+- **Browser / QR** (primary): Plugin opens browser or shows QR; user completes Discord auth; plugin polls `GET /api/auth/qr-status/:sessionId` or exchanges code via `POST /api/auth/discord/exchange`.
+- **Manual token** (debug only, feature-flagged): Not a user-facing option. When a debug feature flag is enabled, user can paste a token from `/auth/token`; `POST /api/auth/token-exchange` validates and returns session info.
 
 ## Responses
 

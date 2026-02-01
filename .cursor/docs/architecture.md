@@ -28,7 +28,7 @@ User Device → Web/API (Cloudflare Workers) → D1 Database
 
 ### Authentication (Hybrid)
 - **Path A** (Web-First): Website → Discord Auth → Download Pre-Linked Plugin
-- **Path B** (Plugin-First): Download Plugin → Install → Auth in Plugin (3 methods: browser, QR, manual token)
+- **Path B** (Plugin-First): Download Plugin → Install → Auth in Plugin (primary: browser, QR; manual token debug-only, feature-flagged)
 
 ### Telemetry Verification
 1. SimHub fires `SessionEnd` event

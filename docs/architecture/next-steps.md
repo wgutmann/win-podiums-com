@@ -17,14 +17,14 @@
 | **Create D1 tables** | `apps/api` | Run the initial schema (empty tables): `npx wrangler d1 migrations apply winpodiums-dev-db --local` (or `--remote` when deploying). SQL in `apps/api/migrations/0001_initial_schema.sql`. |
 | **Configure Discord + secrets** | `apps/api` | Copy `.dev.vars.example` to `.dev.vars`; set `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `SESSION_SECRET`. In Discord Developer Portal, add redirect URI `http://localhost:8787/auth/callback` (and production URL when you deploy). |
 | **Test Worker locally** | Repo root + `apps/api` | Run API: `docker compose up`. Run tests against Docker: `docker compose up -d && cd apps/api && npm test`. Hit `/`, `/auth/discord`, `/auth/token`, `/api/health`, `/api/profile/me` (after login). |
-| **Test plugin** | `apps/plugin` | Build plugin; deploy DLL to `C:\Program Files (x86)\SimHub\Plugins`. Log in on web, generate token at `/auth/token`, then in plugin call `AuthenticateWithManualTokenAsync(token)` and `SendHeartbeatAsync()`. |
+| **Test plugin** | `apps/plugin` | Build plugin; deploy DLL to `C:\Program Files (x86)\SimHub\Plugins`. Primary auth: browser (PKCE). For debug only (feature-flagged): generate token at `/auth/token`, then in plugin call `AuthenticateWithManualTokenAsync(token)` and `SendHeartbeatAsync()`. |
 | **Deploy** | When ready | Create D1/KV/R2 in Cloudflare if needed; set bindings in `wrangler.toml`; apply D1 schema `--remote`; then `wrangler deploy`. See [Deployment Guide](../guides/deployment.md). |
 
 **Implemented in Phase 1 (Step 4):**
 
 - **Worker**: Real Discord OAuth (web: `/auth/discord`, callback; plugin: `POST /api/auth/discord/exchange`, `POST /api/auth/token-exchange`, `GET /api/auth/qr-status/:id` stub). `GET /api/profile/me` and `POST /api/plugin/heartbeat` use D1/KV. Static Gate at `/` and `/gate`; token page at `/auth/token`. Secrets: see `apps/api/.dev.vars.example`.
 - **D1**: Initial-schema SQL `0001_initial_schema.sql` (CREATE TABLE for users, auth_tokens, qr_auth_sessions, manual_tokens, race_results, plugin_installations, rate_limit_logs). No data—just empty tables. Run the command above when you want the Worker to have a DB to write to.
-- **Plugin**: Manual token auth (`AuthenticateWithManualTokenAsync`) and one verification call (`SendHeartbeatAsync`). DPAPI storage; API client in `Services/ApiClient.cs`. SimHub SDK not yet referenced (position detection / IPlugin wiring deferred).
+- **Plugin**: Browser auth (PKCE) primary; manual token **debug-only, feature-flagged** (`AuthenticateWithManualTokenAsync` when flag on). One verification call (`SendHeartbeatAsync`). DPAPI storage; API client in `Services/ApiClient.cs`. SimHub SDK not yet referenced (position detection / IPlugin wiring deferred).
 
 ---
 
@@ -44,7 +44,7 @@
 | **Repo governance** | ✅ Present | AGENTS.md, .gitignore, CONTRIBUTING.md, SECURITY.md, CHANGELOG.md (stubs) |
 | **Repo structure** | ✅ Done | Worker in `apps/api/` (wrangler.toml for D1/R2/KV), SimHub plugin in `apps/plugin/` |
 | **Worker (Phase 1)** | ✅ Done | Real Discord OAuth (web + plugin exchange/token-exchange), D1 initial-schema SQL (create tables), profile/me with D1/KV, heartbeat, Gate + `/auth/token` |
-| **Plugin (Phase 1)** | ✅ Done | Manual token auth, heartbeat API call, DPAPI storage, API client; SimHub SDK/position detection not yet wired |
+| **Plugin (Phase 1)** | ✅ Done | Browser auth (PKCE) primary; manual token debug-only, feature-flagged; heartbeat API call, DPAPI storage, API client; SimHub SDK/position detection not yet wired |
 
 ### What Is Not Done Yet
 
@@ -53,7 +53,7 @@
 | **D1 tables not created yet** | Initial-schema SQL exists in `apps/api/migrations/` (CREATE TABLE only, no data) but has not been run; run `wrangler d1 migrations apply` when you want empty tables for the Worker to use. |
 | **Discord + secrets** | `.dev.vars` not committed; create it from `.dev.vars.example` and configure Discord app redirect URI. |
 | **Deployment** | Worker not yet deployed to Cloudflare; no live routes. |
-| **Plugin SimHub SDK** | SimHub SDK reference and IPlugin/position detection not yet added (Phase 1 used manual token + heartbeat only). |
+| **Plugin SimHub SDK** | SimHub SDK reference and IPlugin/position detection not yet added (Phase 1 used browser PKCE + heartbeat; manual token debug-only). |
 | **Repo docs** | No LICENSE; CONTRIBUTING/SECURITY/CHANGELOG are stubs (full content as implementation progresses). |
 
 So: **Phase 1 implementation is complete.** Next: create D1 tables (run initial schema—empty tables only), configure Discord and `.dev.vars`, test locally; when ready, deploy Worker (see [Deployment Guide](../guides/deployment.md)).
@@ -102,10 +102,10 @@ Follow the order below so that design, scope, and code stay aligned and infra is
 ### Step 4: Implement Phase 1 — ✅ Done
 
 - **Worker**: Auth endpoints (web: `/auth/discord`, callback; plugin: `/api/auth/discord/exchange`, `/api/auth/token-exchange`, `/api/auth/qr-status/:id` stub). Profile `GET /api/profile/me` and `POST /api/plugin/heartbeat` using D1/KV. D1 initial-schema SQL in `apps/api/migrations/0001_initial_schema.sql` (CREATE TABLE only; run it when you want empty tables). Gate at `/`, `/gate`; token page at `/auth/token`.
-- **Plugin**: Manual token auth (`AuthenticateWithManualTokenAsync`) and one verification call (`SendHeartbeatAsync`). DPAPI storage; API client. SimHub SDK and position detection not yet wired.
+- **Plugin**: Browser auth (PKCE) primary; manual token **debug-only, feature-flagged**. One verification call (`SendHeartbeatAsync`). DPAPI storage; API client. SimHub SDK and position detection not yet wired.
 - **Landing**: Static “Gate” page (can be Worker-served or static in R2) that links to Discord auth and plugin download.
 
-**Outcome**: One end-to-end path: user visits site → auth (or plugin manual token) → minimal API + DB/KV → plugin can send heartbeat. **Pick up**: create D1 tables (initial schema only, no data), set `.dev.vars`, test; then deploy when ready (see [Deployment Guide](../guides/deployment.md)).
+**Outcome**: One end-to-end path: user visits site → auth; plugin uses browser (PKCE) to link (manual token only when debug flag on) → minimal API + DB/KV → plugin can send heartbeat. **Pick up**: create D1 tables (initial schema only, no data), set `.dev.vars`, test; then deploy when ready (see [Deployment Guide](../guides/deployment.md)).
 
 ---
 

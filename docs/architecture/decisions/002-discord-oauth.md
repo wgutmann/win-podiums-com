@@ -64,7 +64,7 @@ We will use **Discord OAuth2** as the **sole identity provider**, with no altern
 - **Web authentication**: Standard OAuth2 Authorization Code flow
 - **Plugin authentication**: 
   - Authorization Code + PKCE (no client secret in desktop app)
-  - Three methods supported: Browser launch, QR code, manual token
+  - Primary methods: Browser launch, QR code. Manual token: **debug-only, feature-flagged** (not a user-facing option).
 - **Scopes**: Minimal `identify` scope only (Discord ID + username)
 - **Token storage**: 
   - Web: HTTP-only, Secure, SameSite cookies

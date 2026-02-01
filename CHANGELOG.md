@@ -11,12 +11,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Stub CONTRIBUTING.md, SECURITY.md, CHANGELOG.md.
 - Cursor rules: `.cursor/rules/infra.mdc`, `.cursor/rules/docs.mdc`.
 - Cloudflare Workers skill: `.cursor/skills/cloudflare-workers/`.
-- Agent instructions: current phase, Terraform guardrails, doc conventions (AGENTS.md).
+- Agent instructions: current phase, Worker/Docker 1:1, Terraform out of scope until explicit feature (AGENTS.md).
 
 ### Changed
 
 - `.cursor/docs/index.md`: clarified repo docs links and status; added cloudflare-workers skill.
 - **Documentation refresh (2026-01-31)**: [docs/architecture/next-steps.md](docs/architecture/next-steps.md) updated for current state — Steps 1–3 (doc gaps, Phase 1 scope, repo structure) marked done; Step 4 (Implement Phase 1) is current focus. README, AGENTS.md, CONTRIBUTING.md, and .cursor/docs/index.md aligned with same; CONTRIBUTING/SECURITY linked from README.
+- **Worker/Docker 1:1, Terraform out of scope (2026-01-31)**: README, AGENTS.md, next-steps.md, development.md, deployment.md, wrangler.toml, phase-1-mvp-scope.md, infrastructure.md, .cursor/docs/index.md, and cloudflare-workers skill updated so that (1) Worker and Docker are documented as 1:1 (same app, same config), and (2) Terraform is ignored until explicitly introduced as a feature; all Terraform-based deploy steps removed from the default workflow.
+- **Run and test with Docker (2026-01-31)**: Dockerfile added (Node 20 Bookworm, Wrangler with `--ip 0.0.0.0`); compose uses `env_file: ./apps/api/.dev.vars` and Docker/Worker config aligned via `CLOUDFLARE_INCLUDE_PROCESS_ENV`. Smoke test `apps/api/test/smoke.js` runs against Docker API and asserts `{ ok: true, env: "dev" }`. All docs updated: local run and testing use Docker; start API with `docker compose up`, run tests with `docker compose up -d && cd apps/api && npm test`.
 
 ---
 

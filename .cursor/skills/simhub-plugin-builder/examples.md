@@ -49,9 +49,9 @@ namespace SimHubPlugin
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- TODO: Reference SimHub SDK assemblies -->
+    <!-- TODO: Reference SimHub SDK assemblies (canonical path: C:\Program Files (x86)\SimHub) -->
     <!-- <Reference Include="SimHub.SDK"> -->
-    <!--   <HintPath>SIMHUB_INSTALL_DIR\SDK\SimHub.SDK.dll</HintPath> -->
+    <!--   <HintPath>C:\Program Files (x86)\SimHub\SDK\SimHub.SDK.dll</HintPath> -->
     <!-- </Reference> -->
   </ItemGroup>
 </Project>
@@ -63,8 +63,8 @@ namespace SimHubPlugin
 # Build
 dotnet build -c Debug
 
-# Deploy (update paths for your system)
-$SimHubInstall = "SIMHUB_INSTALL_DIR"
-$PluginOut = "bin\\Debug\\"
-Copy-Item "$PluginOut\\SimHubPlugin.dll" "$SimHubInstall\\Plugins\\" -Force
+# Deploy to SimHub plugins folder (canonical path for this repo)
+$SimHubPlugins = "C:\Program Files (x86)\SimHub\Plugins"
+$PluginOut = "bin\Debug"
+Copy-Item "$PluginOut\SimHubPlugin.dll" "$SimHubPlugins\" -Force
 ```

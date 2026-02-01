@@ -11,8 +11,8 @@ compatibility_date = "2024-01-01"
 
 [[d1_databases]]
 binding = "DB"
-database_name = "winpodiums-d1"   # or from Terraform output
-database_id = "<id-from-terraform>"
+database_name = "winpodiums-dev-db"
+database_id = "<d1-database-id-from-cloudflare>"
 
 [[r2_buckets]]
 binding = "BUCKET"

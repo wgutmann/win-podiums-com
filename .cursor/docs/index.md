@@ -22,7 +22,7 @@ A merit-based luxury community for elite sim racers, verified through real-time 
 - [Brand Philosophy](../../docs/architecture/high-level-design.md#1-executive-summary) — "The Podium Invitation"
 
 ### Developer Guides
-- [Development Setup](../../docs/guides/development.md) — Docker-first dev (API in container); host option for API and plugin
+- [Development Setup](../../docs/guides/development.md) — Run and test locally with Docker; tests run against the Dockerized API
 - [Deployment Guide](../../docs/guides/deployment.md) — Release process (TBD)
 
 ## Project Summary
@@ -44,8 +44,9 @@ A merit-based luxury community for elite sim racers, verified through real-time 
 
 ### API (Cloudflare Worker)
 - Main entry: `apps/api/src/index.ts`
-- **Docker dev**: `docker compose up` — API at http://localhost:8787 (health: `/health`, Gate: `/` or `/gate`)
-- Config: `apps/api/wrangler.toml` (add D1/KV/R2 bindings when Terraform is applied)
+- **Run locally**: `docker compose up` — API at http://localhost:8787 (health: `/health` or `/api/health`, Gate: `/` or `/gate`)
+- **Test**: `docker compose up -d && cd apps/api && npm test` (smoke test against Docker; validates Docker and Worker config match)
+- Config: `apps/api/wrangler.toml` + `apps/api/.dev.vars` (same config in Docker)
 
 ### SimHub Plugin
 - Main entry: `apps/plugin/WinPodiums.Plugin/Core/PluginMain.cs`
@@ -55,9 +56,9 @@ A merit-based luxury community for elite sim racers, verified through real-time 
 ## Development Workflow
 
 1. **Clone repo**: `git clone https://github.com/...` (TBD)
-2. **Install dependencies**: `npm install` (web/API), restore NuGet packages (plugin)
-3. **Local dev**: `wrangler dev` (web/API), F5 in Visual Studio (plugin)
-4. **Run tests**: `npm test` (web/API), run test suite in VS (plugin)
+2. **Run API**: `docker compose up` (from repo root); API at http://localhost:8787
+3. **Run tests**: With Docker up (`docker compose up -d`), run `cd apps/api && npm test` — tests hit the Dockerized API
+4. **Plugin**: Build and run on host (F5 in Visual Studio); point at http://localhost:8787 when API is in Docker
 5. **Deploy**: `wrangler deploy` (production) or open PR for review
 
 ## Skills & Conventions
@@ -70,7 +71,7 @@ This project uses [Cursor Skills](.cursor/skills/) for domain-specific tasks:
 - `github-change-control` — GitHub workflow and secrets management
 - `cursor-project-docs` — Documentation structure and maintenance
 
-Project rules in [.cursor/rules/](.cursor/rules/) apply when editing matching files (e.g. `infra.mdc` for Terraform, `docs.mdc` for docs). See [AGENTS.md](../../AGENTS.md) for AI agent instructions.
+Project rules in [.cursor/rules/](.cursor/rules/) apply when editing matching files (e.g. `docs.mdc` for docs). See [AGENTS.md](../../AGENTS.md) for AI agent instructions. Terraform is out of scope until explicitly introduced as a feature.
 
 ## Status
 
@@ -81,6 +82,6 @@ Project rules in [.cursor/rules/](.cursor/rules/) apply when editing matching fi
 **Next steps:** ([full sequence](../../docs/architecture/next-steps.md))
 1. ~~Close doc gaps~~ (guides, API sub-docs, security LLD)
 2. ~~Define Phase 1 scope~~ ([phase-1-mvp-scope.md](../../docs/product/phase-1-mvp-scope.md))
-3. ~~Set up repo structure~~ (Worker in `apps/api/`, plugin in `apps/plugin/`, wrangler.toml wired to Terraform outputs)
-4. **Implement Phase 1** — real Discord OAuth, D1 migrations, plugin auth + one verification flow (Worker stubs and Gate already in place)
-5. Then apply Terraform and deploy Worker (and plugin)
+3. ~~Set up repo structure~~ (Worker in `apps/api/`, plugin in `apps/plugin/`, wrangler.toml)
+4. ~~Implement Phase 1~~ — real Discord OAuth, D1 migrations (local schema applied), plugin auth + heartbeat
+5. **Pick up**: Create D1 tables (already done locally), configure Discord + `.dev.vars`, run and test with Docker (`docker compose up`, `npm test` in apps/api); then deploy when ready (see [Next Steps](../../docs/architecture/next-steps.md)).

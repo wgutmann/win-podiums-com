@@ -2,7 +2,29 @@
 
 **Status**: Recommendation  
 **Date**: 2026-01-31  
-**Purpose**: Align next work with repo documentation and avoid deploying infrastructure before anything uses it.
+**Purpose**: Align next work with repo documentation.
+
+**Terraform**: Not part of the default workflow. Ignore `infra/terraform/` until explicitly introduced as a feature. See [AGENTS.md](../../AGENTS.md).
+
+---
+
+## Where we are — pick up here
+
+**Step 4 (Implement Phase 1) is done.** Worker and Docker are 1:1 (same app, same config). You can pick up with any of the following.
+
+| Next action | Where | Notes |
+|-------------|--------|------|
+| **Create D1 tables** | `apps/api` | Run the initial schema (empty tables): `npx wrangler d1 migrations apply winpodiums-dev-db --local` (or `--remote` when deploying). SQL in `apps/api/migrations/0001_initial_schema.sql`. |
+| **Configure Discord + secrets** | `apps/api` | Copy `.dev.vars.example` to `.dev.vars`; set `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `SESSION_SECRET`. In Discord Developer Portal, add redirect URI `http://localhost:8787/auth/callback` (and production URL when you deploy). |
+| **Test Worker locally** | Repo root + `apps/api` | Run API: `docker compose up`. Run tests against Docker: `docker compose up -d && cd apps/api && npm test`. Hit `/`, `/auth/discord`, `/auth/token`, `/api/health`, `/api/profile/me` (after login). |
+| **Test plugin** | `apps/plugin` | Build plugin; deploy DLL to `C:\Program Files (x86)\SimHub\Plugins`. Log in on web, generate token at `/auth/token`, then in plugin call `AuthenticateWithManualTokenAsync(token)` and `SendHeartbeatAsync()`. |
+| **Deploy** | When ready | Create D1/KV/R2 in Cloudflare if needed; set bindings in `wrangler.toml`; apply D1 schema `--remote`; then `wrangler deploy`. See [Deployment Guide](../guides/deployment.md). |
+
+**Implemented in Phase 1 (Step 4):**
+
+- **Worker**: Real Discord OAuth (web: `/auth/discord`, callback; plugin: `POST /api/auth/discord/exchange`, `POST /api/auth/token-exchange`, `GET /api/auth/qr-status/:id` stub). `GET /api/profile/me` and `POST /api/plugin/heartbeat` use D1/KV. Static Gate at `/` and `/gate`; token page at `/auth/token`. Secrets: see `apps/api/.dev.vars.example`.
+- **D1**: Initial-schema SQL `0001_initial_schema.sql` (CREATE TABLE for users, auth_tokens, qr_auth_sessions, manual_tokens, race_results, plugin_installations, rate_limit_logs). No data—just empty tables. Run the command above when you want the Worker to have a DB to write to.
+- **Plugin**: Manual token auth (`AuthenticateWithManualTokenAsync`) and one verification call (`SendHeartbeatAsync`). DPAPI storage; API client in `Services/ApiClient.cs`. SimHub SDK not yet referenced (position detection / IPlugin wiring deferred).
 
 ---
 
@@ -19,21 +41,22 @@
 | **API** | ✅ Good | OpenAPI spec (`openapi.yaml`), API README, `authentication.md`, `plugin.md`, `user-profile.md` |
 | **Guides** | ✅ Present | `docs/guides/development.md`, `docs/guides/deployment.md` |
 | **Brand** | ✅ Present | Design system doc |
-| **Infrastructure (Terraform)** | ✅ Ready | D1, R2, KV, optional routes for winpodiums.com; GitHub Actions for plan/apply |
-| **Repo governance** | ✅ Present | AGENTS.md, .gitignore, CONTRIBUTING.md, SECURITY.md, CHANGELOG.md (stubs); Terraform plan/validate only until deploy-ready |
-| **Repo structure** | ✅ Done | Worker in `apps/api/` (wrangler.toml wired to Terraform outputs), SimHub plugin in `apps/plugin/` |
-| **Minimal Worker** | ✅ Present | Health, Gate (static), auth stubs, profile stub (`GET /api/profile/me`); bindings for D1/R2/KV in wrangler.toml |
-| **Plugin scaffold** | ✅ Present | C#/.NET 4.8 project in `apps/plugin/WinPodiums.Plugin/` |
+| **Repo governance** | ✅ Present | AGENTS.md, .gitignore, CONTRIBUTING.md, SECURITY.md, CHANGELOG.md (stubs) |
+| **Repo structure** | ✅ Done | Worker in `apps/api/` (wrangler.toml for D1/R2/KV), SimHub plugin in `apps/plugin/` |
+| **Worker (Phase 1)** | ✅ Done | Real Discord OAuth (web + plugin exchange/token-exchange), D1 initial-schema SQL (create tables), profile/me with D1/KV, heartbeat, Gate + `/auth/token` |
+| **Plugin (Phase 1)** | ✅ Done | Manual token auth, heartbeat API call, DPAPI storage, API client; SimHub SDK/position detection not yet wired |
 
 ### What Is Not Done Yet
 
 | Area | Gap |
 |------|-----|
-| **Phase 1 implementation** | Real Discord OAuth (web + plugin flows), D1 migrations, plugin auth (browser/manual) + one verification API call or stub |
-| **Deployment** | Terraform not applied; Worker not deployed to Terraform-created D1/R2/KV; no live routes |
-| **Repo docs** | No LICENSE; CONTRIBUTING/SECURITY/CHANGELOG are stubs (full content as implementation progresses) |
+| **D1 tables not created yet** | Initial-schema SQL exists in `apps/api/migrations/` (CREATE TABLE only, no data) but has not been run; run `wrangler d1 migrations apply` when you want empty tables for the Worker to use. |
+| **Discord + secrets** | `.dev.vars` not committed; create it from `.dev.vars.example` and configure Discord app redirect URI. |
+| **Deployment** | Worker not yet deployed to Cloudflare; no live routes. |
+| **Plugin SimHub SDK** | SimHub SDK reference and IPlugin/position detection not yet added (Phase 1 used manual token + heartbeat only). |
+| **Repo docs** | No LICENSE; CONTRIBUTING/SECURITY/CHANGELOG are stubs (full content as implementation progresses). |
 
-So: **docs, scope, repo structure, and a minimal Worker + plugin scaffold are in place.** The next focus is **Phase 1 implementation** (real auth, D1, plugin flows); then deploy infra and Worker.
+So: **Phase 1 implementation is complete.** Next: create D1 tables (run initial schema—empty tables only), configure Discord and `.dev.vars`, test locally; when ready, deploy Worker (see [Deployment Guide](../guides/deployment.md)).
 
 ---
 
@@ -43,18 +66,7 @@ So: **docs, scope, repo structure, and a minimal Worker + plugin scaffold are in
 - **.cursor/docs/index.md**: “Next steps: Finalize HLD/LLD review → Set up repository structure → Begin Phase 1 implementation (Discord auth + basic plugin).”
 - **HLD Phase 1 (MVP)**: Discord OAuth2 (all three plugin methods), basic SimHub plugin with position detection, simple verification API with signature validation, static “Gate” landing page, member state (pending/verified).
 
-The documented sequence is: **finalize docs → set up repo structure → Phase 1 implementation.** Deployment of Cloudflare resources fits **after** there is at least a minimal Worker (and ideally a plugin) that can use them.
-
----
-
-## 3. Recommendation: Do Not Deploy Infra Yet
-
-**Do not run `terraform apply` (and do not rely on GitHub Actions to apply) until:**
-
-1. You are ready to run D1 migrations (per database-schema doc) and attach the Worker in `apps/api/` to the Terraform-created D1/R2/KV.
-2. You are ready to deploy the Worker (e.g. `wrangler deploy`) and optionally attach routes (e.g. winpodiums.com).
-
-A minimal Worker already exists and can bind to D1/R2/KV. Terraform and the workflow are **ready**: use them for **plan** and **validate** on PRs; use `apply` when you are ready to deploy.
+The documented sequence is: **finalize docs → set up repo structure → Phase 1 implementation → test locally → deploy** (Wrangler; Terraform is not in scope).
 
 ---
 
@@ -79,30 +91,21 @@ Follow the order below so that design, scope, and code stay aligned and infra is
   - Out of scope for Phase 1: full Telemetry Proof (heartbeat/validation/continuity/challenge-response), luxury UI, Discord roles, leaderboards.
 - **Trace Phase 1 to existing docs**: list which PRDs/tech plans/ADRs/LLDs apply to Phase 1 and which are “Phase 2+”.
 
-**Outcome**: Clear “minimum shippable” set and no confusion about whether Terraform + D1/R2/KV are for Phase 1 or later.
+**Outcome**: Clear “minimum shippable” set and no confusion about Phase 1 scope.
 
 ### Step 3: Set Up Repository Structure — ✅ Done
 
-- Worker: `apps/api/` with `wrangler.toml` referencing Terraform outputs (D1, R2, KV).
+- Worker: `apps/api/` with `wrangler.toml` for D1, R2, KV bindings.
 - SimHub plugin: `apps/plugin/WinPodiums.Plugin/` (C#/.NET Framework 4.8).
 - Minimal Worker serves health, Gate, auth stubs, profile stub; bindings ready for D1/R2/KV.
 
-### Step 4: Implement Phase 1 (Current Focus)
+### Step 4: Implement Phase 1 — ✅ Done
 
-- **Worker**: Implement auth endpoints (per OpenAPI + Discord LLD) and at least one non-auth endpoint (e.g. health or `GET /api/profile/me` stub) using D1/KV. Apply D1 migrations (Wrangler) against the Terraform-created D1 database (local or a single dev environment).
-- **Plugin**: Implement minimal auth (e.g. browser or manual token first), position detection, and one call to the verification API (or a stub) per tech plans and SimHub LLD.
+- **Worker**: Auth endpoints (web: `/auth/discord`, callback; plugin: `/api/auth/discord/exchange`, `/api/auth/token-exchange`, `/api/auth/qr-status/:id` stub). Profile `GET /api/profile/me` and `POST /api/plugin/heartbeat` using D1/KV. D1 initial-schema SQL in `apps/api/migrations/0001_initial_schema.sql` (CREATE TABLE only; run it when you want empty tables). Gate at `/`, `/gate`; token page at `/auth/token`.
+- **Plugin**: Manual token auth (`AuthenticateWithManualTokenAsync`) and one verification call (`SendHeartbeatAsync`). DPAPI storage; API client. SimHub SDK and position detection not yet wired.
 - **Landing**: Static “Gate” page (can be Worker-served or static in R2) that links to Discord auth and plugin download.
 
-**Outcome**: One end-to-end path: user visits site → auth (or plugin auth) → minimal API + DB/KV → plugin can submit (or stub) a result.
-
-### Step 5: Deploy Infrastructure and Then the App
-
-- **Apply Terraform** (locally or via GitHub Actions) once the Worker is ready to bind to the created resources. Use a single environment (e.g. `dev`) first; add `staging`/`prod` later.
-- **Configure Worker**: Point `wrangler.toml` at Terraform outputs (D1 name, R2 bucket, KV id, and zone_id if using winpodiums.com routes).
-- **Deploy Worker**: `wrangler deploy` (manually or via CI); ensure routes (e.g. winpodiums.com) are attached per infrastructure doc.
-- **Plugin distribution**: Use R2 (and optionally GitHub Releases) per deployment guide once you have a build.
-
-**Outcome**: Live infra and a live Worker (and later plugin) using it, with no “orphan” resources.
+**Outcome**: One end-to-end path: user visits site → auth (or plugin manual token) → minimal API + DB/KV → plugin can send heartbeat. **Pick up**: create D1 tables (initial schema only, no data), set `.dev.vars`, test; then deploy when ready (see [Deployment Guide](../guides/deployment.md)).
 
 ---
 
@@ -110,20 +113,20 @@ Follow the order below so that design, scope, and code stay aligned and infra is
 
 | Priority | Action | Why |
 |----------|--------|-----|
-| 1 | **Do not run Terraform apply yet** | Nothing would use D1/R2/KV/routes today. |
-| 2 | **Fill doc gaps** (guides, API sub-docs, security LLD or HLD fix) | Unblocks implementation and keeps links valid. |
-| 3 | **Define Phase 1 scope** on paper | Keeps first implementation and infra aligned with “MVP” in the HLD. |
-| 4 | **Add repo structure** (Worker + plugin projects, wrangler.toml wired to Terraform outputs) | Gives a clear place to implement and a clear moment when Terraform becomes useful. |
-| 5 | **Implement Phase 1** (auth, minimal API, minimal plugin, static gate) | Delivers the MVP path the HLD describes. |
-| 6 | **Then** run Terraform apply and deploy Worker (and plugin) | Infra and code stay in sync; no wasted or unused resources. |
+| 1 | **Fill doc gaps** (guides, API sub-docs, security LLD or HLD fix) | Unblocks implementation and keeps links valid. |
+| 2 | **Define Phase 1 scope** on paper | Keeps first implementation aligned with “MVP” in the HLD. |
+| 3 | **Add repo structure** (Worker + plugin projects, wrangler.toml) | Gives a clear place to implement. |
+| 4 | **Implement Phase 1** (auth, minimal API, minimal plugin, static gate) | Delivers the MVP path the HLD describes. |
+| 5 | **Test locally** (Worker + plugin) | Validates end-to-end before deploy. |
+| 6 | **Deploy** (Wrangler; D1/KV/R2 in Cloudflare as needed) | Live Worker and plugin. See [Deployment Guide](../guides/deployment.md). |
 
-The Terraform and GitHub Actions you have are the right long-term setup. The right next step is **documentation and Phase 1 scope + structure**, then **implementation**, then **deploy**.
+Worker and Docker are 1:1. The right next step is **test locally**, then **deploy** when ready.
 
 ---
 
 ## Related
 
 - [High-Level Design](high-level-design.md) — Phase 1 checklist and system overview
-- [Infrastructure (Terraform)](infrastructure.md) — When and how to apply
 - [README](../../README.md) — Repo status and stack
+- [Deployment Guide](../guides/deployment.md) — How to deploy the Worker
 - [.cursor/docs/index.md](../../.cursor/docs/index.md) — Cursor-facing next steps

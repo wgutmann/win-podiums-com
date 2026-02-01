@@ -7,8 +7,8 @@ System architecture and high-level design decisions for WinPodiums.
 - **[High-Level Design](high-level-design.md)** — Complete system architecture overview
 - **[Architecture Decisions](decisions/)** — ADRs documenting key architectural choices
 - **[Cost Optimization Summary](cost-optimization-summary.md)** — Cost-optimized architecture ($0 MVP, $5 Phase 3, $25-30 Phase 4)
-- **[Infrastructure (Terraform)](infrastructure.md)** — Cloudflare IaC and GitHub Actions deployment
-- **[Next Steps (Pre-Deployment)](next-steps.md)** — Recommended sequence before running Terraform apply
+- **[Infrastructure (Terraform)](infrastructure.md)** — Out of scope until explicitly introduced as a feature; doc kept for future use
+- **[Next Steps (Pre-Deployment)](next-steps.md)** — Recommended sequence (test locally, deploy)
 
 ## System Overview
 

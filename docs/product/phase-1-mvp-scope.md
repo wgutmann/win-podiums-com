@@ -11,11 +11,11 @@
 | Area | Deliverable |
 |------|-------------|
 | **Discord OAuth2** | Web flow + plugin flows (browser, QR, manual token) per [Discord Integration LLD](../design/integrations/discord-integration.md) |
-| **Minimal Worker** | Auth endpoints (stub or real) + health + at least one non-auth endpoint (e.g. `GET /api/profile/me` stub) using D1/KV when Terraform is applied |
+| **Minimal Worker** | Auth endpoints (stub or real) + health + at least one non-auth endpoint (e.g. `GET /api/profile/me`) using D1/KV; config via `wrangler.toml` (same for Docker and wrangler dev, 1:1) |
 | **Basic SimHub plugin** | Position detection, minimal auth (browser or manual token first), one call to verification API (or stub) per [SimHub plugin LLD](../design/components/simhub-plugin.md) |
 | **Static Gate** | Landing page (Worker-served or static) linking to Discord auth and plugin download |
 | **Member state** | Pending / verified (stored in D1 when implemented) |
-| **Infrastructure** | Terraform (D1, R2, KV, optional routes); single environment (e.g. `dev`) first |
+| **Infrastructure** | D1, R2, KV (created in Cloudflare; bindings in `wrangler.toml`). Single environment (e.g. `dev`) first. Terraform is not in scope until explicitly introduced as a feature. |
 
 ## 2. Out of Scope (Phase 1)
 
@@ -41,7 +41,7 @@
 | [SimHub Plugin LLD](../design/components/simhub-plugin.md) | Plugin structure, position detection, API client |
 | [Database Schema](../design/data-models/database-schema.md) | D1 tables when implementing auth/profile |
 | [OpenAPI](../api/openapi.yaml) + [API README](../api/README.md) | Auth, profile, plugin endpoint surface |
-| [Next Steps](../architecture/next-steps.md) | Order of work, when to apply Terraform |
+| [Next Steps](../architecture/next-steps.md) | Order of work, test locally, deploy |
 
 ### Phase 2+ (reference only)
 
@@ -55,7 +55,7 @@
 ## 4. Outcome
 
 - **Clear minimum shippable set**: Auth (web + plugin), minimal API (health + profile stub), basic plugin (position + one verified flow), static Gate, member state.
-- **No confusion**: Terraform + D1/R2/KV are for Phase 1; full Telemetry Proof and luxury UI are Phase 2+.
+- **No confusion**: D1/R2/KV are for Phase 1 (via wrangler.toml); full Telemetry Proof and luxury UI are Phase 2+. Terraform is out of scope until explicitly introduced as a feature.
 
 ## 5. Related
 

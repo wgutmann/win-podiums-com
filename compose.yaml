@@ -1,7 +1,6 @@
 # WinPodiums — Docker dev environment (API / Worker)
-# Run: docker compose up
-# Build: docker compose build
-# Stop: docker compose down
+# Config matches apps/api/wrangler.toml (1:1). Run: docker compose up
+# Build: docker compose build  |  Test: docker compose up -d && cd apps/api && npm test
 services:
   api:
     build:
@@ -10,10 +9,10 @@ services:
     ports:
       - "8787:8787"
     volumes:
-      # Live reload: mount source only so node_modules stay from build
+      # Live reload: mount source so edits reflect without rebuild
       - ./apps/api/src:/app/src
     environment:
       - ENVIRONMENT=dev
-    # Optional: mount .dev.vars for secrets (do not commit)
-    # env_file:
-    #   - .dev.vars
+    # Secrets: same as Worker .dev.vars. Create apps/api/.dev.vars from apps/api/.dev.vars.example if missing. Do not commit.
+    env_file:
+      - ./apps/api/.dev.vars

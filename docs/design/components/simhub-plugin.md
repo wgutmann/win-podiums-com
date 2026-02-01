@@ -481,9 +481,11 @@ WPF XAML structure:
 
 ### Installation
 1. User downloads installer (generic or pre-linked) from R2
-2. Installer copies DLL to `%LocalAppData%\SimHub\Plugins\`
+2. Installer copies DLL to `C:\Program Files (x86)\SimHub\Plugins\`
 3. User restarts SimHub
 4. Plugin auto-loads, shows first-launch UI
+
+**Canonical SimHub path (this repo)**: Use `C:\Program Files (x86)\SimHub` as the SimHub install root and `C:\Program Files (x86)\SimHub\Plugins` for the plugins folder in all documentation and code references.
 
 ### Updates
 - Plugin checks for updates on every heartbeat (5 minutes)

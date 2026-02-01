@@ -4,9 +4,12 @@ Luxury, merit-based community for elite sim racers. Access is earned through ver
 
 ## Status
 
-- **Phase**: Phase 1 MVP (structure + minimal API + Docker dev)
-- **Current focus**: Docker-based dev environment for the API; minimal Worker in `apps/api/`. **Do not run `terraform apply`** until you are ready to deploy the Worker to Terraform-created resources.
-- **Infrastructure**: Terraform (D1, R2, KV, optional routes) and GitHub Actions are in place.
+- **Phase**: Phase 1 MVP — implementation complete; local D1 schema applied.
+- **Current focus**: Configure Discord + `.dev.vars`, test Worker and plugin locally; deploy when ready (see [docs/guides/deployment.md](docs/guides/deployment.md)).
+
+**Run and test locally with Docker**: Start the API with `docker compose up`; run tests against it with `docker compose up -d && cd apps/api && npm test`. Worker and Docker use the same config (`wrangler.toml` + `.dev.vars`).
+
+**Terraform**: Not part of the default workflow. The directory `infra/terraform/` exists for future use; ignore it until explicitly introduced as a feature. See [AGENTS.md](AGENTS.md).
 
 **Recommended next steps**: See [docs/architecture/next-steps.md](docs/architecture/next-steps.md). Development: [docs/guides/development.md](docs/guides/development.md) (Docker-first).
 
@@ -14,9 +17,8 @@ Luxury, merit-based community for elite sim racers. Access is earned through ver
 
 - Product and technical documentation (PRDs, tech plans, HLD, ADRs, design system)
 - API spec (OpenAPI), database schema, Discord and SimHub LLDs
-- Infrastructure as code (Terraform for Cloudflare) and CI (GitHub Actions)
-- **Worker app** (`apps/api/`) — minimal API (health, Gate); run via **Docker** (recommended) or `wrangler dev` on host
-- **Docker dev environment** — `Dockerfile` and `compose.yaml` for local/repo parity (see [AGENTS.md](AGENTS.md))
+- **Worker app** (`apps/api/`) — API + Gate; run and test via **Docker** (see [Development Guide](docs/guides/development.md))
+- **Docker dev environment** — `Dockerfile` and `compose.yaml`; local run and tests use Docker so config stays 1:1 with the Worker
 
 ## Documentation
 
@@ -38,9 +40,9 @@ Start here:
 
 ## Getting started
 
-- **API (Docker, recommended)**: From repo root run `docker compose up`. API at **http://localhost:8787** (health: `/health`, Gate: `/` or `/gate`).
-- **API (host)**: `cd apps/api && npm install && npx wrangler dev`.
-- **Docs**: [docs/guides/development.md](docs/guides/development.md) — Docker-first dev; [docs/architecture/next-steps.md](docs/architecture/next-steps.md) — pre-deploy sequence.
+- **Run locally**: From repo root run `docker compose up`. API at **http://localhost:8787** (health: `/health` or `/api/health`, Gate: `/` or `/gate`).
+- **Test**: With Docker running (`docker compose up -d`), run `cd apps/api && npm test` to validate the API (smoke test against Docker).
+- **Docs**: [docs/guides/development.md](docs/guides/development.md) — run and test with Docker; [docs/architecture/next-steps.md](docs/architecture/next-steps.md) — pre-deploy sequence.
 
 ## Contributing
 

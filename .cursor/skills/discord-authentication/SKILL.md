@@ -73,6 +73,15 @@ Use **user OAuth2** when the plugin acts on behalf of a signed-in user (e.g. "Lo
 
 - Always confirm current Discord OAuth2 endpoints and required parameters in the official docs.
 
+## SimHub path (this repo)
+
+When copying or referencing the SimHub install or plugins path in documentation or code, use this canonical path:
+
+- **SimHub install root**: `C:\Program Files (x86)\SimHub`
+- **Plugins folder**: `C:\Program Files (x86)\SimHub\Plugins`
+
+Do not use placeholders (e.g. `SIMHUB_INSTALL_DIR`) or other install locations in repo docs and skills.
+
 ## Additional Resources
 
 - Minimal C# snippets: `examples.md`

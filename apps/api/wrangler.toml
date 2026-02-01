@@ -1,4 +1,4 @@
-# WinPodiums API — Cloudflare Worker (dev; bindings from Terraform when applied)
+# WinPodiums API — Cloudflare Worker (dev; same config for Docker and wrangler dev)
 name = "winpodiums-api"
 main = "src/index.ts"
 compatibility_date = "2024-01-01"
@@ -6,11 +6,7 @@ compatibility_date = "2024-01-01"
 [vars]
 ENVIRONMENT = "dev"
 
-# D1, R2, KV: names/IDs must match Terraform-created resources.
-# Default Terraform name_prefix = "winpodiums-dev" (project_name-environment).
-# After first `terraform apply`, set database_id and kv id from:
-#   terraform -chdir=infra/terraform output -raw d1_database_id
-#   terraform -chdir=infra/terraform output -raw kv_namespace_id
+# D1, R2, KV: bindings for local dev (wrangler dev / Docker). For remote deploy, create resources in Cloudflare and set database_id / id as needed.
 [[d1_databases]]
 binding = "DB"
 database_name = "winpodiums-dev-db"

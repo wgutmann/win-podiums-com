@@ -12,14 +12,14 @@ Curated pointers for Workers, D1, R2, KV, and Wrangler. Prefer Cloudflare’s of
 
 ## This repo
 
-- **Infrastructure (Terraform)**: `infra/terraform/` — D1, R2, KV, optional routes. Do not run `terraform apply` until a minimal Worker exists.
+- **Worker and Docker are 1:1**: Run and test locally with Docker (`docker compose up`, then `cd apps/api && npm test`). Config in `wrangler.toml` and `.dev.vars`; compose uses `env_file: ./apps/api/.dev.vars` and `CLOUDFLARE_INCLUDE_PROCESS_ENV=true` so Docker and Worker config match. Terraform is out of scope until explicitly introduced as a feature.
 - **ADRs**: `docs/architecture/decisions/001-cloudflare-stack.md`, `005-cost-optimized-cloudflare.md`
 - **Database schema**: `docs/design/data-models/database-schema.md`
 - **API spec**: `docs/api/openapi.yaml`
 
-## Binding names (when Worker exists)
+## Binding names
 
-Terraform outputs (see `infra/terraform/outputs.tf`) provide resource names/IDs. Use them in `wrangler.toml` or env so the Worker binds to Terraform-managed D1, R2, and KV.
+Set D1, R2, and KV bindings in `wrangler.toml` to match resources created in Cloudflare (Dashboard or your automation). Same config for local (Docker / wrangler dev) and remote deploy.
 
 ## Secrets
 

@@ -10,7 +10,9 @@ SimHub plugin for WinPodiums: monitors telemetry, detects podium finishes, and s
 ## Layout
 
 - `WinPodiums.Plugin/` — Main class library
-  - `Core/PluginMain.cs` — Entry point (implement SimHub SDK interfaces after adding reference)
+  - `Core/PluginMain.cs` — Entry point; manual token auth + heartbeat (SimHub SDK interfaces when reference added)
+  - `Auth/TokenStorage.cs` — DPAPI-protected storage for access token and Discord ID
+  - `Services/ApiClient.cs` — API client: token exchange, heartbeat
 
 ## Prerequisites
 
@@ -19,14 +21,28 @@ SimHub plugin for WinPodiums: monitors telemetry, detects podium finishes, and s
 
 ## Build
 
-1. Add reference to SimHub plugin SDK/assemblies from your SimHub install directory (see [SimHub Plugin LLD](../../docs/design/components/simhub-plugin.md)).
+1. Add reference to SimHub plugin SDK/assemblies from the SimHub install directory: `C:\Program Files (x86)\SimHub` (see [SimHub Plugin LLD](../../docs/design/components/simhub-plugin.md)).
 2. From this directory: `dotnet build WinPodiums.Plugin/WinPodiums.Plugin.csproj`
-3. Deploy the built DLL to SimHub Plugins folder and restart SimHub.
+3. Deploy the built DLL to `C:\Program Files (x86)\SimHub\Plugins` and restart SimHub.
+
+## Phase 1: manual token + heartbeat
+
+1. **Get a token**: Log in at https://winpodiums.com (or http://localhost:8787), open **Generate plugin token** (`/auth/token`), click **Generate token**, copy the 8-character code.
+2. **In plugin** (when SimHub SDK is wired): Set the manual token string, then call `AuthenticateWithManualTokenAsync(tokenCode)`. Tokens are stored with DPAPI.
+3. **Heartbeat**: Call `SendHeartbeatAsync(pluginVersion)` to send one verification flow; uses stored Bearer token.
+
+```csharp
+var plugin = new PluginMain();
+plugin.Init();
+plugin.SetApiBaseUrl("http://localhost:8787");  // or https://winpodiums.com
+bool ok = await plugin.AuthenticateWithManualTokenAsync("AB12CD34");
+if (ok) await plugin.SendHeartbeatAsync("1.0.0");
+```
 
 ## Development
 
 - Build and run on Windows host (no Docker for plugin yet).
-- API base URL configurable (e.g. `http://localhost:8787` when using Docker for the API).
+- API base URL configurable via `SetApiBaseUrl` (e.g. `http://localhost:8787` when using Docker for the API).
 
 ## Related
 

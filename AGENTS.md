@@ -4,22 +4,22 @@ Project-level guidance for AI agents working in this repo.
 
 ## Current phase
 
-- **Phase**: Phase 1 MVP. Minimal Worker in `apps/api/` and SimHub plugin scaffold in `apps/plugin/` exist; stubs for health, Gate, auth, profile. **Current focus**: Implement Phase 1 (real Discord OAuth, D1 migrations, plugin auth + verification flow).
-- **Do not run `terraform apply`** until you are ready to deploy the Worker to Terraform-created D1/R2/KV and run D1 migrations. Use Terraform for plan/validate only. See [docs/architecture/next-steps.md](docs/architecture/next-steps.md) for recommended order of work.
+- **Phase**: Phase 1 MVP. Worker in `apps/api/` and SimHub plugin in `apps/plugin/`; real Discord OAuth, D1, plugin auth + heartbeat. **Current focus**: Test Worker and plugin locally; deploy when ready (see [docs/architecture/next-steps.md](docs/architecture/next-steps.md)).
+- **Worker and Docker are 1:1**: Same app runs via Docker; one codebase, one config (`wrangler.toml` + `.dev.vars`). **Run and test locally with Docker**: start API with `docker compose up`, run tests against it with `docker compose up -d && cd apps/api && npm test`. Do not document or implement divergent “Docker vs Worker” flows.
 
 ## Stack and scope
 
-- **Cloudflare (web/API)**: Workers (TypeScript), D1, R2, KV for edge/API and front-end. Use the cloudflare-workers skill when configuring or implementing Workers/D1/R2/KV. Prefer Wrangler for local dev and deployment. Keep secrets in `.dev.vars` (or env-specific files); never commit them. Follow Cloudflare docs and MCP/Context7 when wiring APIs or config.
-- **.NET (SimHub only)**: C#/.NET Framework 4.8 for the SimHub plugin; follow existing .NET/.gitignore conventions.
-- **SimHub**: Plugin and integration work; use the simhub-plugin-builder skill when relevant.
+- **Cloudflare (web/API)**: Workers (TypeScript), D1, R2, KV. Use the cloudflare-workers skill. Prefer Wrangler for local dev and deployment. Config: `apps/api/wrangler.toml` and `.dev.vars`; never commit secrets.
+- **.NET (SimHub only)**: C#/.NET Framework 4.8 for the SimHub plugin.
+- **SimHub**: Plugin work; use the simhub-plugin-builder skill when relevant.
 - **Discord**: Auth and integrations; use the discord-authentication skill when relevant.
-- **Docker**: Dev environment and parity; use the docker-dev-environment skill when relevant.
-- **GitHub**: Change control, PRs, and secrets; use the github-change-control skill when relevant.
-- **Terraform**: Infra lives in `infra/terraform/`. Plan and validate only until you are ready to deploy; see next-steps above.
+- **Docker**: Dev environment; use the docker-dev-environment skill. Run and test locally with Docker; tests run against the Dockerized API so config stays 1:1.
+- **GitHub**: Change control, PRs, secrets; use the github-change-control skill when relevant.
+- **Terraform**: **Out of scope until explicitly introduced as a feature.** The directory `infra/terraform/` exists but is not part of the standard workflow. Do not run, document, or depend on Terraform in guides or next steps unless the user explicitly asks for Terraform/infra-as-code as a feature.
 
 ## Conventions
 
 - Prefer skills in `.cursor/skills` for domain-specific tasks.
-- **Documentation**: Use the cursor-project-docs skill for repo docs, PRDs, tech plans, and `.cursor/docs/`. Follow PRD → HLD → Tech Plan; canonical docs live in `docs/` (see [docs/standards/documentation-standards.md](docs/standards/documentation-standards.md)).
-- **Implementation order**: Follow the sequence in [docs/architecture/next-steps.md](docs/architecture/next-steps.md). Use the documented layout: `apps/api/` (Worker), `apps/plugin/` (SimHub plugin), `infra/terraform/`. Current step: Phase 1 implementation (real auth, D1, plugin flows); then Terraform apply and deploy.
+- **Documentation**: Use the cursor-project-docs skill; canonical docs in `docs/`. Follow PRD → HLD → Tech Plan.
+- **Implementation order**: Follow [docs/architecture/next-steps.md](docs/architecture/next-steps.md). Layout: `apps/api/` (Worker), `apps/plugin/` (SimHub plugin). Current step: test locally, then deploy (Wrangler); Terraform is not in scope.
 - Do not commit secrets, tokens, or `.dev.vars` / `.env` files with credentials.

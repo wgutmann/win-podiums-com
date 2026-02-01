@@ -1,11 +1,15 @@
 # Infrastructure as Code (Terraform)
 
-**Status**: Active  
+**Status**: **Out of scope until explicitly introduced as a feature.**  
 **Last Updated**: 2026-01-31
 
-## Overview
+**Do not use or document Terraform as part of the default workflow.** The directory `infra/terraform/` exists for future use. The Worker and Docker dev flow use `wrangler.toml` and Cloudflare resources created via Dashboard or other means. See [AGENTS.md](../../AGENTS.md) and [Next Steps](next-steps.md).
 
-Cloudflare resources for WinPodiums are managed as **infrastructure as code** with Terraform. Terraform is run **locally only** (no GitHub Actions workflow); use `terraform plan` and `terraform apply` from your machine with `CLOUDFLARE_API_TOKEN` in env.
+---
+
+## Overview (for when Terraform is introduced)
+
+Cloudflare resources can be managed as **infrastructure as code** with Terraform. Terraform would be run **locally only** (no GitHub Actions workflow); use `terraform plan` and `terraform apply` from your machine with `CLOUDFLARE_API_TOKEN` in env.
 
 This aligns with:
 

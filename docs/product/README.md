@@ -23,6 +23,7 @@ Each PRD includes:
 
 ## Feature Areas
 
+- [Cloudflare Security](cloudflare-security/) - Free Cloudflare security (DDoS, SSL, WAF, Bot Fight, Zero Trust, Worker rate limiting)
 - [Telemetry Proof System](telemetry-proof-system/) - Multi-layered security system
 
 ## Traceability

@@ -1,0 +1,25 @@
+# WinPodiums API — Cloudflare Worker (dev; bindings from Terraform when applied)
+name = "winpodiums-api"
+main = "src/index.ts"
+compatibility_date = "2024-01-01"
+
+[vars]
+ENVIRONMENT = "dev"
+
+# D1, R2, KV: names/IDs must match Terraform-created resources.
+# Default Terraform name_prefix = "winpodiums-dev" (project_name-environment).
+# After first `terraform apply`, set database_id and kv id from:
+#   terraform -chdir=infra/terraform output -raw d1_database_id
+#   terraform -chdir=infra/terraform output -raw kv_namespace_id
+[[d1_databases]]
+binding = "DB"
+database_name = "winpodiums-dev-db"
+database_id = "00000000-0000-0000-0000-000000000000"
+
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "winpodiums-dev-storage"
+
+[[kv_namespaces]]
+binding = "CACHE"
+id = "00000000000000000000000000000000"

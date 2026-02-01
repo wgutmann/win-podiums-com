@@ -65,7 +65,8 @@ jobs:
           dotnet restore
           OUT=$(dotnet list package --vulnerable --include-transitive 2>&1) || true
           echo "$OUT"
-          if echo "$OUT" | grep -qE "vulnerable (package|packages)|known vulnerabilities"; then
+          # Fail only when dotnet reports that vulnerabilities exist (not on "has no vulnerable packages")
+          if echo "$OUT" | grep -qE "has the following vulnerable|following package.*have known vulnerabilities"; then
             echo "::error::Vulnerable NuGet package(s) found. Update or remove them."
             exit 1
           fi
@@ -89,8 +90,19 @@ jobs:
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ matrix.language }}
-          # No build for TS (interpreted) and C# (avoid SimHub SDK in CI)
           queries: security-extended
+
+      - name: Setup .NET
+        if: matrix.language == 'csharp'
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Build C# project
+        if: matrix.language == 'csharp'
+        run: |
+          cd apps/plugin/WinPodiums.Plugin
+          dotnet build --configuration Release
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v3

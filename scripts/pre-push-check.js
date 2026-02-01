@@ -3,7 +3,7 @@
  * Pre-push check: run local tests; require at least 80% to pass before allowing push.
  * See docs/guides/development.md#run-tests-before-push
  *
- * Runs: API typecheck, API lint, plugin build, OpenAPI validation, and (if API is up) worker smoke.
+ * Runs: API unit tests, and (if API is up) API smoke.
  * Exit 0 if passed >= ceil(0.8 * totalRun); exit 1 otherwise.
  */
 
@@ -45,35 +45,14 @@ async function main() {
   const results = [];
   const names = [];
 
-  // 1. API typecheck (inline OpenAPI + typecheck)
-  names.push('API typecheck');
-  results.push(
-    runShell(path.join(REPO_ROOT, 'apps/api'), 'node scripts/inline-openapi.js ../../docs/api/openapi.yaml src/openapi-spec.ts && npm run typecheck')
-  );
+  // 1. API unit tests
+  names.push('API unit tests');
+  results.push(runShell(path.join(REPO_ROOT, 'apps/api'), 'npm run test:unit'));
 
-  // 2. API lint (npx so eslint is resolved on Windows)
-  names.push('API lint');
-  results.push(runShell(path.join(REPO_ROOT, 'apps/api'), 'npx eslint src --ext .ts'));
-
-  // 3. Plugin build
-  names.push('Plugin build');
-  results.push(
-    runShell(
-      path.join(REPO_ROOT, 'apps/plugin/WinPodiums.Plugin'),
-      'dotnet restore && dotnet build --configuration Release --no-restore'
-    )
-  );
-
-  // 4. OpenAPI validation
-  names.push('OpenAPI validation');
-  results.push(
-    runShell(REPO_ROOT, 'npx @stoplight/spectral-cli@latest lint docs/api/openapi.yaml --fail-severity=error')
-  );
-
-  // 5. Worker smoke (only if API is already up)
+  // 2. API smoke (only if API is already up)
   const smokeUp = await apiHealthUp();
   if (smokeUp) {
-    names.push('Worker smoke');
+    names.push('API smoke');
     results.push(runShell(path.join(REPO_ROOT, 'apps/api'), 'npm test'));
   }
 

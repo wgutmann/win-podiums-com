@@ -1,5 +1,6 @@
 # CI: typecheck, lint, plugin build, lockfile check, OpenAPI validation.
 # Workflow runs when api/plugin/docs-api change; each job runs only when its paths change.
+# Concurrency cancels in-progress runs when new commits are pushed (saves minutes).
 name: CI
 
 on:
@@ -12,6 +13,10 @@ on:
       - "apps/plugin/**"
       - "docs/api/**"
       - ".github/workflows/ci.yml"
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   paths:
@@ -34,10 +39,10 @@ jobs:
               - 'apps/plugin/**'
               - '.github/workflows/ci.yml'
 
-  api-typecheck:
+  api-validate:
     needs: paths
     if: needs.paths.outputs.api == 'true'
-    name: TypeScript typecheck
+    name: API (typecheck, lint, lockfile, OpenAPI)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -52,35 +57,24 @@ jobs:
           cache: "npm"
           cache-dependency-path: apps/api/package-lock.json
 
-      - name: Install and typecheck
+      - name: Install and inline OpenAPI
         run: |
           npm ci
           node scripts/inline-openapi.js ../../docs/api/openapi.yaml src/openapi-spec.ts
-          npm run typecheck
 
-  api-lint:
-    name: ESLint
-    needs: paths
-    if: needs.paths.outputs.api == 'true'
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/api
-    steps:
-      - uses: actions/checkout@v4
+      - name: Typecheck
+        run: npm run typecheck
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: apps/api/package-lock.json
+      - name: Lint
+        run: npm run lint
 
-      - name: Install and lint
-        run: |
-          npm ci
-          node scripts/inline-openapi.js ../../docs/api/openapi.yaml src/openapi-spec.ts
-          npm run lint
+      - name: Lockfile check
+        run: git diff --exit-code apps/api/package-lock.json
+        working-directory: ${{ github.workspace }}
+
+      - name: OpenAPI validation
+        run: npx @stoplight/spectral-cli@latest lint docs/api/openapi.yaml --fail-severity=error
+        working-directory: ${{ github.workspace }}
 
   plugin-build:
     name: Plugin build
@@ -101,37 +95,3 @@ jobs:
           dotnet restore
           dotnet build --configuration Release --no-restore
 
-  api-lockfile:
-    name: Lockfile check
-    needs: paths
-    if: needs.paths.outputs.api == 'true'
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/api
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: apps/api/package-lock.json
-
-      - name: Install and verify lockfile
-        run: npm ci
-      - name: Verify lockfile unchanged
-        run: git diff --exit-code apps/api/package-lock.json
-        working-directory: ${{ github.workspace }}
-
-  openapi-validate:
-    name: OpenAPI validation
-    needs: paths
-    if: needs.paths.outputs.api == 'true'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Validate OpenAPI spec
-        run: npx @stoplight/spectral-cli@latest lint docs/api/openapi.yaml --fail-severity=error

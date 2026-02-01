@@ -236,7 +236,7 @@ See [Integration Flows](../design/integrations/) for detailed sequence diagrams.
 - **Production**: `winpodiums.com` with protected main branch
 
 ### CI/CD
-- GitHub Actions: **worker-test** (Docker + smoke), **security** (secrets, audits, CodeQL), **CI** (typecheck, lint, plugin build, lockfile, OpenAPI validation)
+- GitHub Actions: **security** (secrets, audits, CodeQL), **CI** (typecheck, lint, plugin build, lockfile, OpenAPI validation)
 - Automated deployment on merge to `main` (Workers)
 - Plugin releases via GitHub Releases + R2 upload
 

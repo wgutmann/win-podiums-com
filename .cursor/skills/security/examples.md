@@ -70,9 +70,9 @@ Concrete scenarios for applying the security skill and ADR-006.
 
 **Steps**:
 
-1. **API**: Smoke test should hit health and, if possible, at least one auth-related path (e.g. redirect or stub). Add a smoke test for new auth or heartbeat endpoints: e.g. `GET /api/health`, `POST /api/plugin/heartbeat` with a placeholder token (expect 401 or 200 depending on design). See [worker-test.yml](../../../.github/workflows/worker-test.yml) and [smoke.js](../../../apps/api/test/smoke.js).
+1. **API**: Smoke test should hit health and, if possible, at least one auth-related path (e.g. redirect or stub). Add a smoke test for new auth or heartbeat endpoints: e.g. `GET /api/health`, `POST /api/plugin/heartbeat` with a placeholder token (expect 401 or 200 depending on design). See [smoke.js](../../../apps/api/test/smoke.js); run locally with Docker and `npm test`.
 2. **Plugin**: For token storage or API client, add unit tests that mock the API and assert correct headers, retries, or error handling. Prefer tests for any code that handles tokens or secrets.
-3. **CI**: Ensure `npm test` (API) and Worker test workflow pass. Do not merge without running tests locally and in CI.
+3. **CI**: Ensure `npm test` (API) and Security/CI workflows pass. Do not merge without running tests locally.
 
 **Do not**: Merge auth or heartbeat changes with no tests; assume "manual testing is enough."
 

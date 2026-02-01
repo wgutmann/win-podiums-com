@@ -4,7 +4,7 @@ import path from "path";
 export default defineConfig({
   test: {
     environment: "node",
-    include: ["test/**/*.test.ts"],
+    include: ["test/required/**/*.test.ts", "test/optional/**/*.test.ts"],
     globals: true,
   },
   resolve: {

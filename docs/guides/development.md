@@ -65,7 +65,7 @@ If the API is not running, `npm test` will fail with a clear message: "Start Doc
 
 `apps/api/test/smoke.js` runs against the Dockerized API and validates: (1) Docker and Worker config match — `GET /api/health` returns `{ ok: true, env: "dev" }`; (2) error shapes — 404 for unknown routes (`GET /api/nonexistent`) and 401 for protected routes without auth (`POST /api/plugin/verify`); (3) **API documentation loads** — `GET /api-docs` and `GET /api-docs/openapi.yaml` are reachable (Swagger UI and valid OpenAPI 3 spec). Each API endpoint is documented in `docs/api/openapi.yaml` and surfaced in Swagger.
 
-**CI**: GitHub Actions runs the same test on push/PR to `main` when `apps/api/`, Dockerfile, or compose change (`.github/workflows/worker-test.yml`): build Docker, start API, run smoke test.
+**CI**: GitHub Actions runs typecheck, lint, plugin build, lockfile check, OpenAPI validation, and security checks on push/PR to `main`. Run API smoke and unit tests locally (Docker + `npm test` / `npm run test:unit`).
 
 ### API quality checks (typecheck, lint)
 
@@ -192,7 +192,6 @@ GitHub Actions run on push and pull requests to `main` (path filters apply so on
 
 | Workflow | Purpose |
 |----------|---------|
-| **worker-test** (`.github/workflows/worker-test.yml`) | Build Docker, start API, run smoke test (health, 404, 401, API docs). Triggered when `apps/api/`, Dockerfile, or compose change. |
 | **security** (`.github/workflows/security.yml`) | Secret scanning (TruffleHog), npm and .NET dependency audits, CodeQL (TypeScript + C#). |
 | **CI** (`.github/workflows/ci.yml`) | TypeScript typecheck, ESLint, plugin build (.NET), lockfile check (`apps/api/package-lock.json`), OpenAPI validation (Spectral). Triggered when `apps/api/`, `apps/plugin/`, or `docs/api/` change. |
 

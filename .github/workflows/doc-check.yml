@@ -1,5 +1,6 @@
 # Doc check: markdown lint, internal link check, Mermaid diagram validation.
 # Workflow runs when docs/config change; each job runs only when its paths change.
+# Concurrency cancels in-progress runs when new commits are pushed (saves minutes).
 name: Doc check
 
 on:
@@ -25,6 +26,10 @@ on:
       - ".markdownlint.jsonc"
       - ".lycheeignore"
       - ".github/workflows/doc-check.yml"
+
+concurrency:
+  group: doc-check-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   paths:
@@ -91,18 +96,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-
       - name: Validate Mermaid (.mmd)
         run: |
-          npx @mermaid-js/mermaid-cli@latest --version
           for f in docs/architecture/diagrams/data-flow.mmd docs/architecture/diagrams/system-overview.mmd docs/design/diagrams/entity-relationship.mmd; do
+            [ -f "$f" ] || continue
             echo "Validating $f ..."
-            npx @mermaid-js/mermaid-cli@latest -p .github/puppeteer-config.json -i "$f" -o /tmp/mermaid-out.svg
+            docker run --rm -v "$PWD:/data" minlag/mermaid-cli mmdc -i "/data/$f" -o /data/out.svg -b transparent
+            rm -f out.svg
           done
 
   openapi-docs:

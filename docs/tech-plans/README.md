@@ -34,6 +34,13 @@ Technical Plans trace from:
 - **ADRs** (`docs/architecture/decisions/`) - Architecture decisions
 - **API Specs** (`docs/api/`) - API endpoints
 
+### Pull requests and ContextStream knowledge graph
+
+PRs that implement a tech plan must link to the TP and PRD so the **ContextStream knowledge graph** shows **PR ↔ Tech Plan ↔ PRD** in the UI:
+
+1. **PR template:** Fill the **Traceability** section with **Implements (Tech Plan):** `TP-XXX` and **PRD:** `PRD-XXX` (e.g. `TP-SPOC-001`, `PRD-001`). See [.github/PULL_REQUEST_TEMPLATE.md](../../.github/PULL_REQUEST_TEMPLATE.md).
+2. **Graph visibility:** To make the link visible in the ContextStream knowledge graph UI, capture an **implementation** event that references the PR URL and the tech plan + PRD doc paths. See [ContextStream mapping – Linking pull requests](../guides/contextstream-mapping.md#14-linking-pull-requests-to-tech-plans-and-prds-graph-visible).
+
 ## Standards
 
 See [Documentation Standards](../standards/documentation-standards.md) for complete format and structure requirements.

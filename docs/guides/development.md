@@ -187,7 +187,7 @@ This is optional; do it once per workspace if you want shared memory from day on
 - **PRD↔tech plan in the graph:** When capturing a decision that links a PRD to its tech plan (e.g. "we implement PRD-001 per TP-001"), include both file paths in the capture so the decision node connects both document nodes in the graph.
 - **Dependency and impact:** Use **graph(action="dependencies", ...)** and **graph(action="impact", target="...")** before refactors (e.g. "what breaks if I change UserService?").
 - **Full graph (Elite/Team):** **graph(action="ingest")** builds richer module/call/dataflow layers when available.
-- **Tagging:** Use stable doc IDs (PRD-XXX, ADR-XXX, TP-XXX) and **Related** / **Implements** in docs so ContextStream can relate content. See [ContextStream mapping](contextstream-mapping.md) for parallels (PRD ↔ plans, docs ↔ memory, lessons, to-dos) and labeling guidance.
+- **Tagging:** Use stable doc IDs (PRD-XXX, ADR-XXX, TP-XXX) and **Related** / **Implements** in docs so ContextStream can relate content. See [ContextStream mapping](contextstream-mapping.md) for parallels (PRD ↔ plans, docs ↔ memory, lessons, to-dos) and labeling guidance. **PRs:** Fill the PR template **Traceability** (Implements: TP-XXX, PRD: PRD-XXX) and optionally capture an implementation event with PR URL and doc paths so the knowledge graph UI shows [PR ↔ Tech Plan ↔ PRD](contextstream-mapping.md#14-linking-pull-requests-to-tech-plans-and-prds-graph-visible).
 
 ### Optional: editor rule
 

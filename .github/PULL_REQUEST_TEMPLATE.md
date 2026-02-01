@@ -3,6 +3,13 @@
 - [What changed]
 - [Why it changed]
 
+## Traceability (ContextStream / knowledge graph)
+
+**Required.** Link this PR to the tech plan(s) and PRD so the ContextStream knowledge graph can show PR ↔ Tech Plan ↔ PRD. Use the stable doc IDs from `docs/tech-plans/` and `docs/product/`.
+
+- **Implements (Tech Plan):** e.g. `TP-SPOC-001` — [list one or more TP-XXX IDs this PR implements, or "none" if doc-only / infra]
+- **PRD:** e.g. `PRD-001` — [PRD ID this work traces to, or "none"]
+
 ## Risk
 
 - [ ] [low / medium / high] — [brief rationale]

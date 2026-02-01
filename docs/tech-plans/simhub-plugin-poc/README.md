@@ -2,7 +2,7 @@
 
 Technical Plans for the SimHub Plugin proof-of-concept. Each TP implements part of [PRD-001: SimHub Plugin POC](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md).
 
-**ContextStream**: TPs use stable IDs **TP-SPOC-001**–**TP-SPOC-005** and **Implements** → PRD-001 for knowledge graph linking. See [ContextStream mapping](../../guides/contextstream-mapping.md).
+**ContextStream**: TPs use stable IDs **TP-SPOC-001**–**TP-SPOC-005** and **Implements** → PRD-001 for knowledge graph linking. PRs that implement a TP must declare **Traceability** (Implements: TP-SPOC-XXX, PRD: PRD-001) in the [PR template](../../../.github/PULL_REQUEST_TEMPLATE.md) and optionally capture an implementation event so the graph UI shows PR ↔ TP ↔ PRD. See [ContextStream mapping – Linking pull requests](../../guides/contextstream-mapping.md#14-linking-pull-requests-to-tech-plans-and-prds-graph-visible).
 
 ## Documents
 

@@ -1,0 +1,44 @@
+---
+description: Automatically fill PR description from PRD/tech plan and link PR to ContextStream (PR ↔ Tech Plan ↔ PRD)
+globs: ".github/**/*"
+alwaysApply: false
+---
+
+# PR and ContextStream Traceability
+
+When creating or filling a **pull request** that implements **PRD-001** (SimHub Plugin POC) or **TP-SPOC-001–005** (SimHub plugin / Phase 1 work):
+
+## 1. Populate PR description (required)
+
+- **Automatically** read [.github/PR_DESCRIPTION_SIMHUB_PLUGIN.md](../../.github/PR_DESCRIPTION_SIMHUB_PLUGIN.md) and use its content to fill the PR description.
+- Copy into the PR:
+  - **Summary** (what changed, why, PRD and Tech Plan links)
+  - **PRD and tech plan docs table** (all rows that apply)
+  - **Traceability** section with:
+    - **Implements (Tech Plan):** `TP-SPOC-001`, `TP-SPOC-002`, `TP-SPOC-003`, `TP-SPOC-004`, `TP-SPOC-005`
+    - **PRD:** `PRD-001`
+    - **Doc paths (for implementation event):** list all doc paths from the file (PRD, tech plans, Phase 1 scope, SimHub LLD)
+- This requirement applies **on the first PR** that touches this scope (i.e. when the PR is created for a branch implementing PRD-001 / TP-SPOC). Do not skip; fill the PR description before or when opening the PR.
+
+## 2. After PR is opened or merged — ContextStream (when MCP available)
+
+- Capture an **implementation event** in ContextStream so the knowledge graph shows **PR ↔ Tech Plan ↔ PRD**:
+  - Use **session(action="capture", event_type="implementation", ...)** with:
+    - **title:** `PR #<number>: <short summary> (TP-SPOC-004)` (e.g. "PR #32: SimHub plugin UI + Phase 1 (TP-SPOC-004)")
+    - **content:** `<PR URL>. Implements TP-SPOC-001–005, PRD-001. <one-line summary>.`
+    - **provenance:** `{ "pr_url": "<PR URL>" }`
+    - **code_refs:** array of `{ "file_path": "docs/product/simhub-plugin-poc/001-simhub-plugin-poc.md" }`, `{ "file_path": "docs/tech-plans/simhub-plugin-poc/001-plugin-skeleton-sdk-config.md" }`, … (all Doc paths from the Traceability section)
+- See [ContextStream mapping §1.4](../../docs/guides/contextstream-mapping.md#14-linking-pull-requests-to-tech-plans-and-prds-graph-visible).
+
+## 3. Labels (when opening the PR)
+
+- Add GitHub labels for filtering and traceability:
+  - **prd-PRD-001**
+  - **tech-plan-TP-SPOC-004** (and optionally **tech-plan-TP-SPOC-001**, **tech-plan-TP-SPOC-002**, **tech-plan-TP-SPOC-003**, **tech-plan-TP-SPOC-005**)
+- If the repo uses a GitHub Action to add labels (see [.github/workflows/pr-labels.yml](../../.github/workflows/pr-labels.yml)), labels may be added automatically when the PR body contains the Traceability section; otherwise add them manually or via `gh pr edit --add-label`.
+
+## Reference
+
+- [.github/PR_DESCRIPTION_SIMHUB_PLUGIN.md](../../.github/PR_DESCRIPTION_SIMHUB_PLUGIN.md) — source for Summary, table, Traceability, Doc paths
+- [.github/PULL_REQUEST_TEMPLATE.md](../../.github/PULL_REQUEST_TEMPLATE.md) — PR template
+- [docs/guides/contextstream-mapping.md §1.4](../../docs/guides/contextstream-mapping.md#14-linking-pull-requests-to-tech-plans-and-prds-graph-visible) — PR ↔ TP ↔ PRD linking

@@ -1,0 +1,46 @@
+# Repository labels (labels-as-code). 1:1 mapping from docs/documentation-index.md.
+# Edit this file and merge to main to create/update labels.
+# Workflow .github/workflows/sync-repo-labels.yml runs on push to main when this file changes.
+
+labels:
+  # PRDs (product requirements) — blue
+  - name: prd-PRD-001
+    color: "1d76db"
+    description: "Traces to PRD-001 SimHub Plugin POC"
+
+  # Tech plans (implementation specs) — green
+  - name: tech-plan-TP-SPOC-001
+    color: "0e8a16"
+    description: "Tech plan TP-SPOC-001 Plugin Skeleton, SDK, Config"
+  - name: tech-plan-TP-SPOC-002
+    color: "0e8a16"
+    description: "Tech plan TP-SPOC-002 Auth (PKCE, Token Storage)"
+  - name: tech-plan-TP-SPOC-003
+    color: "0e8a16"
+    description: "Tech plan TP-SPOC-003 API Client and Heartbeat"
+  - name: tech-plan-TP-SPOC-004
+    color: "0e8a16"
+    description: "Tech plan TP-SPOC-004 Minimal SimHub UI"
+  - name: tech-plan-TP-SPOC-005
+    color: "0e8a16"
+    description: "Tech plan TP-SPOC-005 POC Testing and Completion"
+
+  # ADRs (architecture decisions) — purple
+  - name: adr-ADR-001
+    color: "5319e7"
+    description: "ADR-001 Cloudflare Stack"
+  - name: adr-ADR-002
+    color: "5319e7"
+    description: "ADR-002 Discord OAuth"
+  - name: adr-ADR-003
+    color: "5319e7"
+    description: "ADR-003 Hybrid Auth Paths"
+  - name: adr-ADR-004
+    color: "5319e7"
+    description: "ADR-004 Cloudflare-Only Architecture"
+  - name: adr-ADR-005
+    color: "5319e7"
+    description: "ADR-005 Cost-Optimized Cloudflare"
+  - name: adr-ADR-006
+    color: "5319e7"
+    description: "ADR-006 Security Choices"

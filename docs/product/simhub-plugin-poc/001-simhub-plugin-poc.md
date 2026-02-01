@@ -76,11 +76,13 @@ Deliver a minimal SimHub plugin (POC) that proves: (1) the plugin loads and runs
 
 #### FR-004: Minimal SimHub UI
 - **Priority**: P0 (Critical)
-- **Description**: A minimal UI must be available in SimHub so a user can complete auth and heartbeat without editing code or running scripts.
+- **Description**: A minimal UI must be available in SimHub so a user can complete auth and heartbeat without editing code or running scripts. The UI must be **accessible via the enabled feature menu on the left**; when WinPodiums is selected, all settings and plugin content are displayed.
 - **Acceptance Criteria**:
+  - Plugin appears in SimHub’s **enabled feature menu on the left**; when the user selects WinPodiums, the settings panel (and all plugin content) is displayed.
   - User can trigger **“Link to Discord”** (or equivalent) from the plugin UI; this launches the browser PKCE flow and, on success, stores credentials and shows linked status.
   - User can trigger **“Send heartbeat”** (or equivalent) from the plugin UI; this sends one heartbeat to the API and shows success or failure.
   - **Status** is visible (e.g. “Linked” / “Not linked”, “Heartbeat OK” / “Heartbeat failed” or last result) so the user can confirm the flow without consulting logs.
+  - **API base URL** is configurable from the UI (e.g. editable field + Save). **Log out** is available. **Manual token** (paste token) is available for debug; not presented as primary auth.
   - Full Scrutineering Panel and design polish are out of scope; this is minimal controls and status only.
 
 ### Non-Functional Requirements
@@ -90,8 +92,8 @@ Deliver a minimal SimHub plugin (POC) that proves: (1) the plugin loads and runs
 - **Description**: Plugin must run on .NET Framework 4.8 and load within SimHub on Windows. SimHub SDK wiring and successful load in SimHub are required for POC complete.
 - **Acceptance Criteria**:
   - Plugin builds as a class library targeting .NET Framework 4.8.
-  - SimHub SDK is referenced and plugin entry point implements the SimHub plugin interface (e.g. IPlugin / IDataPlugin as required by the SDK).
-  - **“Loads in SimHub”** means the plugin **appears in SimHub’s plugin list/settings and is usable from the SimHub UI** (user can see and interact with the plugin in SimHub), not only that the DLL loads without crash.
+  - SimHub SDK is referenced and plugin entry point implements the SimHub plugin interface (e.g. IPlugin / IDataPlugin as required by the SDK). For the settings UI, plugin implements **IWPFSettings** and returns a WPF Control from **GetWPFSettingsControl(PluginManager)** so the panel is shown when WinPodiums is selected in the **enabled feature menu on the left**.
+  - **“Loads in SimHub”** means the plugin **appears in SimHub’s plugin list/settings and is usable from the SimHub UI** (user can select WinPodiums in the left menu and see the settings panel with status, API URL, Link to Discord, manual token, Send heartbeat, Log out), not only that the DLL loads without crash.
 
 #### NFR-002: No Secrets in Repository
 - **Priority**: P0 (Critical)

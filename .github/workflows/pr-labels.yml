@@ -1,0 +1,45 @@
+# Add ContextStream traceability labels when a PR body contains PRD-001 / TP-SPOC Traceability.
+# Ensures PRs that declare Implements (Tech Plan): TP-SPOC get labels for filtering.
+# Labels are created from .github/labels.yml (labels-as-code); sync-repo-labels workflow creates them on merge.
+
+name: pr-labels
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+jobs:
+  add-labels:
+    if: github.event.pull_request.body != ''
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Check PR body for Traceability
+        id: check
+        run: |
+          BODY="${{ github.event.pull_request.body }}"
+          if echo "$BODY" | grep -qE 'PRD-001|Implements \(Tech Plan\).*TP-SPOC'; then
+            echo "traceability=prd-tp" >> $GITHUB_OUTPUT
+          else
+            echo "traceability=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Add labels
+        if: steps.check.outputs.traceability != ''
+        uses: actions/github-script@v7
+        continue-on-error: true
+        with:
+          script: |
+            const labels = ['prd-PRD-001', 'tech-plan-TP-SPOC-004'];
+            try {
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                labels: labels
+              });
+              console.log('Added labels:', labels);
+            } catch (err) {
+              console.log('Label add failed:', err.message, '- Labels are defined in .github/labels.yml; merge to main to sync.');
+            }

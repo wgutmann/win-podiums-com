@@ -11,6 +11,7 @@ A merit-based luxury community for elite sim racers, verified through real-time 
 - [CHANGELOG](../../CHANGELOG.md) — Release history
 
 ### Technical Documentation
+- [Documentation Index (metadata tables)](../../docs/documentation-index.md) — Single source of truth for PRDs, Tech Plans, ADRs, guides (agents: create and maintain these tables)
 - [High-Level Design](../../docs/architecture/high-level-design.md) — System architecture overview
 - [Architecture Decisions](../../docs/architecture/decisions/) — ADRs for key choices
 - [Component Design](../../docs/design/components/) — Low-level implementation details
@@ -50,9 +51,10 @@ A merit-based luxury community for elite sim racers, verified through real-time 
 - Config: `apps/api/wrangler.toml` + `apps/api/.dev.vars` (same config in Docker)
 
 ### SimHub Plugin
-- Main entry: `apps/plugin/WinPodiums.Plugin/Core/PluginMain.cs`
-- Project: `apps/plugin/WinPodiums.Plugin/WinPodiums.Plugin.csproj` (.NET Framework 4.8)
-- **Install**: [Plugin installation](../../apps/plugin/README.md#installation) — build, copy `WinPodiums.Plugin.dll` to `C:\Program Files (x86)\SimHub\Plugins`, restart SimHub
+- Main entry: `apps/plugin/WinPodiums.Plugin/Core/PluginMain.cs` (IPlugin, IDataPlugin, IWPFSettings)
+- Settings UI: `apps/plugin/WinPodiums.Plugin/UI/SettingsControl.xaml` — shown when **WinPodiums is selected in the enabled feature menu on the left** (status, API URL, Link to Discord, manual token, Send heartbeat, Log out)
+- Project: `apps/plugin/WinPodiums.Plugin/WinPodiums.Plugin.csproj` (.NET Framework 4.8, UseWPF)
+- **Install**: [Plugin installation](../../apps/plugin/README.md#installation) — build, copy DLL to SimHub (default: `C:\Program Files (x86)\SimHub`); run `.\scripts\deploy-plugin.ps1` from repo root
 - See [plugin README](../../apps/plugin/README.md) and [SimHub Plugin LLD](../../docs/design/components/simhub-plugin.md)
 - **Development handoff:** [PRD-001 SimHub Plugin POC](../../docs/product/simhub-plugin-poc/001-simhub-plugin-poc.md) and [TP-SPOC-001–005](../../docs/tech-plans/simhub-plugin-poc/README.md); implement in order 001→002→003→004→005. POC complete per [TP-SPOC-005](../../docs/tech-plans/simhub-plugin-poc/005-poc-testing-completion.md). See [Development guide — SimHub Plugin POC](../../docs/guides/development.md#simhub-plugin-poc--development-handoff).
 

@@ -2,10 +2,12 @@
 
 **Doc type**: Technical Plan | **ID**: TP-SPOC-004 | **Implements**: [PRD-001: SimHub Plugin POC](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md) | **Related**: [SimHub Plugin LLD](../../design/components/simhub-plugin.md), [API plugin](../../api/plugin.md), [001: Plugin Skeleton](001-plugin-skeleton-sdk-config.md), [002: Auth (PKCE, Token Storage)](002-auth-pkce-token-storage.md), [003: API Client and Heartbeat](003-api-client-heartbeat.md)
 
-**Status**: Draft  
+**Status**: Implemented  
 **Version**: 1.0  
 **Date**: 2026-02-01  
 **Owner**: Development Team
+
+**Implementation**: Plugin implements IWPFSettings; GetWPFSettingsControl returns `UI/SettingsControl` (WPF UserControl). Settings panel is shown when WinPodiums is selected in the enabled feature menu on the left. See `apps/plugin/WinPodiums.Plugin/Core/PluginMain.cs` and `apps/plugin/WinPodiums.Plugin/UI/SettingsControl.xaml`.
 
 ## Overview
 
@@ -37,16 +39,18 @@ flowchart LR
 
 ### UI Elements (Minimal)
 
-- **Link to Discord**: Button or action that starts the browser PKCE flow. Visible when not authenticated; after success, replace with “Linked” (and optionally “Unlink” or “Logout”).
-- **Send heartbeat**: Button or action that sends one heartbeat to the API. Enabled when authenticated (optional: disable when not linked). On click, call heartbeat; update status on success/failure.
-- **Status**:
-  - Auth: “Linked” or “Not linked” (and optionally Discord ID).
-  - Heartbeat: “Heartbeat OK”, “Heartbeat failed”, or last result message (e.g. “Last heartbeat: OK” / “Last heartbeat: Unauthorized”).
+- **Status**: Auth “Linked” or “Not linked” (and optionally Discord ID when linked). Heartbeat: “Heartbeat OK”, “Heartbeat failed”, or last result message.
+- **API base URL**: Editable text box + Save button; persisted via SimHub property “WinPodiums.ApiBaseUrl” and applied via SetApiBaseUrl.
+- **Link to Discord**: Button that opens the browser to `{baseUrl}/auth/discord`. Visible when not authenticated; after success (e.g. via manual token paste), status shows “Linked” and Log out is available.
+- **Log out**: Button that clears stored tokens; status returns to “Not linked”.
+- **Manual token (optional)**: 8-character token text box + “Paste token” button; calls AuthenticateWithManualTokenAsync. Debug-only; not presented as primary auth.
+- **Send heartbeat**: Button that sends one heartbeat to the API. Enabled when authenticated. On click, call heartbeat; update “Heartbeat OK” or “Heartbeat failed” (or last result) in the UI.
 
 ### SimHub UI Integration
 
-- **Surfaces**: Plugin must appear in SimHub’s plugin list/settings and be usable from the SimHub UI (per NFR-001). Use SimHub SDK UI hooks (e.g. properties, actions, or settings panel) as required by the SDK so the plugin is discoverable and the above controls are accessible.
-- **Technology**: WPF or SimHub-supported UI mechanism per [SimHub Plugin LLD](../../design/components/simhub-plugin.md). POC: minimal controls and status only; no full Scrutineering Panel layout or polish.
+- **Surfaces**: Plugin must appear in SimHub’s plugin list/settings and be **accessible via the enabled feature menu on the left**. When the user selects WinPodiums in that menu, **all settings and plugin content** (status, API URL, Link to Discord, manual token, Send heartbeat, Log out) are displayed in the settings panel.
+- **Implementation**: Plugin implements **IWPFSettings**; **GetWPFSettingsControl(PluginManager)** returns a WPF **Control** (e.g. a UserControl). SimHub displays this control when WinPodiums is selected in the left menu. Implemented in `PluginMain` (IWPFSettings, GetWPFSettingsControl) and **UI/SettingsControl.xaml** + **UI/SettingsControl.xaml.cs**.
+- **Technology**: WPF (UseWPF in csproj); SimHub SDK IWPFSettings per [SimHub Plugin LLD](../../design/components/simhub-plugin.md). POC: minimal controls and status only; no full Scrutineering Panel layout or polish.
 
 ### Brand voice (post-POC)
 

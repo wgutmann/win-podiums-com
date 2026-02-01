@@ -16,3 +16,9 @@ services:
     # Secrets: same as Worker .dev.vars. Create apps/api/.dev.vars from apps/api/.dev.vars.example if missing. Do not commit.
     env_file:
       - ./apps/api/.dev.vars
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://127.0.0.1:8787/api/health', (r) => { r.resume(); process.exit(r.statusCode === 200 ? 0 : 1); }).on('error', () => process.exit(1))"]
+      interval: 15s
+      timeout: 5s
+      start_period: 15s
+      retries: 3

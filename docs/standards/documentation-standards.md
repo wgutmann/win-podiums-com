@@ -265,6 +265,8 @@ Each directory must have a `README.md` that:
 - Links to related directories
 - Includes a table of contents for easy navigation
 
+**Documentation metadata tables (agents):** A single source of truth for all key docs is [documentation-index.md](../documentation-index.md). It contains **tables** for PRDs, Tech Plans, ADRs, key guides, and design docs (ID, Title, Path, Implements, Related). **Agents must create and maintain these tables** when adding or updating any PRD, ADR, tech plan, or key guide. Area READMEs (product, tech-plans, architecture) should stay in sync with those tables where they list the same docs.
+
 ## Version Control
 
 - All documentation is version-controlled in Git

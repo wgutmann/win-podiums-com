@@ -5,5 +5,8 @@ https://storybook-url
 # Production site not reachable from CI until deployed
 https://winpodiums\.com/
 
+# Local dev URLs (no server in CI)
+^http://localhost:8787
+
 # TBD file (not yet created)
 WinPodiums-Brand-Guidelines\.pdf

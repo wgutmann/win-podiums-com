@@ -13,7 +13,7 @@
 | **Diagrams** (Mermaid, `.mmd`, inline in docs) | Indexed as file/markdown content | Keep diagrams in `docs/architecture/diagrams/` or inline with a clear heading (e.g. `## System Overview Diagram`). ContextStream indexes repo files; consistent titles and cross-links from READMEs (e.g. [architecture README](../architecture/README.md#diagrams)) help search and graph relate “diagram” content. |
 | **PRD** (product requirements) | **Plans** + **decisions** | PRDs define *what* and *why*. In ContextStream: capture key product decisions as `session(action="capture", event_type="decision", ...)` with title + content and a pointer to the PRD path. For a multi-step roadmap, use `session(action="capture_plan", title="...", steps=[...])` and link plan content to `docs/product/` in the content. |
 | **ADR / Tech Plan / HLD** (decisions and design) | **Decisions** + **implementation** events | ADRs and tech plans are “decisions” and “implementation” in ContextStream terms. After writing or updating an ADR, capture a short decision in ContextStream: `event_type="decision"`, title e.g. “Cloudflare stack (ADR-001)”, content = one-line summary + path to `docs/architecture/decisions/001-cloudflare-stack.md`. Tech plan milestones can be `event_type="implementation"` or `"task"` when completed. |
-| **Technical docs** (`docs/`, `.cursor/docs/`) | Indexed repo + **memory** | ContextStream indexes the repo (code + docs). Use **Related** / **Implements** in every doc (see [documentation-standards](../standards/documentation-standards.md)) so that when ContextStream indexes, related docs are semantically linked. Add a short “ContextStream-friendly” blurb at the top of key docs (e.g. “**Doc type**: ADR | **ID**: ADR-001 | **Related**: PRD Phase 1, TP-001”) if you want explicit labels for recall. |
+| **Technical docs** (`docs/`, `.cursor/docs/`) | Indexed repo + **memory** | ContextStream indexes the repo (code + docs). Use **Related** / **Implements** in every doc (see [documentation-standards](../standards/documentation-standards.md)) so that when ContextStream indexes, related docs are semantically linked. **Agents:** Create and maintain metadata tables in [documentation-index.md](../documentation-index.md) (PRDs, Tech Plans, ADRs, guides) when adding or changing docs. Add a short “ContextStream-friendly” blurb at the top of key docs (e.g. “**Doc type**: ADR | **ID**: ADR-001 | **Related**: PRD Phase 1, TP-001”) if you want explicit labels for recall. |
 | **Lessons learned** (mistakes, preventions) | **Lessons** (`capture_lesson`) | When something goes wrong (e.g. “pushed without running tests”), capture in ContextStream: `session(action="capture_lesson", title="...", trigger="...", impact="...", prevention="...", keywords=[...])`. Do *not* duplicate full runbooks in the repo; use ContextStream for session-level “don’t repeat this” and keep procedures in `docs/guides/`. |
 | **To-dos / tasks** (implementation checklist, next steps) | **Tasks** + **reminders** | Repo to-dos (e.g. in [next-steps](../architecture/next-steps.md)) = human checklist. In ContextStream: use `memory(action="create_task", ...)` for concrete tasks tied to a plan, or **reminder** for “do this before deploy”. When you complete a repo checklist item, you can capture `event_type="task"` in ContextStream so the AI knows it’s done. |
 
@@ -95,6 +95,8 @@ Use this checklist so PRDs and tech plans stay linked and indexed as desired:
 
    See [.github/PULL_REQUEST_TEMPLATE.md](../../.github/PULL_REQUEST_TEMPLATE.md). Using the same IDs as in the tech plan and PRD docs lets ContextStream (and GitHub integration) associate the PR with the same document nodes.
 
+   **Example (SimHub Plugin / Phase 1 PR):** For a PR that implements the SimHub plugin POC (PRD-001, TP-SPOC-001–005), use the filled Summary and Traceability in [.github/PR_DESCRIPTION_SIMHUB_PLUGIN.md](../../.github/PR_DESCRIPTION_SIMHUB_PLUGIN.md). Copy that file’s Summary, PRD/tech plan table, and Traceability (including **Doc paths**) into the PR description so the ContextStream graph can link PR ↔ Tech Plan ↔ PRD.
+
 2. **Optional GitHub labels**  
    For filter and UI clarity, you can add labels such as `tech-plan: TP-SPOC-001` and `prd: PRD-001`. If ContextStream indexes PR labels, these reinforce the link; they also help humans see traceability in the GitHub UI.
 
@@ -126,6 +128,8 @@ ContextStream’s graph is built from **indexed repo content** (document nodes),
 | PR template: Implements (TP-XXX), PRD (PRD-XXX) | Declare traceability; same IDs as docs so search and graph can associate PR with TP and PRD. |
 | Optional labels `tech-plan: TP-XXX`, `prd: PRD-XXX` | GitHub UI and filters; may reinforce ContextStream indexing. |
 | Capture implementation event with PR URL + TP and PRD doc paths | Creates a graph node that links the PR (in content) to the TP and PRD document nodes so the link is **visible in the ContextStream knowledge graph UI**. |
+
+**Labels as code:** To create or change repo labels, edit [.github/labels.yml](../../.github/labels.yml) in a PR and merge; [sync-repo-labels](../../.github/workflows/sync-repo-labels.yml) will create/update them.
 
 ---
 

@@ -55,11 +55,21 @@ When handling change control or repo governance:
 - [ ] Add patterns to .gitignore and update docs with secure workflows.
 - [ ] Suggest secret scanning and pre-commit checks when relevant.
 
+## PR description and ContextStream traceability (SimHub / Phase 1)
+
+When creating or filling a **PR that implements PRD-001 or TP-SPOC-001–005** (SimHub plugin / Phase 1):
+
+1. **Automatically populate the PR description** from [.github/PR_DESCRIPTION_SIMHUB_PLUGIN.md](../../.github/PR_DESCRIPTION_SIMHUB_PLUGIN.md): copy **Summary**, **PRD and tech plan table**, and **Traceability** (including **Doc paths**). This is **required** on the first PR that touches this scope. Do not leave Traceability blank; use the same Implements (TP-SPOC-001–005), PRD (PRD-001), and Doc paths as in that file.
+2. **After the PR is opened or merged:** When ContextStream MCP is available, **capture an implementation event**: `session(action="capture", event_type="implementation", title="PR #<number>: <short summary> (TP-SPOC-004)", content="<PR URL>. Implements TP-SPOC-001–005, PRD-001.", provenance={ pr_url: "<PR URL>" }, code_refs=[ { file_path: "docs/product/simhub-plugin-poc/001-simhub-plugin-poc.md" }, ... ])` with all Doc paths from the Traceability section. See [ContextStream mapping §1.4](../../docs/guides/contextstream-mapping.md#14-linking-pull-requests-to-tech-plans-and-prds-graph-visible).
+3. **When opening the PR:** Add labels **prd-PRD-001** and **tech-plan-TP-SPOC-004** (and **tech-plan-TP-SPOC-001** through **TP-SPOC-005** as desired). If the repo has a workflow that adds labels from PR body (e.g. [.github/workflows/pr-labels.yml](../../.github/workflows/pr-labels.yml)), ensure the PR body contains the Traceability section so labels are applied; otherwise add labels manually or via `gh pr edit --add-label`.
+
+See [.cursor/rules/pr-contextstream.mdc](../../.cursor/rules/pr-contextstream.mdc) for the full rule.
+
 ## Output Templates
 
-### PR Description Template
+### PR Description Template (generic)
 
-Use this when drafting a PR summary:
+Use this when drafting a PR summary (for non–SimHub/Phase 1 PRs):
 
 ```
 ## Summary
@@ -75,6 +85,10 @@ Use this when drafting a PR summary:
 ## Rollback
 - [how to revert]
 ```
+
+### PR Description (SimHub / Phase 1 — use canned content)
+
+For PRs that implement PRD-001 / TP-SPOC-001–005, **do not use the generic template**. Use the content from [.github/PR_DESCRIPTION_SIMHUB_PLUGIN.md](../../.github/PR_DESCRIPTION_SIMHUB_PLUGIN.md) so Traceability and Doc paths are filled.
 
 ### Change Control Log Entry
 

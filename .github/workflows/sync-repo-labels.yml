@@ -1,0 +1,114 @@
+# Sync repository labels from .github/labels.yml (labels-as-code).
+# Runs on push to default branch when labels config or this workflow changes.
+# Creates or updates repo labels via GitHub API so they exist for pr-labels workflow.
+
+name: sync-repo-labels
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/labels.yml"
+      - ".github/workflows/sync-repo-labels.yml"
+  pull_request:
+    paths:
+      - ".github/labels.yml"
+  workflow_dispatch:
+
+jobs:
+  validate-labels-yml:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate .github/labels.yml
+        run: |
+          npm init -y
+          npm install js-yaml
+          node -e "
+            const fs = require('fs');
+            const yaml = require('js-yaml');
+            const path = '.github/labels.yml';
+            const content = fs.readFileSync(path, 'utf8');
+            const config = yaml.load(content);
+            if (!config || !Array.isArray(config.labels)) {
+              console.error('labels.yml must have a top-level "labels" array');
+              process.exit(1);
+            }
+            for (let i = 0; i < config.labels.length; i++) {
+              const L = config.labels[i];
+              if (!L.name || typeof L.name !== 'string') {
+                console.error('Label at index', i, 'missing "name" string');
+                process.exit(1);
+              }
+              if (!L.color || typeof L.color !== 'string') {
+                console.error('Label', L.name, 'missing "color" string');
+                process.exit(1);
+              }
+            }
+            console.log('Valid:', config.labels.length, 'labels');
+          "
+
+  sync-labels:
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Parse .github/labels.yml to JSON
+        run: |
+          npm init -y
+          npm install js-yaml
+          node -e "
+            const fs = require('fs');
+            const yaml = require('js-yaml');
+            const c = fs.readFileSync('.github/labels.yml', 'utf8');
+            const data = yaml.load(c);
+            fs.writeFileSync('labels.json', JSON.stringify(data));
+          "
+
+      - name: Sync labels to repository
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const config = JSON.parse(fs.readFileSync('labels.json', 'utf8'));
+            const labels = config.labels || [];
+            const { owner, repo } = context.repo;
+            for (const label of labels) {
+              const name = label.name;
+              const color = (label.color || 'ededed').toString().replace(/^#/, '');
+              const description = (label.description || '').toString();
+              try {
+                await github.rest.issues.createLabel({
+                  owner,
+                  repo,
+                  name,
+                  color,
+                  description
+                });
+                console.log('Created label:', name);
+              } catch (err) {
+                if (err.status === 422) {
+                  try {
+                    await github.rest.issues.updateLabel({
+                      owner,
+                      repo,
+                      name,
+                      color,
+                      description
+                    });
+                    console.log('Updated label:', name);
+                  } catch (e) {
+                    console.log('Update failed for', name, e.message);
+                  }
+                } else {
+                  console.error('Error for', name, err.message);
+                }
+              }
+            }

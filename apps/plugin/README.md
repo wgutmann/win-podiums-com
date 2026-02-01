@@ -12,9 +12,10 @@ SimHub plugin for WinPodiums: monitors telemetry, detects podium finishes, and s
 ## Layout
 
 - `WinPodiums.Plugin/` — Main class library
-  - `Core/PluginMain.cs` — Entry point; implements SimHub `IPlugin` and `IDataPlugin` (Init, DataUpdate, End); browser auth (PKCE) + heartbeat; manual token only when debug flag on
+  - `Core/PluginMain.cs` — Entry point; implements SimHub `IPlugin`, `IDataPlugin`, and **IWPFSettings** (Init, DataUpdate, End, **GetWPFSettingsControl**); browser auth (PKCE) + heartbeat; manual token only when debug flag on
   - `Auth/TokenStorage.cs` — DPAPI-protected storage for access token and Discord ID
   - `Services/ApiClient.cs` — API client: PKCE exchange, token exchange (debug), heartbeat
+  - `UI/SettingsControl.xaml` + `SettingsControl.xaml.cs` — WPF settings panel shown when **WinPodiums is selected in the enabled feature menu on the left**; displays status, API URL, Link to Discord, manual token, Send heartbeat, Log out
 
 ## Prerequisites
 
@@ -36,7 +37,7 @@ To install the WinPodiums plugin in SimHub: build the plugin, copy the DLL to Si
 
 **Manual:** **Copy** only `WinPodiums.Plugin.dll` from `WinPodiums.Plugin/bin/Release/net48/` to `C:\Program Files (x86)\SimHub\Plugins`. Writing to that folder usually requires elevation (e.g. run as Administrator).
 2. **Restart SimHub** (or start it if not running). SimHub loads plugins from the Plugins folder and invokes `IPlugin.Init(PluginManager)`.
-3. **Confirm** the plugin appears in SimHub’s plugin list/settings as **WinPodiums** (see [SimHub Plugin LLD](../../docs/design/components/simhub-plugin.md)).
+3. **Confirm** the plugin appears in SimHub’s plugin list/settings as **WinPodiums**. Select **WinPodiums** in the **enabled feature menu on the left** to open the settings panel (status, API URL, Link to Discord, manual token, Send heartbeat, Log out). See [SimHub Plugin LLD](../../docs/design/components/simhub-plugin.md).
 4. **Troubleshooting:** If the plugin fails to load with a `FileNotFoundException` (or "Could not load file or assembly 'Newtonsoft.Json'"), copy `Newtonsoft.Json.dll` from the same build output folder (`WinPodiums.Plugin/bin/Release/net48/`) into `C:\Program Files (x86)\SimHub\Plugins` and restart SimHub. SimHub usually provides Newtonsoft.Json from its own folder, so this is only needed in some setups.
 
 ## Phase 1: browser auth (PKCE) + heartbeat

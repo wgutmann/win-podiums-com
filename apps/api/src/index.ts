@@ -64,6 +64,8 @@ export default {
     const path = url.pathname;
     const method = request.method;
     const baseUrl = `${url.protocol}//${url.host}`;
+    // Match Discord OAuth redirects: production uses /api/auth/callback, local uses /auth/callback
+    const authCallbackPath = url.host === "winpodiums.com" ? "/api/auth/callback" : "/auth/callback";
 
     // Health
     if (path === "/health" || path === "/api/health") {
@@ -149,7 +151,7 @@ export default {
         });
       }
       const state = generateState();
-      const redirectUri = `${baseUrl}/auth/callback`;
+      const redirectUri = `${baseUrl}${authCallbackPath}`;
       if (env.CACHE) {
         await env.CACHE.put(`auth:state:${state}`, redirectUri, { expirationTtl: 600 });
       }
@@ -163,13 +165,13 @@ export default {
     }
 
     // Web OAuth callback (Discord redirects here with ?code=...&state=...)
-    if (method === "GET" && path === "/auth/callback") {
+    if (method === "GET" && (path === "/auth/callback" || path === "/api/auth/callback")) {
       const code = url.searchParams.get("code");
       const state = url.searchParams.get("state");
       if (!code || !state) {
         return Response.redirect(`${baseUrl}/gate?error=missing_params`, 302);
       }
-      const redirectUri = `${baseUrl}/auth/callback`;
+      const redirectUri = `${baseUrl}${authCallbackPath}`;
       const storedRedirect = env.CACHE ? await env.CACHE.get(`auth:state:${state}`) : null;
       if (env.CACHE) await env.CACHE.delete(`auth:state:${state}`);
       if (!env.DISCORD_CLIENT_ID || !env.DISCORD_CLIENT_SECRET || !env.DB) {

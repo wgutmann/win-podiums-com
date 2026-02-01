@@ -12,7 +12,7 @@
 |------|-------------|
 | **Discord OAuth2** | Web flow + plugin flows (browser, QR; manual token debug-only, feature-flagged) per [Discord Integration LLD](../design/integrations/discord-integration.md) |
 | **Minimal Worker** | Auth endpoints (stub or real) + health + at least one non-auth endpoint (e.g. `GET /api/profile/me`) using D1/KV; config via `wrangler.toml` (same for Docker and wrangler dev, 1:1) |
-| **Basic SimHub plugin** | Position detection deferred; minimal auth (browser primary; manual token only as debug feature-flag), one call to verification API (heartbeat) per [SimHub plugin LLD](../design/components/simhub-plugin.md) and [SimHub Plugin POC PRD](simhub-plugin-poc/001-simhub-plugin-poc.md) |
+| **Basic SimHub plugin** | Position detection deferred; minimal auth (browser primary; manual token only as debug feature-flag), one call to verification API (heartbeat). **UI**: accessible via the **enabled feature menu on the left**; when WinPodiums is selected, settings and plugin content are displayed (status, API URL, Link to Discord, manual token, Send heartbeat, Log out) per [SimHub plugin LLD](../design/components/simhub-plugin.md) and [SimHub Plugin POC PRD](simhub-plugin-poc/001-simhub-plugin-poc.md). |
 | **Static Gate** | Landing page (Worker-served or static) linking to Discord auth and plugin download |
 | **Member state** | Pending / verified (stored in D1 when implemented) |
 | **Infrastructure** | D1, R2, KV (created in Cloudflare; bindings in `wrangler.toml`). Single environment (e.g. `dev`) first. Terraform is not in scope until explicitly introduced as a feature. |

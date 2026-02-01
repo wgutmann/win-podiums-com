@@ -143,7 +143,8 @@ https://discord.com/oauth2/authorize
 **Parameters**:
 - `client_id`: Discord application ID (public, safe to embed)
 - `redirect_uri`: 
-  - Web: `https://winpodiums.com/auth/callback`
+  - Web (production): `https://winpodiums.com/api/auth/callback`
+  - Web (local): `http://localhost:8787/auth/callback`
   - Plugin Browser: `http://127.0.0.1:{RANDOM_PORT}/callback`
   - Plugin QR: `https://winpodiums.com/auth/qr-callback`
 - `response_type`: Always `code` (Authorization Code flow)

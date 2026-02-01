@@ -6,12 +6,12 @@
     <OutputType>Library</OutputType>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
     <Reference Include="System.Security" />
-    <Reference Include="PresentationCore" />
   </ItemGroup>
   <!-- SimHub SDK: install root C:\Program Files (x86)\SimHub. Adjust HintPath if your install path differs. -->
   <ItemGroup>

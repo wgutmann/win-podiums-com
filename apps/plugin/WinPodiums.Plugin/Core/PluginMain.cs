@@ -1,21 +1,24 @@
 using System;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Media;
 using GameReaderCommon;
 using SimHub.Plugins;
 using WinPodiums.Plugin.Auth;
 using WinPodiums.Plugin.Services;
+using WinPodiums.Plugin.UI;
 
 namespace WinPodiums.Plugin.Core
 {
     /// <summary>
     /// SimHub plugin entry point. Phase 1: manual token auth + one heartbeat API call.
-    /// Implements IPlugin and IDataPlugin so SimHub loads the DLL. See docs/design/components/simhub-plugin.md.
+    /// Implements IPlugin, IDataPlugin, and IWPFSettings so SimHub loads the DLL and shows settings in the left menu.
+    /// See docs/design/components/simhub-plugin.md.
     /// </summary>
     [PluginName("WinPodiums")]
     [PluginDescription("WinPodiums telemetry verification and podium submission.")]
     [PluginAuthor("WinPodiums")]
-    public class PluginMain : IPlugin, IDataPlugin
+    public class PluginMain : IPlugin, IDataPlugin, IWPFSettings
     {
         private ApiClient? _apiClient;
         private string _apiBaseUrl = "https://winpodiums.com";
@@ -29,11 +32,23 @@ namespace WinPodiums.Plugin.Core
         /// <summary>Short title in SimHub left menu.</summary>
         public string LeftMenuTitle => "WinPodiums";
 
+        /// <summary>Current API base URL (e.g. https://winpodiums.com or http://localhost:8787).</summary>
+        public string ApiBaseUrl => _apiBaseUrl;
+
         /// <summary>Called once after plugin startup. Keeps existing Init logic.</summary>
         public void Init(PluginManager pluginManager)
         {
             PluginManager = pluginManager;
+            var saved = pluginManager.GetPropertyValue("WinPodiums.ApiBaseUrl")?.ToString()?.Trim();
+            if (!string.IsNullOrEmpty(saved))
+                _apiBaseUrl = saved!.TrimEnd('/');
             _apiClient = new ApiClient(_apiBaseUrl);
+        }
+
+        /// <summary>Return the WPF control shown when the user selects WinPodiums in the left menu.</summary>
+        public Control GetWPFSettingsControl(PluginManager pluginManager)
+        {
+            return new SettingsControl(this);
         }
 
         /// <summary>Called every game data update. No-op for POC (position detection deferred).</summary>

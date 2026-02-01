@@ -53,6 +53,18 @@
 
 Compose uses `env_file: ./apps/api/.dev.vars` so the container gets the same secrets the Worker expects. The Dockerfile sets `CLOUDFLARE_INCLUDE_PROCESS_ENV=true` so Wrangler passes those env vars into the Worker (config match). Wrangler is started with `--ip 0.0.0.0` so the API is reachable from the host (port 8787) for tests and the plugin.
 
+### Update and redeploy
+
+After changing the Dockerfile, compose file, or app dependencies, rebuild and restart:
+
+```bash
+docker compose down
+docker compose build
+docker compose up -d
+```
+
+Verify: open **http://localhost:8787/api/health** (expect `{ "ok": true, "env": "dev" }`). Use `docker compose logs -f api` if the API does not become healthy.
+
 ### Useful commands
 
 - **Logs**: `docker compose logs -f api`
@@ -104,7 +116,7 @@ Do not commit `.dev.vars`. Create it from `.dev.vars.example`.
 
 ## SimHub plugin (no Docker)
 
-The plugin targets .NET Framework 4.8 and SimHub on Windows. Build and run on the host (Visual Studio or MSBuild). **To install the plugin** (build, copy DLL to SimHub Plugins folder, restart SimHub), see [Installation](../apps/plugin/README.md#installation) in the plugin README. Deploy the built DLL to `C:\Program Files (x86)\SimHub\Plugins`. Point the plugin at `http://localhost:8787` when the API is running in Docker. Official SimHub docs sometimes refer to the SimHub install root for plugin DLLs; this repo uses the `Plugins` subfolder unless your SimHub version requires otherwise.
+The plugin targets .NET Framework 4.8 and SimHub on Windows. Build and run on the host (Visual Studio or MSBuild). **To install the plugin** (build, copy DLL to SimHub Plugins folder, restart SimHub), see [Installation](../../apps/plugin/README.md#installation) in the plugin README. Deploy the built DLL to `C:\Program Files (x86)\SimHub\Plugins`. Point the plugin at `http://localhost:8787` when the API is running in Docker. Official SimHub docs sometimes refer to the SimHub install root for plugin DLLs; this repo uses the `Plugins` subfolder unless your SimHub version requires otherwise.
 
 ### SimHub Plugin POC — development handoff
 
@@ -194,6 +206,8 @@ After ContextStream is connected, you can bootstrap project memory once so new s
 | Phase 1 scope | Auth, minimal Worker, basic plugin, static Gate, D1/KV; single env first | [phase-1-mvp-scope.md](../product/phase-1-mvp-scope.md) |
 | Phase 1 out of scope | Full Telemetry Proof, luxury UI, Discord roles, leaderboards, full anti-cheat LLD deferred to Phase 2+ | [phase-1-mvp-scope.md](../product/phase-1-mvp-scope.md) |
 | PRD-001 SimHub POC | Plugin POC: browser PKCE, heartbeat, minimal UI; complete when TP-SPOC-005 (manual E2E + min automated tests) satisfied | [001-simhub-plugin-poc.md](../product/simhub-plugin-poc/001-simhub-plugin-poc.md) |
+
+**Labels as code:** Repository labels are defined in [.github/labels.yml](../../.github/labels.yml) (1:1 from [documentation-index.md](../documentation-index.md)). Merge that file to main (or run the [sync-repo-labels](../../.github/workflows/sync-repo-labels.yml) workflow) to create/update repo labels.
 | Free Cloudflare security only | Use only free security features (DDoS, SSL, WAF, Bot Fight); no paid add-ons for baseline | [001-free-cloudflare-security.md](../product/cloudflare-security/001-free-cloudflare-security.md) |
 | Never commit secrets | Do not commit .dev.vars, .env, or tokens; rotate if ever exposed | [AGENTS.md](../../AGENTS.md), [SECURITY.md](../../SECURITY.md) |
 

@@ -23,6 +23,23 @@ The SimHub plugin is a desktop application that monitors sim racing telemetry vi
 
 ### Module Structure
 
+**Phase 1 (implemented):** Plugin entry point, auth (manual token + browser link), API client, heartbeat, and **settings UI** accessible via the **enabled feature menu on the left**. When WinPodiums is selected, the settings panel shows status, API URL, Link to Discord, manual token, Send heartbeat, Log out.
+
+```
+WinPodiums.Plugin/
+├── Core/
+│   └── PluginMain.cs              # Entry point: IPlugin, IDataPlugin, IWPFSettings; GetWPFSettingsControl returns settings panel
+├── Auth/
+│   └── TokenStorage.cs            # DPAPI wrapper for token storage
+├── Services/
+│   └── ApiClient.cs               # API client: token exchange, heartbeat
+├── UI/
+│   ├── SettingsControl.xaml       # WPF UserControl: status, API URL, Link to Discord, manual token, Send heartbeat, Log out
+│   └── SettingsControl.xaml.cs    # Code-behind; shown when WinPodiums selected in left menu
+```
+
+**Phase 2+ (LLD target):**
+
 ```
 WinPodiums.Plugin/
 ├── Core/
@@ -37,6 +54,7 @@ WinPodiums.Plugin/
 │   ├── ManualTokenAuthFlow.cs     # Token input and validation
 │   └── TokenStorage.cs            # DPAPI wrapper for token encryption
 ├── UI/
+│   ├── SettingsControl.xaml/.cs   # (Phase 1) Settings panel — left menu; status, API URL, auth, heartbeat
 │   ├── MainWindow.xaml/.cs        # Primary plugin window (Scrutineering Panel)
 │   ├── AuthWindow.xaml/.cs        # Authentication method selection
 │   ├── QRCodeWindow.xaml/.cs      # QR code display
@@ -54,16 +72,16 @@ WinPodiums.Plugin/
 ### Class Diagram (Key Classes)
 
 ```csharp
-// Core Plugin Entry Point
-public class PluginMain : IPlugin, IDataPlugin
+// Core Plugin Entry Point (Phase 1: IPlugin, IDataPlugin, IWPFSettings)
+public class PluginMain : IPlugin, IDataPlugin, IWPFSettings
 {
     public void Init(PluginManager pluginManager);
     public void DataUpdate(PluginManager pluginManager, ref GameData data);
     public void End(PluginManager pluginManager);
+    public Control GetWPFSettingsControl(PluginManager pluginManager);  // Returns SettingsControl; shown when WinPodiums selected in left menu
     
-    private TelemetryMonitor _monitor;
-    private AuthenticationManager _auth;
-    private VerificationService _verification;
+    private ApiClient _apiClient;
+    // Phase 2+: TelemetryMonitor _monitor; AuthenticationManager _auth; VerificationService _verification;
 }
 
 // Telemetry Monitoring

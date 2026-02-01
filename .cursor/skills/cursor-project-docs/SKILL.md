@@ -11,13 +11,19 @@ Use this skill when the user asks to **document the repo**, **create PRDs**, **c
 
 **Flow**: (1) Start with PRDs to define product requirements. (2) Create HLD for system architecture. (3) Create Tech Plans for implementation details. (4) Populate Cursor's doc section (`.cursor/docs/`) for indexing context.
 
+**Documentation metadata tables**: **Agents must create and maintain tables** for all key docs. When you add, rename, move, or update any PRD, ADR, tech plan, or key guide, update the corresponding table in [docs/documentation-index.md](../../../docs/documentation-index.md). That file is the single source of truth for doc IDs, paths, Implements, and Related. Keep area READMEs ([product/README](../../../docs/product/README.md), [tech-plans/README](../../../docs/tech-plans/README.md), [architecture/README](../../../docs/architecture/README.md)) in sync with those tables where they list the same docs.
+
+**Labels as code:** Repository labels are defined in [.github/labels.yml](../../../.github/labels.yml) and synced by [.github/workflows/sync-repo-labels.yml](../../../.github/workflows/sync-repo-labels.yml). To add or change labels, edit `.github/labels.yml` in a PR and merge; the workflow creates or updates repo labels. Do not create labels manually in GitHub Settings when this file exists.
+
+**Evaluate process when docs change:** When you create or **significantly modify** documentation (new or updated PRD, ADR, tech plan, or key guide), **use this skill** to evaluate and update as needed: (1) [docs/documentation-index.md](../../../docs/documentation-index.md) tables, (2) **labels-as-code** — if a new PRD or tech plan (or new doc IDs) are used for traceability, add corresponding entries to `.github/labels.yml` so PRs can be tagged, (3) PR template and canned PR descriptions (e.g. [.github/PULL_REQUEST_TEMPLATE.md](../../../.github/PULL_REQUEST_TEMPLATE.md), [.github/PR_DESCRIPTION_SIMHUB_PLUGIN.md](../../../.github/PR_DESCRIPTION_SIMHUB_PLUGIN.md)) if doc IDs or scope change.
+
 **Consistency**: Apply the [Consistency checklist](#consistency-checklist-when-creating-or-updating-docs) for every new or updated PRD, ADR, tech plan, or key guide (Related/Implements, optional Doc type | ID, bootstrap table, diagram READMEs). Align to [documentation-standards](../../../docs/standards/documentation-standards.md).
 
 **ContextStream (when available):** Before creating or editing docs, use ContextStream `search` to find related PRDs, ADRs, tech plans. After adding or updating a key doc (PRD, ADR, tech plan), capture a short decision in ContextStream with title and path. If it's a key decision, add it to "Suggested decisions to capture" in [docs/guides/development.md](../../../docs/guides/development.md#optional-one-time-bootstrap). See [ContextStream mapping](../../../docs/guides/contextstream-mapping.md).
 
 ## Scope
 
-- **In scope**: How we document the repository — GitHub repo docs (README, CONTRIBUTING, SECURITY, CHANGELOG, etc.), product requirements (PRDs), high-level design (HLD), tech plans (implementation specs), and populating `.cursor/docs/` from them.
+- **In scope**: How we document the repository — GitHub repo docs (README, CONTRIBUTING, SECURITY, CHANGELOG, etc.), product requirements (PRDs), high-level design (HLD), tech plans (implementation specs), populating `.cursor/docs/` from them, and the **labels-as-code process** ([.github/labels.yml](../../../.github/labels.yml) and [sync-repo-labels](../../../.github/workflows/sync-repo-labels.yml)) when doc changes affect traceability or PR labeling.
 - **Out of scope**: Change control, branch protection, secret hygiene (see github-change-control skill); Cursor Settings/Indexing UI; modifying `.cursorignore` unless the user asks.
 
 ## Best-Practices Sources
@@ -245,10 +251,34 @@ When ContextStream MCP is enabled, repo docs map to ContextStream memory for bet
 
 See [ContextStream mapping](../../../docs/guides/contextstream-mapping.md) for full parallels, graph usage (ingest_local, dependencies, impact), and tagging guidance.
 
+## Documentation metadata tables (agents: create and maintain)
+
+**Single source of truth**: [docs/documentation-index.md](../../../docs/documentation-index.md) contains canonical **tables** for PRDs, Tech Plans, ADRs, key guides, and design docs (ID, Title, Path, Implements, Related).
+
+**When you create or update docs:**
+- **New PRD, ADR, tech plan, or key guide** → Add or update the corresponding row in the appropriate table in `docs/documentation-index.md`.
+- **Rename, move, or deprecate a doc** → Update the table row (path, title, Related/Implements).
+- **Change Related/Implements in a doc** → Update the table row to match.
+- **Area READMEs** (product, tech-plans, architecture) that list the same docs should stay in sync with these tables.
+
+This keeps traceability and ContextStream mapping consistent and gives agents one place to look for all documentation metadata.
+
+## Labels as code (GitHub)
+
+Repository labels are **defined as code** so they can be created or updated by pull request:
+
+- **Source of truth:** [.github/labels.yml](../../../.github/labels.yml) — each entry: `name`, `color` (hex without `#`), optional `description`. Bootstrapped 1:1 from [docs/documentation-index.md](../../../docs/documentation-index.md) (one label per PRD, tech plan, ADR with a stable ID).
+- **Sync:** [.github/workflows/sync-repo-labels.yml](../../../.github/workflows/sync-repo-labels.yml) runs on push to the default branch when `.github/labels.yml` (or the workflow) changes and creates/updates repo labels via the GitHub API.
+- **To add or change labels:** Edit `.github/labels.yml` in a PR and merge; the workflow will create or update the labels. Do not rely on manually creating labels in GitHub Settings when this file exists.
+- **When you add or significantly change a PRD or tech plan** that is used for PR traceability, evaluate whether new label entries are needed in `.github/labels.yml` (e.g. `prd-PRD-XXX`, `tech-plan-TP-XXX`, `adr-ADR-XXX`) and add them so the [pr-labels](../../../.github/workflows/pr-labels.yml) workflow can apply them to PRs.
+
 ## Consistency checklist (when creating or updating docs)
 
 Before finishing any new or updated PRD, ADR, tech plan, or key guide:
 
+- [ ] **Documentation index tables**: Add or update the row in [docs/documentation-index.md](../../../docs/documentation-index.md) for this doc (PRD, Tech Plan, ADR, or key guide table).
+- [ ] **Evaluate process:** When documentation is created or modified in a significant way, evaluate and update as needed: documentation-index tables (above); [.github/labels.yml](../../../.github/labels.yml) for new PRDs/tech plans used for traceability; [PR template](../../../.github/PULL_REQUEST_TEMPLATE.md) and canned PR descriptions if doc IDs or scope change.
+- [ ] **Labels as code:** If the change introduces or renames a PRD or tech plan ID used for traceability, add or update the corresponding label entry in [.github/labels.yml](../../../.github/labels.yml).
 - [ ] **Related** (and **Implements** for tech plans) in metadata; stable IDs (PRD-XXX, ADR-XXX, TP-XXX) in title.
 - [ ] Optional **Doc type | ID | Related** line at top of key docs (see [contextstream-mapping](../../../docs/guides/contextstream-mapping.md#3-tagging-and-labeling-for-better-contextstream-metadata)).
 - [ ] If adding a new key decision (ADR or product decision): add a row to "Suggested decisions to capture" in [docs/guides/development.md](../../../docs/guides/development.md#optional-one-time-bootstrap).

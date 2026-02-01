@@ -11,5 +11,6 @@ alwaysApply: false
 - Keep each doc focused on one subject. Use `README.md` as the index in each subdirectory.
 - **docs/product/** — PRDs (what and why). **docs/architecture/** — HLD and ADRs (how at system level). **docs/tech-plans/** — implementation specs (how at code level). **docs/design/** — component and integration design.
 - When adding or changing docs, maintain traceability: HLD sections reference PRD requirements; tech plans reference HLD components. Use consistent cross-references (e.g. PRD-001, ADR-002).
+- **Documentation metadata tables:** When you add, rename, move, or update any PRD, ADR, tech plan, or key guide, **create or update the corresponding row** in [docs/documentation-index.md](../../docs/documentation-index.md). That file is the single source of truth for doc IDs, paths, Implements, and Related. Keep area READMEs in sync with those tables.
 - Do not duplicate content; link to the canonical doc. Do not populate `.cursor/docs/` with content that contradicts `docs/`.
 - **Before pushing to remote:** Run local tests; at least 80% must pass (see [development guide](../../docs/guides/development.md#run-tests-before-push)).

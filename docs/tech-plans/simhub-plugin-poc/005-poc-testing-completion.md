@@ -30,7 +30,7 @@ graph TB
 
 ### Manual E2E
 
-- **Steps**: (1) Build plugin DLL. (2) Install in SimHub (copy to Plugins folder or documented install method). (3) Restart SimHub; confirm plugin appears in plugin list/settings. (4) Open plugin UI; confirm “Link to Discord” and status “Not linked”. (5) Click “Link to Discord”; complete Discord auth in browser; confirm “Linked” in plugin. (6) Click “Send heartbeat”; confirm “Heartbeat OK” (or documented failure if API unavailable). (7) Optionally set API base URL to local (e.g. localhost:8787) and repeat 5–6 against local API.
+- **Steps**: (1) Build plugin DLL. (2) Install in SimHub (copy to SimHub install folder or Plugins; see `scripts/deploy-plugin.ps1`). (3) Restart SimHub; confirm plugin appears in plugin list/settings. (4) **Select WinPodiums in the enabled feature menu on the left**; confirm settings panel shows “Link to Discord”, status “Not linked”, API URL, manual token, Send heartbeat, Log out. (5) Click “Link to Discord” (or paste manual token); complete Discord auth; confirm “Linked” in plugin. (6) Click “Send heartbeat”; confirm “Heartbeat OK” (or documented failure if API unavailable). (7) Optionally set API base URL to local (e.g. localhost:8787) and repeat 5–6 against local API.
 - **Documentation**: Record these steps in [Development guide](../../guides/development.md) or [Next steps](../../architecture/next-steps.md) so any developer can run manual E2E and confirm POC completion.
 
 ### Automated Tests (Minimum)

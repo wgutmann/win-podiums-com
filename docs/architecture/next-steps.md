@@ -24,7 +24,7 @@
 
 - **Worker**: Real Discord OAuth (web: `/auth/discord`, callback; plugin: `POST /api/auth/discord/exchange`, `POST /api/auth/token-exchange`, `GET /api/auth/qr-status/:id` stub). `GET /api/profile/me` and `POST /api/plugin/heartbeat` use D1/KV. Dynamic Gate at `/` and `/gate` (login state + logout); token page at `/auth/token` (login state + logout); **GET /auth/logout** clears session and redirects to Gate. Secrets: see `apps/api/.dev.vars.example`.
 - **D1**: Initial-schema SQL `0001_initial_schema.sql` (CREATE TABLE for users, auth_tokens, qr_auth_sessions, manual_tokens, race_results, plugin_installations, rate_limit_logs). No data—just empty tables. Run the command above when you want the Worker to have a DB to write to.
-- **Plugin**: Browser auth (PKCE) primary; manual token **debug-only, feature-flagged** (`AuthenticateWithManualTokenAsync` when flag on). One verification call (`SendHeartbeatAsync`). DPAPI storage; API client in `Services/ApiClient.cs`. SimHub SDK not yet referenced (position detection / IPlugin wiring deferred).
+- **Plugin**: Browser auth (PKCE) primary; manual token **debug-only, feature-flagged** (`AuthenticateWithManualTokenAsync` when flag on). One verification call (`SendHeartbeatAsync`). DPAPI storage; API client in `Services/ApiClient.cs`. **SimHub SDK wired**: plugin implements IPlugin, IDataPlugin, and **IWPFSettings**; **GetWPFSettingsControl** returns the settings panel. UI is **accessible via the enabled feature menu on the left**; when WinPodiums is selected, settings and content are displayed (status, API URL, Link to Discord, manual token, Send heartbeat, Log out). Position detection deferred.
 
 ---
 
@@ -44,7 +44,7 @@
 | **Repo governance** | ✅ Present | AGENTS.md, .gitignore, CONTRIBUTING.md, SECURITY.md, CHANGELOG.md (stubs) |
 | **Repo structure** | ✅ Done | Worker in `apps/api/` (wrangler.toml for D1/R2/KV), SimHub plugin in `apps/plugin/` |
 | **Worker (Phase 1)** | ✅ Done | Real Discord OAuth (web + plugin exchange/token-exchange), D1 initial-schema SQL (create tables), profile/me with D1/KV, heartbeat, dynamic Gate + token page (login state + logout), GET /auth/logout |
-| **Plugin (Phase 1)** | ✅ Done | Browser auth (PKCE) primary; manual token debug-only, feature-flagged; heartbeat API call, DPAPI storage, API client; SimHub SDK/position detection not yet wired |
+| **Plugin (Phase 1)** | ✅ Done | Browser auth (PKCE) primary; manual token debug-only, feature-flagged; heartbeat API call, DPAPI storage, API client; SimHub SDK wired (IPlugin, IDataPlugin, IWPFSettings); settings UI in left menu (status, API URL, Link to Discord, manual token, Send heartbeat, Log out); position detection deferred |
 
 ### What Is Not Done Yet
 
@@ -53,7 +53,7 @@
 | **D1 tables not created yet** | Initial-schema SQL exists in `apps/api/migrations/` (CREATE TABLE only, no data) but has not been run; run `wrangler d1 migrations apply` when you want empty tables for the Worker to use. |
 | **Discord + secrets** | `.dev.vars` not committed; create it from `.dev.vars.example` and configure Discord app redirect URI. |
 | **Deployment** | Worker not yet deployed to Cloudflare; no live routes. |
-| **Plugin SimHub SDK** | SimHub SDK reference and IPlugin/position detection not yet added (Phase 1 used browser PKCE + heartbeat; manual token debug-only). |
+| **Plugin position detection** | Position detection and telemetry logic deferred; POC = auth + heartbeat + settings UI in left menu. |
 | **Repo docs** | No LICENSE; CONTRIBUTING/SECURITY/CHANGELOG are stubs (full content as implementation progresses). |
 
 So: **Phase 1 implementation is complete.** Next: create D1 tables (run initial schema—empty tables only), configure Discord and `.dev.vars`, test locally; when ready, deploy Worker (see [Deployment Guide](../guides/deployment.md)).

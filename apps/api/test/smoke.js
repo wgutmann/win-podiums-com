@@ -1,6 +1,7 @@
 /**
  * Smoke test: run against the Dockerized API (docker compose up -d).
- * Validates that Docker and Worker config match (health returns ok + env dev).
+ * Validates: (1) Docker and Worker config match (health ok, env dev),
+ * (2) API documentation loads (Swagger UI and OpenAPI spec reachable).
  * Run from repo root: docker compose up -d && cd apps/api && npm test
  */
 const API_BASE = process.env.API_BASE || 'http://localhost:8787';
@@ -30,7 +31,30 @@ async function main() {
     process.exit(1);
   }
 
-  console.log('Smoke test passed: API health ok, env=%s', data.env);
+  // API documentation loads: Swagger UI and OpenAPI spec must be reachable
+  res = await fetch(`${API_BASE}/api-docs`);
+  if (!res.ok) {
+    console.error('API documentation failed to load:', res.status, res.statusText);
+    process.exit(1);
+  }
+  const docsHtml = await res.text();
+  if (!docsHtml.includes('swagger-ui') && !docsHtml.includes('WinPodiums')) {
+    console.error('API documentation did not contain expected content');
+    process.exit(1);
+  }
+
+  res = await fetch(`${API_BASE}/api-docs/openapi.yaml`);
+  if (!res.ok) {
+    console.error('OpenAPI spec failed to load:', res.status, res.statusText);
+    process.exit(1);
+  }
+  const yaml = await res.text();
+  if (!yaml.startsWith('openapi: 3')) {
+    console.error('OpenAPI spec invalid (expected openapi: 3...)');
+    process.exit(1);
+  }
+
+  console.log('Smoke test passed: API health ok, env=%s, API documentation loads', data.env);
 }
 
 main();

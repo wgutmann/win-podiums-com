@@ -141,13 +141,17 @@ High-level structure; derived from README and codebase.
 
 ## Template: docs/product/[feature-name].md (PRD)
 
+Include **Related** (and optional **Doc type | ID | Related** line) per [documentation-standards](../../docs/standards/documentation-standards.md). When the PRD is a key product decision, add it to "Suggested decisions to capture" in docs/guides/development.md.
+
 ```markdown
-# PRD: [Feature Name]
+# PRD-XXX: [Feature Name]
+
+**Doc type**: PRD | **ID**: PRD-XXX | **Related**: [HLD link], [ADR link]
 
 **Status**: Draft | In Review | Approved | Implemented
 **Author**: [Name]
 **Last Updated**: YYYY-MM-DD
-**PRD ID**: PRD-XXX
+**Related**: [Links to related PRDs, Technical Plans, ADRs]
 
 ## 1. Problem Statement
 
@@ -275,14 +279,17 @@ Overview of system architecture and design decisions.
 
 - [High-Level Design](high-level-design.md) — System-wide architecture, components, technology choices
 - [Architecture Decisions](decisions/) — ADRs documenting key architectural choices
+- [Next Steps](next-steps.md) — Recommended order of work
 
 ## Diagrams
 
-- [System Overview](diagrams/system-overview.mmd) — Component diagram showing major services and integrations
+- [Diagrams folder](diagrams/README.md) — Index of architecture diagrams
+- [System Overview](diagrams/system-overview.mmd) — Component relationships (Mermaid)
+- [Data Flow](diagrams/data-flow.mmd) — Request/response patterns (Mermaid)
 
 ## Related
 
-- [Component-level design](../design/) — Low-level implementation details for each component
+- [Component-level design](../design/) — LLDs: components/, data-models/, integrations/, diagrams/
 - [API Documentation](../api/) — API endpoint specifications
 ```
 
@@ -335,16 +342,20 @@ Overview of system architecture and design decisions.
 [Guiding principles for implementation decisions]
 ```
 
-## Template: docs/tech-plans/components/[component-name].md (Tech Plan)
+## Template: docs/tech-plans/[feature-area]/[number]-[name].md (Tech Plan)
+
+Use **Implements** (PRD link) and **Related** (ADRs, API specs) per [documentation-standards](../../docs/standards/documentation-standards.md).
 
 ```markdown
-# Tech Plan: [Component Name]
+# Technical Plan: [Feature Name]
+
+**Doc type**: Tech Plan | **ID**: TP-XXX | **Implements**: [PRD-XXX](link), **Related**: [ADR link], [API link]
 
 **Status**: Draft | In Review | Approved | Implemented
 **Author**: [Name]
 **Last Updated**: YYYY-MM-DD
-**Tech Plan ID**: TP-XXX
-**Implements**: HLD Section [X], PRD-XXX
+**Implements**: [PRD-XXX link]
+**Related**: [Links to related Technical Plans, ADRs, API specs]
 
 ## 1. Overview
 
@@ -526,22 +537,30 @@ Keep `.cursor/docs/` as index and summaries; point to canonical docs for full te
 
 ## Document Hierarchy Summary
 
+Align to [docs/standards/documentation-standards.md](../../docs/standards/documentation-standards.md):
+
 ```
 docs/
-├── prd/                    # FIRST: What are we building and why?
-│   └── [feature].md        # Product requirements, user stories, acceptance criteria
+├── product/                # FIRST: What are we building and why?
+│   ├── README.md           # PRD index
+│   ├── phase-1-mvp-scope.md
+│   └── {feature-area}/     # e.g. telemetry-proof-system/, cloudflare-security/
 │
 ├── architecture/           # SECOND: How does the system work?
-│   └── high-level-design.md # System architecture, components, technology choices
+│   ├── README.md           # Architecture index; link to diagrams
+│   ├── high-level-design.md
+│   ├── decisions/         # ADRs (001-cloudflare-stack.md, etc.)
+│   ├── diagrams/          # system-overview.mmd, data-flow.mmd; list in README
+│   └── next-steps.md
 │
-├── tech-plans/             # THIRD: How do we implement each component?
-│   ├── components/         # Component-specific implementation specs
-│   ├── data-models/        # Database schemas
-│   └── integrations/       # Integration specs
+├── tech-plans/             # THIRD: Implementation specs by feature-area
+│   └── {feature-area}/     # e.g. telemetry-proof-system/ (001-heartbeat-system.md, etc.)
 │
-├── api/                    # Interface contracts (can be part of tech-plans)
-├── guides/                 # How-to documentation
-└── brand/                  # Design system and UX patterns
+├── design/                 # Component LLDs: components/, data-models/, integrations/, diagrams/
+├── api/                    # API docs, openapi.yaml
+├── guides/                 # development.md, deployment.md, contextstream-mapping.md
+├── standards/              # documentation-standards.md (canonical)
+└── brand/                  # design-system.md
 ```
 
-**Remember**: PRDs → HLD → Tech Plans → Code. Never skip steps.
+**Consistency**: Every PRD, ADR, tech plan must have **Related** (and **Implements** for tech plans). When adding a key decision, add it to the "Suggested decisions to capture" table in docs/guides/development.md. **Remember**: PRDs → HLD → Tech Plans → Code. Never skip steps.

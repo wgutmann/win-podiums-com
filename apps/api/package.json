@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "wrangler dev",
+    "predev": "node scripts/inline-openapi.js ../../docs/api/openapi.yaml src/openapi-spec.ts",
     "deploy": "wrangler deploy",
     "cf-typegen": "wrangler types",
     "test": "node test/smoke.js"

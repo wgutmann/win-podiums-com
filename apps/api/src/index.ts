@@ -22,6 +22,7 @@ import {
   recordHeartbeat,
 } from "./lib/user";
 import type { AuthMethod } from "./lib/user";
+import { openApiYaml } from "./openapi-spec";
 
 export interface Env {
   ENVIRONMENT?: string;
@@ -68,6 +69,22 @@ export default {
     // Health
     if (path === "/health" || path === "/api/health") {
       return jsonResponse({ ok: true, env: env.ENVIRONMENT ?? "dev" });
+    }
+
+    // Swagger / OpenAPI docs (local and Docker)
+    if (method === "GET" && path === "/api-docs/openapi.yaml") {
+      return new Response(openApiYaml, {
+        headers: {
+          "Content-Type": "application/yaml; charset=utf-8",
+          "Cache-Control": "public, max-age=60",
+        },
+      });
+    }
+    if (method === "GET" && (path === "/api-docs" || path === "/api-docs/")) {
+      const html = getSwaggerUiHtml(baseUrl);
+      return new Response(html, {
+        headers: { "Content-Type": "text/html; charset=utf-8" },
+      });
     }
 
     // Gate (static landing) — enhanced with auth and plugin links
@@ -436,7 +453,7 @@ function getGateHtml(baseUrl: string): string {
   <div class="card">
     <p><strong>Plugin</strong></p>
     <p>After logging in, <a href="${baseUrl}/auth/token">generate a one-time token</a> and paste it in the SimHub plugin, or use the in-plugin browser login.</p>
-    <p><a href="${baseUrl}/auth/token" class="btn">Generate plugin token</a> · <a href="/api/health">API health</a></p>
+    <p><a href="${baseUrl}/auth/token" class="btn">Generate plugin token</a> · <a href="/api/health">API health</a> · <a href="${baseUrl}/api-docs">API docs (Swagger)</a></p>
   </div>
 </body>
 </html>`;
@@ -478,6 +495,35 @@ function getTokenPageHtml(baseUrl: string): string {
         if (!r.ok) { out.className = 'error'; out.textContent = j.message || 'Failed'; return; }
         out.innerHTML = 'Token: <span class="token">' + j.data.token + '</span><br><span class="muted">Expires in 10 minutes. Paste this in the plugin.</span>';
       } catch (e) { out.className = 'error'; out.textContent = 'Request failed. Are you logged in?'; }
+    }; 
+  </script>
+</body>
+</html>`;
+}
+
+function getSwaggerUiHtml(baseUrl: string): string {
+  const specUrl = `${baseUrl}/api-docs/openapi.yaml`;
+  return `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>API docs — WinPodiums</title>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css">
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js" crossorigin></script>
+  <script>
+    window.onload = function() {
+      window.ui = SwaggerUIBundle({
+        url: "${specUrl}",
+        dom_id: "#swagger-ui",
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIBundle.SwaggerUIStandalonePreset
+        ],
+        layout: "BaseLayout"
+      });
     };
   </script>
 </body>

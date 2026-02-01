@@ -12,6 +12,9 @@ RUN npm ci
 # Copy Worker config and source (wrangler.toml must match Worker bindings)
 COPY apps/api/wrangler.toml apps/api/tsconfig.json apps/api/worker-configuration.d.ts ./
 COPY apps/api/src ./src
+COPY apps/api/scripts ./scripts
+COPY docs/api/openapi.yaml ./openapi.yaml
+RUN node scripts/inline-openapi.js openapi.yaml src/openapi-spec.ts
 COPY apps/api/migrations ./migrations
 
 # Wrangler reads .dev.vars from project dir; use env_file in compose and CLOUDFLARE_INCLUDE_PROCESS_ENV so env matches
@@ -19,4 +22,5 @@ ENV CLOUDFLARE_INCLUDE_PROCESS_ENV=true
 
 EXPOSE 8787
 
-CMD ["npx", "wrangler", "dev", "--local", "--port", "8787", "--ip", "0.0.0.0"]
+# Regenerate openapi-spec at startup so Swagger works with volume-mounted src
+CMD ["sh", "-c", "node scripts/inline-openapi.js openapi.yaml src/openapi-spec.ts && npx wrangler dev --local --port 8787 --ip 0.0.0.0"]

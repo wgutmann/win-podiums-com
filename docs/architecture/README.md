@@ -5,7 +5,7 @@ System architecture and high-level design decisions for WinPodiums.
 ## Documents
 
 - **[High-Level Design](high-level-design.md)** — Complete system architecture overview
-- **[Architecture Decisions](decisions/)** — ADRs documenting key architectural choices
+- **[Architecture Decisions](decisions/)** — ADRs (001–005 Cloudflare, Discord, auth, cost; [006 Security Choices](decisions/006-security-choices.md) — secrets, Cloudflare security, CI, test coverage)
 - **[Cost Optimization Summary](cost-optimization-summary.md)** — Cost-optimized architecture ($0 MVP, $5 Phase 3, $25-30 Phase 4)
 - **[Infrastructure (Terraform)](infrastructure.md)** — Out of scope until explicitly introduced as a feature; doc kept for future use
 - **[Next Steps (Pre-Deployment)](next-steps.md)** — Recommended sequence (test locally, deploy)
@@ -32,7 +32,9 @@ WinPodiums is a **microservices architecture** deployed on **Cloudflare Edge Net
 
 ## Diagrams
 
-- [Diagrams folder](diagrams/README.md) — Place `system-overview.mmd`, `data-flow.mmd` here when added
+- [Diagrams folder](diagrams/README.md) — Index of architecture diagrams
+- [System Overview](diagrams/system-overview.mmd) — Component relationships (Mermaid)
+- [Data Flow](diagrams/data-flow.mmd) — Request/response patterns (Mermaid)
 - [Auth Flows](../design/integrations/discord-integration.md#sequence-diagrams) — Authentication sequences (inline Mermaid in Discord integration doc)
 
 ## For Developers

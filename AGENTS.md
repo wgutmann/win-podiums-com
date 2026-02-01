@@ -2,6 +2,8 @@
 
 Project-level guidance for AI agents working in this repo.
 
+**ContextStream session bootstrap:** On the first message of every new chat, before anything else, call `session_init` (repo folder path + user message as context_hint) then `context_smart` (user message). This loads smart context from ContextStream automatically so the session has project memory and decisions from the start.
+
 ## Current phase
 
 - **Phase**: Phase 1 MVP. Worker in `apps/api/` and SimHub plugin in `apps/plugin/`; real Discord OAuth, D1, plugin auth + heartbeat. **Current focus**: Test Worker and plugin locally; deploy when ready (see [docs/architecture/next-steps.md](docs/architecture/next-steps.md)).
@@ -15,6 +17,7 @@ Project-level guidance for AI agents working in this repo.
 - **Discord**: Auth and integrations; use the discord-authentication skill when relevant.
 - **Docker**: Dev environment; use the docker-dev-environment skill. Run and test locally with Docker; tests run against the Dockerized API so config stays 1:1.
 - **GitHub**: Change control, PRs, secrets; use the github-change-control skill when relevant.
+- **Security**: Secrets hygiene, auth, Cloudflare security, CI security, test coverage for security-sensitive code; use the security skill. Canonical choices: [ADR-006 Security Choices](docs/architecture/decisions/006-security-choices.md).
 - **Terraform**: **Out of scope until explicitly introduced as a feature.** The directory `infra/terraform/` exists but is not part of the standard workflow. Do not run, document, or depend on Terraform in guides or next steps unless the user explicitly asks for Terraform/infra-as-code as a feature.
 
 ## Conventions

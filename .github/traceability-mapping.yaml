@@ -1,0 +1,24 @@
+# Doc ID → path for ContextStream code_refs and PR doc links.
+# Keep in sync with docs/product/* and docs/tech-plans/*.
+# Reference: docs/guides/contextstream-mapping.md §1.4
+
+prds:
+  PRD-001: docs/product/simhub-plugin-poc/001-simhub-plugin-poc.md
+  PRD-002: docs/product/telemetry-proof-system/001-heartbeat-system.md
+  PRD-003: docs/product/telemetry-proof-system/002-heartbeat-validation.md
+  PRD-004: docs/product/telemetry-proof-system/003-race-submission-requirements.md
+  PRD-005: docs/product/telemetry-proof-system/004-telemetry-continuity.md
+  PRD-006: docs/product/telemetry-proof-system/005-challenge-response.md
+  PRD-007: docs/product/cloudflare-security/001-free-cloudflare-security.md
+
+tech_plans:
+  TP-SPOC-001: docs/tech-plans/simhub-plugin-poc/001-plugin-skeleton-sdk-config.md
+  TP-SPOC-002: docs/tech-plans/simhub-plugin-poc/002-auth-pkce-token-storage.md
+  TP-SPOC-003: docs/tech-plans/simhub-plugin-poc/003-api-client-heartbeat.md
+  TP-SPOC-004: docs/tech-plans/simhub-plugin-poc/004-minimal-simhub-ui.md
+  TP-SPOC-005: docs/tech-plans/simhub-plugin-poc/005-poc-testing-completion.md
+  TP-001: docs/tech-plans/telemetry-proof-system/001-heartbeat-system.md
+  TP-002: docs/tech-plans/telemetry-proof-system/002-heartbeat-validation.md
+  TP-003: docs/tech-plans/telemetry-proof-system/003-race-submission-requirements.md
+  TP-004: docs/tech-plans/telemetry-proof-system/004-telemetry-continuity.md
+  TP-005: docs/tech-plans/telemetry-proof-system/005-challenge-response.md

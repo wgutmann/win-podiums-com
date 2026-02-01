@@ -5,10 +5,12 @@
 
 ## Traceability (ContextStream / knowledge graph)
 
-**Required.** Link this PR to the tech plan(s) and PRD so the ContextStream knowledge graph can show PR ↔ Tech Plan ↔ PRD. Use the stable doc IDs from `docs/tech-plans/` and `docs/product/`.
+**Required.** Link this PR to the tech plan(s) and PRD so the ContextStream knowledge graph can show PR ↔ Tech Plan ↔ PRD. Use the stable doc IDs from [.github/traceability-mapping.yaml](.github/traceability-mapping.yaml).
 
 - **Implements (Tech Plan):** e.g. `TP-SPOC-001` — [list one or more TP-XXX IDs this PR implements, or "none" if doc-only / infra]
 - **PRD:** e.g. `PRD-001` — [PRD ID this work traces to, or "none"]
+- **Doc links:** Add markdown links to the PRD and tech plan doc(s) using the [traceability mapping](.github/traceability-mapping.yaml). Example: [PRD-001](docs/product/simhub-plugin-poc/001-simhub-plugin-poc.md), [TP-SPOC-001](docs/tech-plans/simhub-plugin-poc/001-plugin-skeleton-sdk-config.md). (Use "none" if doc-only / infra.)
+- **Labels:** Apply traceability labels from [.github/labels.yaml](.github/labels.yaml) (e.g. `prd:PRD-001`, `tech-plan:TP-SPOC-001`).
 
 ## Risk
 

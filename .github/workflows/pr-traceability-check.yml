@@ -1,0 +1,66 @@
+# Optional: Check that PRs have Traceability section, Doc links, and traceability labels.
+# Recommended for ContextStream PR ↔ Tech Plan ↔ PRD linking. Not required for merge unless
+# branch protection is configured to require this check. See CONTRIBUTING.md.
+
+name: PR traceability check
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+permissions:
+  pull-requests: read
+  contents: read
+
+jobs:
+  traceability:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check PR traceability
+        id: check
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+          PR_LABELS_JSON: ${{ toJSON(github.event.pull_request.labels) }}
+        run: |
+          MISSING=""
+          if ! echo "$PR_BODY" | grep -q "Implements (Tech Plan):"; then
+            MISSING="${MISSING}- PR body must include **Implements (Tech Plan):** (TP-XXX or none). "
+          fi
+          if ! echo "$PR_BODY" | grep -q "PRD:"; then
+            MISSING="${MISSING}- PR body must include **PRD:** (PRD-XXX or none). "
+          fi
+          if ! echo "$PR_BODY" | grep -qE 'docs/(product|tech-plans)/[^)]+\.md'; then
+            MISSING="${MISSING}- PR body must include at least one **Doc link** to a PRD or tech plan doc (see [traceability mapping](.github/traceability-mapping.yaml)). "
+          fi
+          if ! echo "$PR_LABELS_JSON" | grep -qE '"(prd:|tech-plan:)'; then
+            MISSING="${MISSING}- PR must have at least one traceability label from [.github/labels.yaml](.github/labels.yaml) (e.g. prd:PRD-001, tech-plan:TP-SPOC-001). "
+          fi
+
+          if [ -n "$MISSING" ]; then
+            echo "missing=$MISSING" >> "$GITHUB_OUTPUT"
+            echo "fail=1" >> "$GITHUB_OUTPUT"
+          else
+            echo "fail=0" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Comment on failure
+        if: steps.check.outputs.fail == '1'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '**PR traceability check** (recommended for ContextStream PR ↔ Tech Plan ↔ PRD):\n\n' +
+                '${{ steps.check.outputs.missing }}\n\n' +
+                'See [CONTRIBUTING](https://github.com/' + context.repo.owner + '/' + context.repo.repo + '/blob/' + context.ref + '/CONTRIBUTING.md#contextstream-pr--tech-plan--prd-in-the-knowledge-graph) and the [PR template](.github/PULL_REQUEST_TEMPLATE.md).'
+            })
+
+      - name: Fail if traceability missing
+        if: steps.check.outputs.fail == '1'
+        run: |
+          echo "::${{ steps.check.outputs.missing }}"
+          exit 1

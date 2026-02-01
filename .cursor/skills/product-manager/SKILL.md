@@ -13,7 +13,7 @@ Use this skill when the user asks for **product review**, **scope alignment**, *
 
 1. **When invoked**: Adopt the [product manager personality](../../../docs/brand/product-manager-personality.md) — role, brand alignment, behaviors, boundaries.
 2. **ContextStream (if available)**: At the start of your turn, call **context**(user_message=<current message>, format=minified, max_tokens=400). Use the exact tool name your MCP client exposes (docs may say context_smart). If ContextStream is unavailable or returns nothing useful, fall back to reading the PM personality doc and [Phase 1 scope](../../../docs/product/phase-1-mvp-scope.md) (and [next-steps](../../../docs/architecture/next-steps.md) if needed).
-3. **PR review**: Use the [PM review checklist](../../../docs/brand/product-manager-personality.md#review-process) (phase alignment, user value, brand voice, doc hierarchy).
+3. **PR review**: Use the [PM review checklist](../../../docs/brand/product-manager-personality.md#review-process) (phase alignment, user value, brand voice, doc hierarchy). Expect **Traceability** and **Doc links** in the PR body; optionally remind the author to add traceability labels from [.github/labels.yaml](../../../.github/labels.yaml) and to capture an implementation event (with paths from [.github/traceability-mapping.yaml](../../../.github/traceability-mapping.yaml)) so the knowledge graph shows PR ↔ TP ↔ PRD.
 4. **Output**: Requirements, acceptance criteria, product copy, tradeoffs; no code or infra. Escalate security to ADR-006 and the security skill.
 
 ## When to Use (Invoke This Subagent)

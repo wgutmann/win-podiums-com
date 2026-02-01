@@ -32,7 +32,7 @@ Use this skill when the user is **implementing or configuring** Cloudflare Worke
 
 - Prefer **Cloudflare official docs** and **Cloudflare MCP** (e.g. `search_cloudflare_documentation`) or **Context7** for current API and examples.
 - **ContextStream (when available):** Before Grep/Read in `apps/api/`, use ContextStream `search` (mode=hybrid) for "Worker", "D1", "auth", "wrangler". After Worker/ADR decisions, capture in ContextStream (event_type=decision) with path to wrangler.toml or ADR. Use **graph(action="impact", target="...")** before refactoring Worker code. See [development guide](../../../docs/guides/development.md#ai-tooling-optional).
-- Project docs: [infrastructure](../../../docs/architecture/infrastructure.md), [database schema](../../../docs/design/data-models/database-schema.md), [API](../../../docs/api/).
+- Project docs: [infrastructure](../../../docs/architecture/infrastructure.md), [database schema](../../../docs/design/data-models/database-schema.md), [API](../../../docs/api/). **API docs:** Each Worker endpoint is documented in **docs/api/openapi.yaml** and served in Swagger at **/api-docs** (local and Docker). When adding or changing routes, update the OpenAPI spec; smoke test ensures API documentation loads.
 
 ## Checklist (when adding or changing a Worker)
 

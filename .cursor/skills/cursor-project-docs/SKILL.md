@@ -107,7 +107,7 @@ docs/
 ├── architecture/                 # HLD, decisions/ (ADRs), diagrams/ (system-overview.mmd, data-flow.mmd), next-steps.md
 ├── tech-plans/                   # Tech plans by feature-area (e.g. telemetry-proof-system/)
 ├── design/                       # Component LLDs: components/, data-models/, integrations/, diagrams/ (entity-relationship.mmd)
-├── api/                          # API README, openapi.yaml, authentication.md, plugin.md, user-profile.md
+├── api/                          # API README, openapi.yaml (all endpoints; Swagger at /api-docs), authentication.md, plugin.md, user-profile.md. Each Worker endpoint must be in openapi.yaml; smoke test ensures API documentation loads.
 ├── guides/                       # development.md, deployment.md, contextstream-mapping.md
 ├── standards/                    # documentation-standards.md (canonical)
 └── brand/                        # design-system.md

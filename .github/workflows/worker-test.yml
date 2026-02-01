@@ -1,5 +1,6 @@
 # Worker test: build Docker, start API, run smoke test against it.
-# Validates that Docker and Worker config match (health ok, env=dev).
+# Validates (1) Docker and Worker config match (health ok, env=dev),
+# (2) API documentation loads (Swagger UI and OpenAPI spec reachable).
 name: Worker test
 
 on:

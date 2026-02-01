@@ -1,12 +1,26 @@
 # Security: secret scanning, dependency audits, and code scanning (SAST).
-# Runs on push to main and on pull requests; blocks merge if critical issues are found.
+# Runs when code or dependency manifests change; skips doc-only or config-only commits.
 name: Security
 
 on:
   push:
     branches: [main]
+    paths:
+      - "apps/**"
+      - "package-lock.json"
+      - "**/package.json"
+      - "**/*.csproj"
+      - "**/packages.lock.json"
+      - ".github/workflows/security.yml"
   pull_request:
     branches: [main]
+    paths:
+      - "apps/**"
+      - "package-lock.json"
+      - "**/package.json"
+      - "**/*.csproj"
+      - "**/packages.lock.json"
+      - ".github/workflows/security.yml"
 
 permissions:
   contents: read

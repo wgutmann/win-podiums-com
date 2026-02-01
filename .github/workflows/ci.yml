@@ -1,5 +1,5 @@
 # CI: typecheck, lint, plugin build, lockfile check, OpenAPI validation.
-# Path filters per job keep runs focused; extended smoke tests run in worker-test.
+# Workflow runs when api/plugin/docs-api change; each job runs only when its paths change.
 name: CI
 
 on:
@@ -14,7 +14,29 @@ on:
       - ".github/workflows/ci.yml"
 
 jobs:
+  paths:
+    name: Paths filter
+    runs-on: ubuntu-latest
+    outputs:
+      api: ${{ steps.filter.outputs.api }}
+      plugin: ${{ steps.filter.outputs.plugin }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            api:
+              - 'apps/api/**'
+              - 'docs/api/**'
+              - '.github/workflows/ci.yml'
+            plugin:
+              - 'apps/plugin/**'
+              - '.github/workflows/ci.yml'
+
   api-typecheck:
+    needs: paths
+    if: needs.paths.outputs.api == 'true'
     name: TypeScript typecheck
     runs-on: ubuntu-latest
     defaults:
@@ -38,6 +60,8 @@ jobs:
 
   api-lint:
     name: ESLint
+    needs: paths
+    if: needs.paths.outputs.api == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -60,6 +84,8 @@ jobs:
 
   plugin-build:
     name: Plugin build
+    needs: paths
+    if: needs.paths.outputs.plugin == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -77,6 +103,8 @@ jobs:
 
   api-lockfile:
     name: Lockfile check
+    needs: paths
+    if: needs.paths.outputs.api == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -99,6 +127,8 @@ jobs:
 
   openapi-validate:
     name: OpenAPI validation
+    needs: paths
+    if: needs.paths.outputs.api == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

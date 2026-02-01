@@ -1,5 +1,5 @@
 # Doc check: markdown lint, internal link check, Mermaid diagram validation.
-# Ensures docs have no syntax/formatting errors and diagrams/READMEs load.
+# Workflow runs when docs/config change; each job runs only when its paths change.
 name: Doc check
 
 on:
@@ -27,7 +27,40 @@ on:
       - ".github/workflows/doc-check.yml"
 
 jobs:
+  paths:
+    name: Paths filter
+    runs-on: ubuntu-latest
+    outputs:
+      docs: ${{ steps.filter.outputs.docs }}
+      mermaid: ${{ steps.filter.outputs.mermaid }}
+      openapi: ${{ steps.filter.outputs.openapi }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            docs:
+              - 'docs/**'
+              - 'README.md'
+              - 'AGENTS.md'
+              - 'CONTRIBUTING.md'
+              - 'SECURITY.md'
+              - '.markdownlint.jsonc'
+              - '.lycheeignore'
+              - '.github/workflows/doc-check.yml'
+            mermaid:
+              - 'docs/**/*.mmd'
+              - 'docs/architecture/diagrams/**'
+              - 'docs/design/diagrams/**'
+              - '.github/workflows/doc-check.yml'
+            openapi:
+              - 'docs/api/**'
+              - '.github/workflows/doc-check.yml'
+
   markdown-lint:
+    needs: paths
+    if: needs.paths.outputs.docs == 'true'
     name: Markdown lint
     runs-on: ubuntu-latest
     steps:
@@ -38,6 +71,8 @@ jobs:
 
   link-check:
     name: Link check
+    needs: paths
+    if: needs.paths.outputs.docs == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -45,11 +80,13 @@ jobs:
       - name: Link checker
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --verbose --no-progress --cache --max-cache-age 1d "./docs/**/*.md" "./README.md" "./AGENTS.md" "./CONTRIBUTING.md" "./SECURITY.md" "./apps/plugin/README.md" "./infra/terraform/README.md"
+          args: --verbose --no-progress --cache --max-cache-age 1d --exclude-all-private "./docs/**/*.md" "./README.md" "./AGENTS.md" "./CONTRIBUTING.md" "./SECURITY.md" "./apps/plugin/README.md" "./infra/terraform/README.md"
           fail: true
 
   mermaid-validate:
     name: Mermaid diagrams
+    needs: paths
+    if: needs.paths.outputs.mermaid == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -61,17 +98,17 @@ jobs:
           cache: "npm"
 
       - name: Validate Mermaid (.mmd)
-        env:
-          PUPPETEER_ARGS: "--no-sandbox --disable-setuid-sandbox"
         run: |
           npx @mermaid-js/mermaid-cli@latest --version
           for f in docs/architecture/diagrams/data-flow.mmd docs/architecture/diagrams/system-overview.mmd docs/design/diagrams/entity-relationship.mmd; do
             echo "Validating $f ..."
-            npx @mermaid-js/mermaid-cli@latest -i "$f" -o /tmp/mermaid-out.svg
+            npx @mermaid-js/mermaid-cli@latest -p .github/puppeteer-config.json -i "$f" -o /tmp/mermaid-out.svg
           done
 
   openapi-docs:
     name: OpenAPI (docs)
+    needs: paths
+    if: needs.paths.outputs.openapi == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

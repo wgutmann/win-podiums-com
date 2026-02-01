@@ -186,7 +186,7 @@ export default {
 
     // API prefix
     if (path.startsWith("/api/")) {
-      const rest = path.slice(4);
+      const rest = path.slice(5);
 
       // POST /api/auth/discord/callback — server-side web callback (if frontend posts code)
       if (method === "POST" && rest === "auth/discord/callback") {
@@ -196,7 +196,7 @@ export default {
         } catch {
           return errorResponse("bad_request", "Invalid JSON body", 400);
         }
-        const { code, state, redirect_uri } = body;
+        const { code, redirect_uri } = body;
         if (!code || !redirect_uri || !env.DISCORD_CLIENT_ID || !env.DISCORD_CLIENT_SECRET || !env.DB) {
           return errorResponse("bad_request", "Missing code, redirect_uri, or server config", 400);
         }

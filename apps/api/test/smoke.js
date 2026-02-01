@@ -1,7 +1,7 @@
 /**
  * Smoke test: run against the Dockerized API (docker compose up -d).
  * Validates: (1) Docker and Worker config match (health ok, env dev),
- * (2) API documentation loads (Swagger UI and OpenAPI spec reachable).
+ * (2) error shapes (404, 401), (3) API documentation loads (Swagger UI and OpenAPI spec).
  * Run from repo root: docker compose up -d && cd apps/api && npm test
  */
 const API_BASE = process.env.API_BASE || 'http://localhost:8787';
@@ -28,6 +28,30 @@ async function main() {
   }
   if (data.env !== 'dev') {
     console.error('Expected env "dev" (Docker/Worker config match), got:', data.env);
+    process.exit(1);
+  }
+
+  // 404: unknown API route
+  res = await fetch(`${API_BASE}/api/nonexistent`);
+  if (res.status !== 404) {
+    console.error('Expected 404 for /api/nonexistent, got:', res.status);
+    process.exit(1);
+  }
+  const notFoundBody = await res.json();
+  if (notFoundBody.success !== false || notFoundBody.error !== 'not_found') {
+    console.error('Expected { success: false, error: "not_found" }, got:', notFoundBody);
+    process.exit(1);
+  }
+
+  // 401: protected route without Authorization
+  res = await fetch(`${API_BASE}/api/plugin/verify`, { method: 'POST' });
+  if (res.status !== 401) {
+    console.error('Expected 401 for POST /api/plugin/verify without auth, got:', res.status);
+    process.exit(1);
+  }
+  const unauthBody = await res.json();
+  if (unauthBody.success !== false || unauthBody.error !== 'unauthorized') {
+    console.error('Expected { success: false, error: "unauthorized" }, got:', unauthBody);
     process.exit(1);
   }
 

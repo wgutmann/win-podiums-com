@@ -1,0 +1,107 @@
+# CI: typecheck, lint, plugin build, lockfile check, OpenAPI validation.
+# Path filters per job keep runs focused; extended smoke tests run in worker-test.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/api/**"
+      - "apps/plugin/**"
+      - "docs/api/**"
+      - ".github/workflows/ci.yml"
+
+jobs:
+  api-typecheck:
+    name: TypeScript typecheck
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: apps/api/package-lock.json
+
+      - name: Install and typecheck
+        run: |
+          npm ci
+          node scripts/inline-openapi.js ../../docs/api/openapi.yaml src/openapi-spec.ts
+          npm run typecheck
+
+  api-lint:
+    name: ESLint
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: apps/api/package-lock.json
+
+      - name: Install and lint
+        run: |
+          npm ci
+          node scripts/inline-openapi.js ../../docs/api/openapi.yaml src/openapi-spec.ts
+          npm run lint
+
+  plugin-build:
+    name: Plugin build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore and build
+        run: |
+          cd apps/plugin/WinPodiums.Plugin
+          dotnet restore
+          dotnet build --configuration Release --no-restore
+
+  api-lockfile:
+    name: Lockfile check
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: apps/api/package-lock.json
+
+      - name: Install and verify lockfile
+        run: npm ci
+      - name: Verify lockfile unchanged
+        run: git diff --exit-code apps/api/package-lock.json
+        working-directory: ${{ github.workspace }}
+
+  openapi-validate:
+    name: OpenAPI validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate OpenAPI spec
+        run: npx @stoplight/spectral-cli@latest lint docs/api/openapi.yaml --fail-severity=error

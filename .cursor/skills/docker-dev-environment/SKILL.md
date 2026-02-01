@@ -9,7 +9,7 @@ description: Standardizes Docker-based development environments using official D
 
 Use this skill when the user asks to create or standardize a **Docker** or **Docker Compose** setup, achieve **local/repo parity** for a **containerized dev environment**, or to **debug**, **monitor**, or validate dev containers locally and in CI.
 
-**Flow**: (1) Detect existing Docker artifacts. (2) Choose minimal setup (Dockerfile-only vs Compose). (3) Ensure local and repo config stay in parity. (4) Provide run/debug/monitor workflows and verify them. (5) Define local and CI tests for Docker stability.
+**Flow**: (1) Detect existing Docker artifacts. (2) Choose minimal setup (Dockerfile-only vs Compose). (3) Ensure local and repo config stay in parity. (4) **When preparing env or running build/up:** check for already-running containers—stop first with `docker compose down` to avoid port conflicts and stale images (see §3a). (5) Provide run/debug/monitor workflows and verify them. (6) Define local and CI tests for Docker stability.
 
 **ContextStream (when available):** Before changing Docker/Compose, use ContextStream `search` for "Docker", "compose", "wrangler", "Worker" to find existing setup and parity decisions. After Docker/parity decisions, capture in ContextStream (event_type=decision) with path to Dockerfile, compose.yaml, or docs/guides/development.md.
 
@@ -69,6 +69,27 @@ See [reference.md](reference.md) for curated links to specific Docker and Compos
 3. **Verify**: Hit a health endpoint or run a minimal CLI command to confirm the app starts.
 4. **Optional**: Use `docker compose up -d` for detached mode; document how to stop (`docker compose down`).
 
+### 3a. Prepare env when a container is already running
+
+A **running** container can cause issues when you prepare the env (rebuild, or start again): port already in use, old image/CMD still in use, or conflicting state. **Always account for already-running containers** when giving "prepare env" or "fresh env" steps.
+
+1. **Check**: Run `docker compose ps` (or `docker ps`) to see if this project’s containers are running.
+2. **Stop first**: Before rebuild or a fresh `up`, run `docker compose down` so the next `up` uses the new image and frees the port. Use `docker compose down --volumes` only when you want to wipe local data (e.g. D1 state).
+3. **Then**: Run `docker compose build` (or `docker compose build SERVICE`) and then `docker compose up` (or `docker compose up -d`).
+4. **Document**: In any "prepare fresh environment" or runbook, include: "If a container is already running, run `docker compose down` first, then build and up."
+
+When **implementing** prepare-env (e.g. in scripts or agent flows), either: (a) run `docker compose down` before build/up, or (b) detect running containers and tell the user to stop first, then build and up.
+
+### 3b. Prepare env includes starting the stack
+
+**Prepare env** means the user ends with a **running** dev environment. After down (if needed), secrets check, and build, **start the stack** so the app is up and reachable.
+
+1. **Start**: Run `docker compose up -d` (or `docker compose up SERVICE -d`) so containers run in the background; the user can then hit the health endpoint or use the app without keeping a terminal attached. Use `docker compose up` (foreground) only if the user explicitly wants logs in the terminal.
+2. **Verify**: Optionally hit the health endpoint (e.g. `GET /api/health`) to confirm the service is ready.
+3. **Document**: In "prepare fresh environment" or runbooks, state that the final step is starting the stack (`docker compose up -d`) so the env is ready to use.
+
+When **implementing** prepare-env, the sequence is: down (if running) → secrets/config → build → **up** (prefer `up -d` so the env is running when done).
+
 ### 4. Debugging
 
 1. **Shell**: Attach a shell with `docker compose exec SERVICE sh` (or `bash` if available).
@@ -83,6 +104,18 @@ See [reference.md](reference.md) for curated links to specific Docker and Compos
 2. **Container state**: Use `docker ps -a` for status and exit codes.
 3. **Disk usage**: Run `docker system df` to see space used by images, containers, volumes.
 4. **Cleanup**: For dev, `docker compose down --volumes` only when data is disposable; document which volumes are safe to remove.
+
+### 6. Local deployment — SimHub plugin (host-only)
+
+When building and deploying the SimHub plugin DLL on the host (no Docker for the plugin):
+
+1. **Before building**: Close SimHub completely. If SimHub is running, it may lock plugin DLLs and cause build or copy issues.
+2. **Build**: From repo root, run `dotnet build apps/plugin/WinPodiums.Plugin/WinPodiums.Plugin.csproj` (or use your IDE).
+3. **Before deploying**: Ensure SimHub is stopped. If SimHub is open, the plugin file in the SimHub Plugins folder will be locked and the copy will fail (cannot overwrite).
+4. **Deploy**: Once SimHub is stopped, copy the built DLL (e.g. from `apps/plugin/WinPodiums.Plugin/bin/Debug/net48/` or `Release`) to the SimHub Plugins folder (e.g. `C:\Program Files (x86)\SimHub\Plugins`).
+5. **Verify**: Start SimHub and confirm the plugin appears in the plugin list.
+
+Include this sequence in any local deployment setup or runbook that involves the SimHub plugin.
 
 ---
 
@@ -118,6 +151,7 @@ See [reference.md](reference.md) for curated links to specific Docker and Compos
 ### Stack-specific
 - **.NET**: Run `dotnet test` inside the built container to match runtime.
 - **Cloudflare Workers**: Run `npm test` or `wrangler test` in a Node-based image.
+- **SimHub plugin (host)**: Close SimHub before building the plugin DLL; stop SimHub before copying the DLL to the Plugins folder (file lock). See [Local deployment — SimHub plugin](#6-local-deployment--simhub-plugin-host-only).
 - Use Compose-based integration tests only when dependencies are required.
 
 ## Output Expectations

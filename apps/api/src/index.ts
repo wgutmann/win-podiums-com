@@ -114,7 +114,12 @@ export default {
         });
       }
       const state = generateState();
-      const redirectUri = `${baseUrl}/auth/callback`;
+      // In dev, use localhost for redirect_uri so it matches Discord's configured redirect (127.0.0.1 ≠ localhost for OAuth)
+      const authBase =
+        env.ENVIRONMENT === "dev" && url.hostname === "127.0.0.1"
+          ? `http://localhost:${url.port || "8787"}`
+          : baseUrl;
+      const redirectUri = `${authBase}/auth/callback`;
       if (env.CACHE) {
         await env.CACHE.put(`auth:state:${state}`, redirectUri, { expirationTtl: 600 });
       }

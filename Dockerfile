@@ -22,5 +22,5 @@ ENV CLOUDFLARE_INCLUDE_PROCESS_ENV=true
 
 EXPOSE 8787
 
-# Regenerate openapi-spec at startup so Swagger works with volume-mounted src
-CMD ["sh", "-c", "node scripts/inline-openapi.js openapi.yaml src/openapi-spec.ts && npx wrangler dev --local --port 8787 --ip 0.0.0.0"]
+# Regenerate openapi-spec at startup; apply D1 schema so Worker has tables (e.g. manual_tokens); then start Worker
+CMD ["sh", "-c", "node scripts/inline-openapi.js openapi.yaml src/openapi-spec.ts && npx wrangler d1 migrations apply winpodiums-dev-db --local && npx wrangler dev --local --port 8787 --ip 0.0.0.0"]

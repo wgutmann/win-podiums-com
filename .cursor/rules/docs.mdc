@@ -12,3 +12,4 @@ alwaysApply: false
 - **docs/product/** — PRDs (what and why). **docs/architecture/** — HLD and ADRs (how at system level). **docs/tech-plans/** — implementation specs (how at code level). **docs/design/** — component and integration design.
 - When adding or changing docs, maintain traceability: HLD sections reference PRD requirements; tech plans reference HLD components. Use consistent cross-references (e.g. PRD-001, ADR-002).
 - Do not duplicate content; link to the canonical doc. Do not populate `.cursor/docs/` with content that contradicts `docs/`.
+- **Before pushing to remote:** Run local tests; at least 80% must pass (see [development guide](../../docs/guides/development.md#run-tests-before-push)).

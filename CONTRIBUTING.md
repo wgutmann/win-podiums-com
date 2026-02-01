@@ -12,6 +12,12 @@ The project is in **Phase 1 MVP**. A minimal Worker (`apps/api/`) and SimHub plu
 - Review and comment on architecture decisions in `docs/architecture/decisions/`.
 - Follow [AGENTS.md](AGENTS.md) and the skills in `.cursor/skills/` when working with AI agents.
 
+## Before you push
+
+**Run local tests before pushing to a remote branch.** At least **80% of tests must pass** before pushing. See [Run tests before push](docs/guides/development.md#run-tests-before-push) in the development guide for the exact commands (typecheck, lint, plugin build, worker smoke, OpenAPI validation).
+
+**Enforce with a git hook (blocks push until 80% pass):** Run once per clone: `git config core.hooksPath .githooks`. Then every push (including from Cursor) runs the pre-push check and blocks if &lt;80% pass. To skip once: `git push --no-verify`.
+
 ## Coming soon
 
 - Branching and PR workflow

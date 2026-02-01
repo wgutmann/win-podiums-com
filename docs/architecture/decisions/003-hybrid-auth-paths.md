@@ -1,5 +1,7 @@
 # ADR-003: Hybrid Authentication Paths (Web-First vs Plugin-First)
 
+**Doc type**: ADR | **ID**: ADR-003 | **Related**: [Phase 1 scope](../../product/phase-1-mvp-scope.md), [HLD](../high-level-design.md), [ADR-002 Discord OAuth](002-discord-oauth.md), [Discord Integration LLD](../../design/integrations/discord-integration.md), [SimHub Plugin LLD](../../design/components/simhub-plugin.md), [API README](../../api/README.md)
+
 **Status**: Accepted  
 **Date**: 2026-01-31  
 **Deciders**: Architecture Team, UX Lead
@@ -132,7 +134,15 @@ To support Path B effectively, the plugin offers **three authentication methods*
 - **Pros**: Ensures all plugin users are authenticated
 - **Cons**: Blocks exploration, increases abandonment rate for curious users
 
+## Related
+
+- [ADR-002: Discord OAuth](002-discord-oauth.md) — Sole identity provider
+- [Phase 1 scope](../../product/phase-1-mvp-scope.md) — MVP deliverables
+- [Discord Integration LLD](../../design/integrations/discord-integration.md) — OAuth flows
+- [SimHub Plugin LLD](../../design/components/simhub-plugin.md) — Plugin auth and API client
+- [API README](../../api/README.md) — Auth endpoints
+
 ## References
 
 - [OAuth 2.0 for Native Apps (RFC 8252)](https://datatracker.ietf.org/doc/html/rfc8252)
-- [UX Research: Authentication Timing and Conversion](https://www.nngroup.com/articles/authentication-timing/)
+- [Website Response Times (timing and conversion)](https://www.nngroup.com/articles/website-response-times/)

@@ -36,8 +36,8 @@ No root `package.json`; monorepo is app-scoped (`apps/api`, `apps/plugin`). No r
 
 | Area | What exists | Gap |
 |------|-------------|-----|
-| **API smoke** | `apps/api/test/smoke.js`: GET /api/health, GET /api-docs, GET /api-docs/openapi.yaml. Runs in CI (worker-test.yml). | No coverage of auth/profile/heartbeat behavior. |
-| **API unit** | None. | Session JWT and response helpers are untested. |
+| **API smoke** | `apps/api/test/smoke.js`: GET /api/health, GET /api-docs, GET /api-docs/openapi.yaml. Run locally with `npm test`; no CI workflow. | No coverage of auth/profile/heartbeat behavior. |
+| **API unit** | Vitest in `test/required/` (response, session JWT) and `test/optional/`. Run order: required first; optional only if all required pass (`npm run test:unit`). | Add optional tests for non-critical or slower checks as needed. |
 | **Plugin** | No test project. | Token storage, API client, auth flows untested. |
 
 ADR-006 and the security skill require tests for auth, token exchange, profile, and heartbeat before merge.
@@ -58,11 +58,19 @@ ADR-006 and the security skill require tests for auth, token exchange, profile, 
 3. **Plugin (later)**  
    - Unit tests for token storage and API client (mock HTTP); add when Phase 1 stabilizes or security review requests it.
 
+### Test groups (required / optional)
+
+Unit tests run in order by group:
+
+1. **Required** (`test/required/**/*.test.ts`) — Core and security-sensitive behavior (e.g. response helpers, session JWT). Runs first.
+2. **Optional** (`test/optional/**/*.test.ts`) — Runs only if all required tests pass (`vitest run test/required/ && vitest run test/optional/`). Use for non-critical or slower tests.
+
+This avoids running optional tests when required ones already failed, saving time and keeping failure output focused.
+
 ---
 
 ## CI
 
-- **worker-test.yml**: Builds Docker API, runs `npm test` (smoke only). Extend when new tests are added (e.g. `npm run test:unit`).
 - **security.yml**: TruffleHog, npm audit, dotnet vulnerable packages, CodeQL. No change needed for tests.
 - New test scripts (e.g. `test:unit`) should be run in CI so that merge is blocked if tests fail.
 

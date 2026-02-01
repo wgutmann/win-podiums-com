@@ -1,5 +1,6 @@
-# CI: required (typecheck, lint, build, lockfile) run first; optional (OpenAPI) runs only after all required pass.
+# CI: typecheck, lint, plugin build, lockfile check, OpenAPI validation.
 # Workflow runs on every push/PR to main; each job runs only when its paths change (path filter below).
+# Concurrency cancels in-progress runs when new commits are pushed (saves minutes).
 name: CI
 
 on:
@@ -8,32 +9,37 @@ on:
   pull_request:
     branches: [main]
 
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   paths:
-    name: Path filter
+    name: Paths filter
     runs-on: ubuntu-latest
     outputs:
-      api: ${{ steps.filters.outputs.api }}
-      plugin: ${{ steps.filters.outputs.plugin }}
+      api: ${{ steps.filter.outputs.api }}
+      plugin: ${{ steps.filter.outputs.plugin }}
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - uses: dorny/paths-filter@v3
-        id: filters
+        id: filter
         with:
           filters: |
             api:
               - 'apps/api/**'
               - 'docs/api/**'
+              - '.github/workflows/ci.yml'
             plugin:
               - 'apps/plugin/**'
+              - '.github/workflows/ci.yml'
 
-  # --- Required: must pass before any optional job runs ---
-  api-check:
+  api-validate:
     needs: paths
     if: needs.paths.outputs.api == 'true'
-    name: TypeScript typecheck + ESLint (required)
+    name: API (typecheck, lint, lockfile, OpenAPI)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -61,10 +67,18 @@ jobs:
       - name: Lint
         run: npm run lint
 
+      - name: Lockfile check
+        run: git diff --exit-code apps/api/package-lock.json
+        working-directory: ${{ github.workspace }}
+
+      - name: OpenAPI validation
+        run: npx @stoplight/spectral-cli@latest lint docs/api/openapi.yaml --fail-severity=error
+        working-directory: ${{ github.workspace }}
+
   plugin-build:
+    name: Plugin build
     needs: paths
     if: needs.paths.outputs.plugin == 'true'
-    name: Plugin build (required)
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -81,43 +95,3 @@ jobs:
           cd apps/plugin/WinPodiums.Plugin
           dotnet restore
           dotnet build --configuration Release --no-restore
-
-  api-lockfile:
-    needs: paths
-    if: needs.paths.outputs.api == 'true'
-    name: Lockfile check (required)
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: apps/api
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "20"
-          cache: "npm"
-          cache-dependency-path: apps/api/package-lock.json
-
-      - name: Install and verify lockfile
-        run: npm ci
-      - name: Verify lockfile unchanged
-        run: git diff --exit-code apps/api/package-lock.json
-        working-directory: ${{ github.workspace }}
-
-  # --- Optional: runs only after all required jobs pass (or are skipped by path filter) ---
-  openapi-validate:
-    needs: [paths, api-check, api-lockfile, plugin-build]
-    if: always() && needs.paths.outputs.api == 'true' && (needs.api-check.result == 'success' || needs.api-check.result == 'skipped') && (needs.api-lockfile.result == 'success' || needs.api-lockfile.result == 'skipped') && (needs.plugin-build.result == 'success' || needs.plugin-build.result == 'skipped')
-    name: OpenAPI validation (optional)
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
-      - name: Validate OpenAPI spec
-        run: npx @stoplight/spectral-cli@latest lint docs/api/openapi.yaml --fail-severity=error

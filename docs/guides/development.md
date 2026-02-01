@@ -65,7 +65,7 @@ If the API is not running, `npm test` will fail with a clear message: "Start Doc
 
 `apps/api/test/smoke.js` runs against the Dockerized API and validates: (1) Docker and Worker config match — `GET /api/health` returns `{ ok: true, env: "dev" }`; (2) error shapes — 404 for unknown routes (`GET /api/nonexistent`) and 401 for protected routes without auth (`POST /api/plugin/verify`); (3) **API documentation loads** — `GET /api-docs` and `GET /api-docs/openapi.yaml` are reachable (Swagger UI and valid OpenAPI 3 spec). Each API endpoint is documented in `docs/api/openapi.yaml` and surfaced in Swagger.
 
-**CI**: GitHub Actions runs the same test on push/PR to `main` when `apps/api/`, Dockerfile, or compose change (`.github/workflows/worker-test.yml`): build Docker, start API, run smoke test.
+**CI**: GitHub Actions runs typecheck, lint, plugin build, lockfile check, OpenAPI validation, and security checks on push/PR to `main`. Run API smoke and unit tests locally (Docker + `npm test` / `npm run test:unit`).
 
 ### API quality checks (typecheck, lint)
 
@@ -130,11 +130,11 @@ Tests (`npm test`) still expect the API at `http://localhost:8787`; start either
 
 ## AI tooling (optional)
 
-**ContextStream** ([contextstream.io](https://contextstream.io)) is the recommended **persistent memory and code-intelligence** layer for AI-assisted work on this repo. It gives Cursor (and other MCP tools) shared memory across sessions, semantic code search, and decision recall so you don’t re-explain the stack every chat.
+**ContextStream** ([ContextStream](https://contextstream.io)) is the recommended **persistent memory and code-intelligence** layer for AI-assisted work on this repo. It gives Cursor (and other MCP tools) shared memory across sessions, semantic code search, and decision recall so you don’t re-explain the stack every chat.
 
 ### Setup
 
-- **Option A (project MCP):** Copy `.cursor/mcp.json.example` to `.cursor/mcp.json`, then replace `PASTE_YOUR_CONTEXTSTREAM_API_KEY_HERE` with your key from [contextstream.io](https://contextstream.io) (Account → API Keys). **`.cursor/mcp.json` is in `.gitignore`** so it is never committed; the repo only has the example file. If a real key was ever committed in the past, rotate it in the ContextStream dashboard. On Windows, if Cursor is started from a shortcut, it may not inherit shell env vars; using `mcp.json` with your key avoids that.
+- **Option A (project MCP):** Copy `.cursor/mcp.json.example` to `.cursor/mcp.json`, then replace `PASTE_YOUR_CONTEXTSTREAM_API_KEY_HERE` with your key from [ContextStream](https://contextstream.io) (Account → API Keys). **`.cursor/mcp.json` is in `.gitignore`** so it is never committed; the repo only has the example file. If a real key was ever committed in the past, rotate it in the ContextStream dashboard. On Windows, if Cursor is started from a shortcut, it may not inherit shell env vars; using `mcp.json` with your key avoids that.
 - **Option B (wizard):** Run `npx -y @contextstream/mcp-server setup` and add ContextStream to your global Cursor MCP config; no project file change needed.
 
 Restart Cursor after adding or changing MCP config.
@@ -182,7 +182,7 @@ A Cursor rule in `.cursor/rules/` tells the AI to use ContextStream when availab
 ### Optional: Router mode and integrations
 
 - **Router mode:** If you use many MCP servers or hit context limits, set `CONTEXTSTREAM_PROGRESSIVE_MODE=true` in the ContextStream MCP env in `.cursor/mcp.json` to use Router mode (~2 meta-tools). See [ContextStream docs](https://contextstream.io/docs/mcp).
-- **Pro integrations:** Pro users can connect GitHub and Slack so `context_smart` surfaces relevant issues, PRs, and discussions (see [contextstream.io](https://contextstream.io)).
+- **Pro integrations:** Pro users can connect GitHub and Slack so `context_smart` surfaces relevant issues, PRs, and discussions (see [ContextStream](https://contextstream.io)).
 
 ContextStream is **optional** for contributors and is not required for CI or build.
 
@@ -192,9 +192,46 @@ GitHub Actions run on push and pull requests to `main` (path filters apply so on
 
 | Workflow | Purpose |
 |----------|---------|
-| **worker-test** (`.github/workflows/worker-test.yml`) | Build Docker, start API, run smoke test (health, 404, 401, API docs). Triggered when `apps/api/`, Dockerfile, or compose change. |
 | **security** (`.github/workflows/security.yml`) | Secret scanning (TruffleHog), npm and .NET dependency audits, CodeQL (TypeScript + C#). |
 | **CI** (`.github/workflows/ci.yml`) | TypeScript typecheck, ESLint, plugin build (.NET), lockfile check (`apps/api/package-lock.json`), OpenAPI validation (Spectral). Triggered when `apps/api/`, `apps/plugin/`, or `docs/api/` change. |
+
+## Run tests before push
+
+**Policy:** Before pushing to a remote branch, run local tests; **at least 80% of tests must pass** before pushing. Agents and contributors should run (or advise running) these checks and block or warn on push if the threshold is not met.
+
+Run the same checks CI runs (from repo root unless noted):
+
+1. **API typecheck** — `cd apps/api && npm ci && node scripts/inline-openapi.js ../../docs/api/openapi.yaml src/openapi-spec.ts && npm run typecheck`
+2. **API lint** — `cd apps/api && npm ci && node scripts/inline-openapi.js ../../docs/api/openapi.yaml src/openapi-spec.ts && npm run lint`
+3. **Plugin build** — `cd apps/plugin/WinPodiums.Plugin && dotnet restore && dotnet build --configuration Release --no-restore`
+4. **Worker smoke** — `docker compose up -d` (wait for `http://localhost:8787/api/health`), then `cd apps/api && npm ci && npm test`
+5. **OpenAPI validation** — `npx @stoplight/spectral-cli@latest lint docs/api/openapi.yaml --fail-severity=error`
+
+Optional: lockfile check — after `npm ci` in `apps/api`, run `git diff --exit-code apps/api/package-lock.json` from repo root. Doc check (markdown lint, Mermaid) — see [CI workflows](#ci-workflows) and `.github/workflows/doc-check.yml`.
+
+Count passing steps vs total run; require ≥80% (e.g. 4 of 5, or 5 of 6 if including lockfile) before pushing.
+
+### Enforce with a git hook (blocks push until 80% pass)
+
+A **pre-push** git hook runs the same checks and **blocks the push** (including from Cursor) until at least 80% pass. Enable it once per clone:
+
+```bash
+git config core.hooksPath .githooks
+```
+
+- **Hook:** `.githooks/pre-push` runs `node scripts/pre-push-check.js` from the repo root.
+- **Checks:** API typecheck, API lint, plugin build, OpenAPI validation, and (if the API is already up at `http://localhost:8787`) worker smoke. If the API is not up, only the first four run; you need all four to pass.
+- **Skip hook once:** `git push --no-verify` (use only when necessary; policy is 80% pass before push).
+
+To disable the hook for this repo: `git config --unset core.hooksPath`.
+
+## Related
+
+- [Deployment](deployment.md) — Deploy Worker with Wrangler
+- [Next Steps](../architecture/next-steps.md) — Recommended order of work (test locally, deploy)
+- [Phase 1 scope](../product/phase-1-mvp-scope.md) — MVP deliverables and trace to docs
+- [API README](../api/README.md) — Endpoint surface and OpenAPI spec
+- [ContextStream mapping](contextstream-mapping.md) — AI tooling (ContextStream MCP, graph, tagging)
 
 ## TBD
 

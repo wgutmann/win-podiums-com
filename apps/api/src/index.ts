@@ -21,7 +21,6 @@ import {
   getProfile,
   recordHeartbeat,
 } from "./lib/user";
-import type { AuthMethod } from "./lib/user";
 import { openApiYaml } from "./openapi-spec";
 
 export interface Env {
@@ -184,9 +183,16 @@ export default {
       }
     }
 
+    // POST /api/plugin/verify — stub (match by path so CI/Docker always hit)
+    if (method === "POST" && (path === "/api/plugin/verify" || path === "/api/plugin/verify/")) {
+      const auth = await getAuth(request, env);
+      if (!auth) return errorResponse("unauthorized", "Missing or invalid authorization", 401);
+      return jsonResponse({ success: true, data: { message: "stub" } });
+    }
+
     // API prefix
     if (path.startsWith("/api/")) {
-      const rest = path.slice(5);
+      const rest = path.slice(5).replace(/\/$/, "");
 
       // POST /api/auth/discord/callback — server-side web callback (if frontend posts code)
       if (method === "POST" && rest === "auth/discord/callback") {
@@ -414,12 +420,6 @@ export default {
         return jsonResponse({ success: true, data: { accepted: true } });
       }
 
-      // POST /api/plugin/verify — stub
-      if (method === "POST" && rest === "plugin/verify") {
-        const auth = await getAuth(request, env);
-        if (!auth) return errorResponse("unauthorized", "Missing or invalid authorization", 401);
-        return jsonResponse({ success: true, data: { message: "stub" } });
-      }
     }
 
     return errorResponse("not_found", "Not found", 404);

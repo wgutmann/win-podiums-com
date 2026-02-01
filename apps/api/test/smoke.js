@@ -45,11 +45,11 @@ async function main() {
 
   // 401: protected route without Authorization
   res = await fetch(`${API_BASE}/api/plugin/verify`, { method: 'POST' });
+  const unauthBody = await res.json().catch(() => ({}));
   if (res.status !== 401) {
     console.error('Expected 401 for POST /api/plugin/verify without auth, got:', res.status);
     process.exit(1);
   }
-  const unauthBody = await res.json();
   if (unauthBody.success !== false || unauthBody.error !== 'unauthorized') {
     console.error('Expected { success: false, error: "unauthorized" }, got:', unauthBody);
     process.exit(1);

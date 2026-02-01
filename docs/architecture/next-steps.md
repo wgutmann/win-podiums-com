@@ -127,6 +127,10 @@ Worker and Docker are 1:1. The right next step is **test locally**, then **deplo
 ## Related
 
 - [High-Level Design](high-level-design.md) — Phase 1 checklist and system overview
-- [README](../../README.md) — Repo status and stack
+- [Phase 1 scope](../product/phase-1-mvp-scope.md) — MVP deliverables and trace to docs
+- [Development Guide](../guides/development.md) — Local run and test (Docker, plugin)
 - [Deployment Guide](../guides/deployment.md) — How to deploy the Worker
+- [API README](../api/README.md) — Endpoint surface and OpenAPI spec
+- [ADR-001 Cloudflare Stack](decisions/001-cloudflare-stack.md), [ADR-002 Discord OAuth](decisions/002-discord-oauth.md) — Core stack and auth
+- [README](../../README.md) — Repo status and stack
 - [.cursor/docs/index.md](../../.cursor/docs/index.md) — Cursor-facing next steps

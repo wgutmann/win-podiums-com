@@ -1,13 +1,14 @@
 /**
  * Unit tests for session JWT (createSessionJWT, verifySessionJWT).
  * Security-sensitive: ensures signing/verification and expiry behavior.
+ * Group: required — runs first; optional tests run only if all required pass.
  */
 import { describe, it, expect } from "vitest";
 import {
   createSessionJWT,
   verifySessionJWT,
   type SessionPayload,
-} from "../src/lib/session";
+} from "../../src/lib/session";
 
 const SECRET = "test-secret-at-least-32-characters-long";
 

@@ -30,4 +30,7 @@ TBD – R2 bucket and optionally GitHub Releases when plugin build exists.
 ## Related
 
 - [Development](development.md) — Local dev (Docker and wrangler dev, 1:1)
-- [Next Steps](../architecture/next-steps.md) — Recommended order of work
+- [Next Steps](../architecture/next-steps.md) — Recommended order of work (test locally, then deploy)
+- [Phase 1 scope](../product/phase-1-mvp-scope.md) — MVP deliverables
+- [API README](../api/README.md) — Endpoint surface; Worker code in `apps/api/`
+- [HLD](../architecture/high-level-design.md) — System overview

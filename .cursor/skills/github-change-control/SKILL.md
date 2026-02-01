@@ -25,6 +25,7 @@ When handling change control or repo governance:
 
 ## Repo Management Checklist
 
+- [ ] **Before pushing to a remote branch:** Run local tests; **at least 80% of tests must pass** before pushing. See [Run tests before push](../../../docs/guides/development.md#run-tests-before-push). Block or warn on push if the threshold is not met.
 - [ ] Branching: ensure main is protected; feature branches for changes.
 - [ ] Protections: require reviews, status checks, and linear history when appropriate.
 - [ ] Permissions: least-privilege access; remove stale admins.

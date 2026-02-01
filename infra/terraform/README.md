@@ -1,6 +1,6 @@
 # Terraform – Cloudflare IaC
 
-Terraform root for WinPodiums Cloudflare resources (D1, R2, KV). GitHub Actions runs plan on PR and apply on push to `main`.
+Terraform root for WinPodiums Cloudflare resources (D1, R2, KV). We recommend adding GitHub Actions for plan on PR and apply on push to `main` if desired; the repo does not ship workflows by default.
 
 ## Quick reference
 

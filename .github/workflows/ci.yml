@@ -92,7 +92,7 @@ jobs:
 
   plugin-build:
     name: Plugin build
-    needs: paths
+    needs: [paths, api-validate]
     if: needs.paths.outputs.plugin == 'true'
     runs-on: ubuntu-latest
     steps:

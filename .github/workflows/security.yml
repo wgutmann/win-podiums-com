@@ -1,43 +1,79 @@
 # Security: secret scanning, dependency audits, and code scanning (SAST).
-# Runs on push to main and on pull requests when code or dependency manifests change; skips doc-only or config-only commits.
-# Blocks merge if critical issues are found. When any check fails on push to main, opens a PR to revert the offending commit (safety net).
+# Does NOT run automatically. Trigger via:
+#   - Actions tab → "Run workflow" (workflow_dispatch), or
+#   - Comment "/run-security" on a PR (issue_comment).
+# Branch protection can require "Security / security-gate" so merge is blocked until Security is run and passes.
+# See docs/guides/testing-harness.md.
 name: Security
 
 on:
-  push:
-    branches: [main]
-    paths:
-      - "apps/**"
-      - "package-lock.json"
-      - "**/package.json"
-      - "**/*.csproj"
-      - "**/packages.lock.json"
-      - ".github/workflows/security.yml"
-  pull_request:
-    branches: [main]
-    paths:
-      - "apps/**"
-      - "package-lock.json"
-      - "**/package.json"
-      - "**/*.csproj"
-      - "**/packages.lock.json"
-      - ".github/workflows/security.yml"
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "Branch to run security on (default: workflow ref)"
+        required: false
+  issue_comment:
+    types: [created]
 
 concurrency:
-  group: security-${{ github.ref }}
+  group: security-${{ github.event_name }}-${{ github.event.issue.number || github.ref }}
   cancel-in-progress: true
 
 permissions:
   contents: read
   security-events: write
   actions: read
+  pull-requests: read
 
 jobs:
+  # --- Resolve ref to run on: PR head when triggered by /run-security comment, else workflow ref ---
+  get-ref:
+    name: Get ref
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    outputs:
+      ref: ${{ steps.set-ref.outputs.ref }}
+      skip: ${{ steps.set-ref.outputs.skip }}
+      is_main: ${{ steps.set-ref.outputs.is_main }}
+    steps:
+      - name: Set ref and skip
+        id: set-ref
+        run: |
+          REF="${{ github.sha }}"
+          SKIP="false"
+          if [ "${{ github.event_name }}" = "issue_comment" ]; then
+            BODY="${{ github.event.comment.body }}"
+            HAS_PULL_REQUEST="${{ github.event.issue.pull_request }}"
+            if [ -z "$HAS_PULL_REQUEST" ] || ! echo "$BODY" | grep -qiE '/run-security'; then
+              REF="${{ github.sha }}"
+              SKIP="true"
+              echo "ref=$REF" >> $GITHUB_OUTPUT
+              echo "skip=$SKIP" >> $GITHUB_OUTPUT
+              echo "is_main=false" >> $GITHUB_OUTPUT
+              echo "Skipping: not a PR or comment does not contain /run-security"
+              exit 0
+            else
+              REF=$(gh pr view "${{ github.event.issue.number }}" --json headRefOid -q .headRefOid)
+              echo "Running security on PR head: $REF"
+            fi
+          fi
+          echo "ref=$REF" >> $GITHUB_OUTPUT
+          echo "skip=$SKIP" >> $GITHUB_OUTPUT
+          # For revert-on-failure: only revert when the ref we ran on is main
+          MAIN_SHA=$(gh api repos/${{ github.repository }}/git/refs/heads/main -q .object.sha 2>/dev/null || echo "")
+          if [ -n "$MAIN_SHA" ] && [ "$REF" = "$MAIN_SHA" ]; then
+            echo "is_main=true" >> $GITHUB_OUTPUT
+          else
+            echo "is_main=false" >> $GITHUB_OUTPUT
+          fi
+
   # --- Path filter: skip dependency/CodeQL jobs when only unrelated files change ---
   filter:
     name: Path filter
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    needs: [get-ref]
+    if: needs.get-ref.outputs.skip != 'true'
     outputs:
       api: ${{ steps.paths.outputs.api }}
       plugin: ${{ steps.paths.outputs.plugin }}
@@ -46,6 +82,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          ref: ${{ needs.get-ref.outputs.ref }}
           fetch-depth: 0
 
       - uses: dorny/paths-filter@v3
@@ -85,9 +122,12 @@ jobs:
     name: Secret scan
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    needs: [get-ref]
+    if: needs.get-ref.outputs.skip != 'true'
     steps:
       - uses: actions/checkout@v6
         with:
+          ref: ${{ needs.get-ref.outputs.ref }}
           fetch-depth: 0
 
       - name: TruffleHog (secrets)
@@ -101,10 +141,12 @@ jobs:
     name: npm audit
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    needs: [filter]
-    if: needs.filter.outputs.api == 'true'
+    needs: [get-ref, filter]
+    if: needs.get-ref.outputs.skip != 'true' && needs.filter.outputs.api == 'true'
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.get-ref.outputs.ref }}
 
       - name: Setup Node
         uses: actions/setup-node@v6
@@ -122,10 +164,12 @@ jobs:
     name: .NET vulnerable packages
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    needs: [filter]
-    if: needs.filter.outputs.plugin == 'true'
+    needs: [get-ref, filter]
+    if: needs.get-ref.outputs.skip != 'true' && needs.filter.outputs.plugin == 'true'
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.get-ref.outputs.ref }}
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
@@ -151,8 +195,8 @@ jobs:
     name: CodeQL
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    needs: [filter]
-    if: needs.filter.outputs.code == 'true' && needs.filter.outputs.codeql_languages != '[]' && (github.event_name != 'pull_request' || github.event.pull_request.draft != true)
+    needs: [get-ref, filter]
+    if: needs.get-ref.outputs.skip != 'true' && needs.filter.outputs.code == 'true' && needs.filter.outputs.codeql_languages != '[]'
     permissions:
       security-events: write
       actions: read
@@ -163,6 +207,8 @@ jobs:
         language: ${{ fromJson(needs.filter.outputs.codeql_languages) }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.get-ref.outputs.ref }}
 
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
@@ -187,13 +233,24 @@ jobs:
         with:
           category: "/language:${{ matrix.language }}"
 
-  # --- Revert PR when any security check fails on push to main ---
+  # --- Gate for branch protection: require this job to pass before merge ---
+  security-gate:
+    name: security-gate
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    needs: [get-ref, secrets, deps-npm, deps-dotnet, codeql]
+    if: needs.get-ref.outputs.skip != 'true'
+    steps:
+      - name: All security checks passed
+        run: echo "Security checks passed. Use this status for branch protection (Security / security-gate)."
+
+  # --- Revert PR when security fails on main (e.g. workflow_dispatch on main) ---
   revert-on-failure:
     name: Open revert PR
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    needs: [secrets, deps-npm, deps-dotnet, codeql]
-    if: failure() && github.ref == 'refs/heads/main' && github.event_name == 'push'
+    needs: [get-ref, secrets, deps-npm, deps-dotnet, codeql]
+    if: failure() && needs.get-ref.outputs.is_main == 'true'
     permissions:
       contents: write
       pull-requests: write

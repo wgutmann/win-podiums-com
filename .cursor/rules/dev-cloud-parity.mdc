@@ -1,0 +1,16 @@
+---
+description: Dev/Cloud parity and local-first testing; Cloud production must match dev 1:1
+globs: "**/*"
+alwaysApply: true
+---
+
+# Dev/Cloud Parity
+
+**Non-negotiable:** Cloud production MUST match the dev environment 1:1. Dev is the source of truth.
+
+- **One codebase, one config**: `wrangler.toml` + `.dev.vars`. Same bindings for Docker and Cloudflare.
+- **Test locally first**: Run API with `docker compose up`; run tests with `docker compose up -d && cd apps/api && npm test`. Do not rely on Cloudflare deployment for routine testing.
+- **Use Cloudflare only when strictly required**: Deployment, production D1/R2/KV, global routing, custom domains. Everything else (Worker code, auth, API endpoints, local D1) is tested locally.
+- **Do not** document or implement divergent "Docker vs Worker" or "local vs cloud" flows.
+
+**Canonical:** [ADR-007 Dev/Cloud Parity](../../docs/architecture/decisions/007-dev-cloud-parity-local-first.md) — full decision and "what needs Cloudflare" list.

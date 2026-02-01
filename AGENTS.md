@@ -9,6 +9,12 @@ Project-level guidance for AI agents working in this repo.
 - **Phase**: Phase 1 MVP. Worker in `apps/api/` and SimHub plugin in `apps/plugin/`; real Discord OAuth, D1, plugin auth + heartbeat. **Current focus**: Test Worker and plugin locally; deploy when ready (see [docs/architecture/next-steps.md](docs/architecture/next-steps.md)).
 - **Worker and Docker are 1:1**: Same app runs via Docker; one codebase, one config (`wrangler.toml` + `.dev.vars`). **Run and test locally with Docker**: start API with `docker compose up`, run tests against it with `docker compose up -d && cd apps/api && npm test`. Do not document or implement divergent “Docker vs Worker” flows.
 
+## Dev/Cloud parity (non-negotiable)
+
+- **Cloud production MUST match dev environment 1:1.** Dev is the source of truth; cloud deployment is the same app. No divergent flows.
+- **Test everything locally first.** Use Cloudflare only for what strictly requires it: deployment, production D1/R2/KV, global routing, custom domains. See [ADR-007 Dev/Cloud Parity](docs/architecture/decisions/007-dev-cloud-parity-local-first.md) for the full "what needs Cloudflare" list.
+- **Do not introduce** features that only work in Cloudflare and cannot be validated locally, unless explicitly justified.
+
 ## Stack and scope
 
 - **Cloudflare (web/API)**: Workers (TypeScript), D1, R2, KV. Use the cloudflare-workers skill. Prefer Wrangler for local dev and deployment. Config: `apps/api/wrangler.toml` and `.dev.vars`; never commit secrets.

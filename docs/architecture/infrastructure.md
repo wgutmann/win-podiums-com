@@ -46,7 +46,7 @@ infra/terraform/
 
 ## Local Usage
 
-1. **Prerequisites**: [Terraform](https://www.terraform.io/downloads) >= 1.5, Cloudflare API token with appropriate permissions.
+1. **Prerequisites**: [Terraform](https://developer.hashicorp.com/terraform) >= 1.5, Cloudflare API token with appropriate permissions.
 2. **Secrets**: Never commit `.tfvars` with credentials. Use env or a local `terraform.tfvars` (gitignored):
 
    ```bash

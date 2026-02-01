@@ -101,7 +101,7 @@ jobs:
           for f in docs/architecture/diagrams/data-flow.mmd docs/architecture/diagrams/system-overview.mmd docs/design/diagrams/entity-relationship.mmd; do
             [ -f "$f" ] || continue
             echo "Validating $f ..."
-            docker run --rm -v "$PWD:/data" minlag/mermaid-cli mmdc -i "/data/$f" -o /data/out.svg -b transparent
+            docker run --rm -v "$PWD:/data" minlag/mermaid-cli -i "/data/$f" -o /data/out.svg -b transparent
             rm -f out.svg
           done
 

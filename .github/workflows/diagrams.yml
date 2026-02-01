@@ -34,7 +34,7 @@ jobs:
           for f in docs/architecture/diagrams/*.mmd docs/design/diagrams/*.mmd; do
             [ -f "$f" ] || continue
             echo "Validating $f"
-            docker run --rm -v "$PWD:/data" minlag/mermaid-cli mmdc -i "/data/$f" -o /data/out.svg -b transparent
+            docker run --rm -v "$PWD:/data" minlag/mermaid-cli -i "/data/$f" -o /data/out.svg -b transparent
             rm -f out.svg
           done
 
@@ -45,7 +45,7 @@ jobs:
             echo "Checking $md"
             sed -n '/^```mermaid$/,/^```$/p' "$md" | sed '1d;$d' > /tmp/extracted.mmd
             if [ -s /tmp/extracted.mmd ]; then
-              docker run --rm -v "$PWD:/data" -v /tmp/extracted.mmd:/tmp/extracted.mmd minlag/mermaid-cli mmdc -i /tmp/extracted.mmd -o /data/out.svg -b transparent
+              docker run --rm -v "$PWD:/data" -v /tmp/extracted.mmd:/tmp/extracted.mmd minlag/mermaid-cli -i /tmp/extracted.mmd -o /data/out.svg -b transparent
               rm -f out.svg
             fi
           done

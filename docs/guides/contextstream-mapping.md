@@ -190,19 +190,19 @@ This is optional; the main gain is from **Related** / **Implements** and consist
 
 ## 4. ContextStream tool reference
 
-This repo relies on the following ContextStream MCP tools (consolidated domain tools, v0.4.x). If the MCP server API changes, update this reference and the ContextStream rule.
+This repo relies on the following ContextStream MCP tools (consolidated domain tools, v0.4.x). **Use the exact tool names your MCP client exposes.** The server often exposes **init** and **context** (docs may say session_init and context_smart). If the MCP server API changes, update this reference and the ContextStream rule.
 
 | Tool / action | Purpose |
 |---------------|---------|
-| **session_init** | Add session in ContextStream; pass repo folder path and short context hint. Call at start of each new session. |
-| **context_smart** | Load project context (and relevant lessons) for the current message. Call after session_init. |
-| **search** | Code/docs search; use `mode=hybrid` or `mode=semantic`. Prefer before Grep/Read. |
-| **session** | `action=capture` (event_type=decision|implementation|task|…), `action=recall`, `action=get_lessons`, `action=capture_lesson`. |
-| **project** | `action=ingest_local` — index the repo (code + docs). Run once after clone or first use; repeat after major changes. |
+| **init** (session_init) | Add session in ContextStream; pass repo folder path and short context hint. Call at start of each new session. |
+| **context** (context_smart) | Load project context (and relevant lessons) for the current message. Call with format=minified, max_tokens=400 (or 800 for complex queries). Call after init. |
+| **search** | Code/docs search; use `mode=hybrid` or `mode=semantic`. Prefer before Grep/Read. Prefer **output_format=paths** for file discovery, **output_format=count** for "how many" or existence checks; use **full** only when content is needed. |
+| **session** | `action=capture` (event_type=decision|implementation|task|…); include **file path** or **code_refs** in content so the graph links the decision to the doc/module. Also `action=recall`, `action=get_lessons`, `action=capture_lesson`. |
+| **project** | `action=index_status` — check if repo is indexed; if not or stale, run `action=ingest_local`. `action=ingest_local` — index the repo (code + docs). Run once after clone or first use; repeat after major changes. |
 | **graph** | `action=dependencies`, `action=impact` (target=…), `action=ingest` (full graph, Elite/Team). Also `action=related` (node_id), `action=path` (source_id, target_id), `action=decisions` — use these to surface more node relationships. Use before refactors. |
 | **memory** | `action=create_task` for tasks tied to a plan; use with reminder for “do this before deploy”. |
 
-See [ContextStream MCP docs](https://contextstream.io/docs/mcp/tools) for full tool catalog and parameters.
+If ContextStream is configured with Router or progressive mode, fewer tools may be exposed; use the tools your client lists. See [ContextStream MCP docs](https://contextstream.io/docs/mcp/tools) for full tool catalog and parameters.
 
 ---
 
@@ -215,5 +215,5 @@ See [ContextStream MCP docs](https://contextstream.io/docs/mcp/tools) for full t
 - **To-dos** = repo checklist + ContextStream **tasks** / **reminders** for AI-aware follow-up.
 - **Graph**: run **project(ingest_local)** and use **graph(dependencies, impact)**; optionally **graph(ingest)** for full graph; link decisions to file/module paths.
 - **Tagging**: stable IDs (PRD-XXX, ADR-XXX, TP-XXX), Related/Implements, index READMEs, diagram labels, cross-links so ContextStream can build useful metadata and relate content.
-- **Tool reference**: See [section 4](#4-contextstream-tool-reference) for the tools this repo uses (session_init, context_smart, search, session, project, graph, memory); update if the MCP server API changes.
+- **Tool reference**: See [section 4](#4-contextstream-tool-reference) for the tools this repo uses (init, context, search, session, project, graph, memory); update if the MCP server API changes.
 - **PR ↔ Tech Plan ↔ PRD**: PR template requires **Traceability** (Implements: TP-XXX, PRD: PRD-XXX). Capture an implementation event with PR URL and TP/PRD doc paths so the link is visible in the ContextStream knowledge graph UI. Tech plans already map to PRD via Implements in the repo. See [§1.4](#14-linking-pull-requests-to-tech-plans-and-prds-graph-visible).

@@ -146,7 +146,7 @@ Tests (`npm test`) still expect the API at `http://localhost:8787`; start either
 
 ### Setup
 
-- **Option A (project MCP):** Copy `.cursor/mcp.json.example` to `.cursor/mcp.json`, then replace `PASTE_YOUR_CONTEXTSTREAM_API_KEY_HERE` with your key from [ContextStream](https://contextstream.io) (Account → API Keys). **`.cursor/mcp.json` is in `.gitignore`** so it is never committed; the repo only has the example file. If a real key was ever committed in the past, rotate it in the ContextStream dashboard. On Windows, if Cursor is started from a shortcut, it may not inherit shell env vars; using `mcp.json` with your key avoids that.
+- **Option A (project MCP):** Copy `.cursor/mcp.json.example` to `.cursor/mcp.json`, then replace `PASTE_YOUR_CONTEXTSTREAM_API_KEY_HERE` with your key from [ContextStream](https://contextstream.io) (Account → API Keys). **`.cursor/mcp.json` is in `.gitignore`** so it is never committed; the repo only has the example file. If a real key was ever committed in the past, rotate it in the ContextStream dashboard. On Windows, if Cursor is started from a shortcut, it may not inherit shell env vars; using `mcp.json` with your key avoids that. **In a worktree,** use the same `.cursor/mcp.json` (or a copy) so ContextStream uses the same project/workspace; avoid committing the key.
 - **Option B (wizard):** Run `npx -y @contextstream/mcp-server setup` and add ContextStream to your global Cursor MCP config; no project file change needed.
 
 Restart Cursor after adding or changing MCP config.
@@ -159,7 +159,7 @@ After connecting ContextStream, run **project(action="ingest_local")** once so t
 
 After ContextStream is connected, you can bootstrap project memory once so new sessions have context:
 
-1. In a Cursor chat, run **session_init** with `folder_path` = repo root and a short `context_hint` (e.g. "WinPodiums Phase 1 MVP: Worker + SimHub plugin; Docker and Worker 1:1").
+1. In a Cursor chat, run **init** (session_init) with `folder_path` = repo root and a short `context_hint` (e.g. "WinPodiums Phase 1 MVP: Worker + SimHub plugin; Docker and Worker 1:1"). Use the exact tool name your MCP client exposes.
 2. Use **session(action="capture", event_type="decision", ...)** to capture key decisions. Point to the doc path in the content so ContextStream can relate decisions to code.
 
 **Suggested decisions to capture** (one per capture, include file path in content):
@@ -191,12 +191,12 @@ This is optional; do it once per workspace if you want shared memory from day on
 
 ### Optional: editor rule
 
-A Cursor rule in `.cursor/rules/` tells the AI to use ContextStream when available (session_init/context_smart for project context, ContextStream search before broad Grep/Read, graph for dependencies/impact). No change needed unless you want to adjust that behavior.
+A Cursor rule in `.cursor/rules/` tells the AI to use ContextStream when available (init/context for project context, ContextStream search before broad Grep/Read, graph for dependencies/impact). No change needed unless you want to adjust that behavior.
 
 ### Optional: Router mode and integrations
 
 - **Router mode:** If you use many MCP servers or hit context limits, set `CONTEXTSTREAM_PROGRESSIVE_MODE=true` in the ContextStream MCP env in `.cursor/mcp.json` to use Router mode (~2 meta-tools). See [ContextStream docs](https://contextstream.io/docs/mcp).
-- **Pro integrations:** Pro users can connect GitHub and Slack so `context_smart` surfaces relevant issues, PRs, and discussions (see [ContextStream](https://contextstream.io)).
+- **Pro integrations:** Pro users can connect GitHub and Slack so **context** surfaces relevant issues, PRs, and discussions (see [ContextStream](https://contextstream.io)).
 
 ContextStream is **optional** for contributors and is not required for CI or build.
 

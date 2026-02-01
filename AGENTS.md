@@ -2,7 +2,7 @@
 
 Project-level guidance for AI agents working in this repo.
 
-**ContextStream bootstrap (mandatory, no exceptions):** When ContextStream MCP is available, **every new chat** you must do this first, before any other tool or reply: (1) call `session_init(folder_path=<repo root>, context_hint=<user's message or "WinPodiums Phase 1 MVP">)` then (2) call `context_smart(user_message=<user's message>)`. On **every subsequent message** in that chat, call `context_smart(user_message=<current message>)` at the start of your turn. Do not skip these; they load project memory and decisions. If ContextStream is unavailable, fall back to reading this file and [docs/architecture/next-steps.md](docs/architecture/next-steps.md).
+**ContextStream (when MCP is available):** Follow [.cursor/rules/contextstream.mdc](.cursor/rules/contextstream.mdc). First message: **init** then **context**; every later message: **context** at the start of your turn; before Grep/Read: **search**(hybrid/semantic) first. If ContextStream is unavailable, fall back to this file and [docs/architecture/next-steps.md](docs/architecture/next-steps.md).
 
 ## Current phase
 
@@ -29,7 +29,7 @@ Project-level guidance for AI agents working in this repo.
 ## Conventions
 
 - Prefer skills in `.cursor/skills` for domain-specific tasks.
-- **ContextStream (when MCP enabled):** (1) **Every new session (mandatory):** first action must be `session_init` then `context_smart`; on every later message, call `context_smart` at the start of your turn—do not skip. (2) **Before Grep/Read:** use ContextStream `search` (hybrid/semantic) first for code or docs. (3) **Decisions:** recall or capture via session/memory tools; after significant choices, capture with file path. (4) **Refactors:** use `graph(dependencies|impact)` before changing code. (5) **Lessons:** use `capture_lesson` when the user corrects a mistake. If ContextStream is unavailable, fall back to [AGENTS.md](AGENTS.md) and [docs/architecture/next-steps.md](docs/architecture/next-steps.md). See [development guide](docs/guides/development.md#ai-tooling-optional) and `.cursor/rules/contextstream.mdc`.
+- **ContextStream (when MCP enabled):** See [.cursor/rules/contextstream.mdc](.cursor/rules/contextstream.mdc) for bootstrap, search-first, decisions, graph, and lessons. If ContextStream is unavailable, fall back to this file and [docs/architecture/next-steps.md](docs/architecture/next-steps.md). See [development guide](docs/guides/development.md#ai-tooling-optional).
 - **Documentation**: Use the cursor-project-docs skill; canonical docs in `docs/`. Follow PRD → HLD → Tech Plan.
 - **Implementation order**: Follow [docs/architecture/next-steps.md](docs/architecture/next-steps.md). Layout: `apps/api/` (Worker), `apps/plugin/` (SimHub plugin). Current step: test locally, then deploy (Wrangler); Terraform is not in scope.
 - Do not commit secrets, tokens, or `.dev.vars` / `.env` files with credentials.

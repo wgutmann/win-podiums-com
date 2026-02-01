@@ -1,9 +1,32 @@
 ## Project Structure Template
 
+### This repo (WinPodiums)
+
+```
+apps/plugin/
+├── README.md
+└── WinPodiums.Plugin/
+    ├── WinPodiums.Plugin.csproj
+    ├── Core/
+    │   └── PluginMain.cs          # SimHub plugin entry point, lifecycle hooks
+    ├── Auth/
+    │   └── TokenStorage.cs
+    ├── Services/
+    │   └── ApiClient.cs
+    └── Properties/
+        └── AssemblyInfo.cs (optional)
+```
+
+See [docs/design/components/simhub-plugin.md](docs/design/components/simhub-plugin.md) for full LLD.
+
+### Minimal plugin (generic, SDK-aligned)
+
 ```
 SimHubPlugin/
 ├── SimHubPlugin.csproj
 ├── Plugin.cs
+├── Control.xaml / Control.xaml.cs  # Optional: settings UI (IWPFSettingsV2)
+├── Settings.cs                    # Optional: settings model
 ├── Properties/
 │   └── AssemblyInfo.cs
 └── README.md
@@ -11,51 +34,71 @@ SimHubPlugin/
 
 ## Minimal Plugin Class Skeleton (C#)
 
+SDK-aligned: **IPlugin**, **IDataPlugin**, **Init(PluginManager)**, **DataUpdate(PluginManager, ref GameData)**, **End(PluginManager)**. No Start().
+
 ```csharp
+using GameReaderCommon;
+using SimHub.Plugins;
 using System;
 
 namespace SimHubPlugin
 {
-    // TODO: Implement the required SimHub plugin interface(s) from the SDK.
-    public class Plugin /* : ISimHubPluginInterface */
+    [PluginName("My SimHub Plugin")]
+    [PluginAuthor("Your Name")]
+    [PluginDescription("Short description for SimHub menu")]
+    public class Plugin : IPlugin, IDataPlugin
     {
-        // TODO: Add required lifecycle methods (Init/Start/Stop/etc).
-        public void Init()
+        public void Init(PluginManager pluginManager)
         {
-            // Initialize plugin state
+            // Called once at startup. Declare properties, events, actions; load settings.
         }
 
-        public void Start()
+        public void DataUpdate(PluginManager pluginManager, ref GameData data)
         {
-            // Start collecting data or services
+            // Called every game data update (~1/fps). Must be fast; avoid throwing.
+            if (data.GameRunning && data.NewData != null)
+            {
+                // Prefer normalized data, e.g. data.NewData.SpeedKmh
+                // Avoid relying on undocumented/raw types.
+            }
         }
 
-        public void Stop()
+        public void End(PluginManager pluginManager)
         {
-            // Cleanup
+            // Called at plugin stop. Save settings, dispose resources.
         }
     }
 }
 ```
+
+For a settings UI, implement **IWPFSettingsV2** and return a WPF Control from `GetWPFSettingsControl(PluginManager)`.
 
 ## csproj Template Snippet
 
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework><!-- TODO: Set to SDK-required framework --></TargetFramework>
+    <TargetFramework>net48</TargetFramework>
     <AssemblyName>SimHubPlugin</AssemblyName>
     <RootNamespace>SimHubPlugin</RootNamespace>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- TODO: Reference SimHub SDK assemblies (canonical path: C:\Program Files (x86)\SimHub) -->
-    <!-- <Reference Include="SimHub.SDK"> -->
-    <!--   <HintPath>C:\Program Files (x86)\SimHub\SDK\SimHub.SDK.dll</HintPath> -->
+    <!-- Reference SimHub.Plugins and GameReaderCommon from SimHub install.
+         Demo projects: C:\Program Files (x86)\SimHub\PluginSdk.
+         Copy reference paths from the SDK demo .csproj (e.g. User.PluginSdkDemo). -->
+    <!-- <Reference Include="SimHub.Plugins"> -->
+    <!--   <HintPath>C:\Program Files (x86)\SimHub\...\SimHub.Plugins.dll</HintPath> -->
+    <!-- </Reference> -->
+    <!-- <Reference Include="GameReaderCommon"> -->
+    <!--   <HintPath>C:\Program Files (x86)\SimHub\...\GameReaderCommon.dll</HintPath> -->
     <!-- </Reference> -->
   </ItemGroup>
 </Project>
 ```
+
+For this repo's assembly name use `WinPodiums.Plugin`; replace `SimHubPlugin` above with your assembly name when scaffolding a new plugin.
 
 ## Build and Deploy (PowerShell)
 
@@ -65,6 +108,9 @@ dotnet build -c Debug
 
 # Deploy to SimHub plugins folder (canonical path for this repo)
 $SimHubPlugins = "C:\Program Files (x86)\SimHub\Plugins"
-$PluginOut = "bin\Debug"
-Copy-Item "$PluginOut\SimHubPlugin.dll" "$SimHubPlugins\" -Force
+$PluginOut = "bin\Debug\net48"
+# Use your assembly name, e.g. WinPodiums.Plugin.dll
+Copy-Item "$PluginOut\WinPodiums.Plugin.dll" "$SimHubPlugins\" -Force
 ```
+
+If SimHub does not load the plugin, try copying the DLL to the SimHub install root: `C:\Program Files (x86)\SimHub\`.

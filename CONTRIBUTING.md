@@ -18,10 +18,18 @@ The project is in **Phase 1 MVP**. A minimal Worker (`apps/api/`) and SimHub plu
 
 **Enforce with a git hook (blocks push until 80% pass):** Run once per clone: `git config core.hooksPath .githooks`. Then every push (including from Cursor) runs the pre-push check and blocks if &lt;80% pass. To skip once: `git push --no-verify`.
 
+## Review and merge process
+
+- **All PRs**: Require approval and passing CI (see [Run tests before push](docs/guides/development.md#run-tests-before-push)). Fill out the [PR template](.github/PULL_REQUEST_TEMPLATE.md) (summary, risk, test plan, rollback).
+- **Product review**: PRs that change **scope, requirements, or user-facing copy** should get product review before merge. That means:
+  - **Paths**: `docs/product/**`, `docs/brand/**`, or any change that adds/edits user-facing text (UI strings, API contract descriptions, landing copy).
+  - **Who**: A human product manager, or an agent using the [product manager personality](docs/brand/product-manager-personality.md) (e.g. @-mention the personality doc when asking for review).
+  - **What**: Reviewer checks phase alignment, user value, brand voice, and PRD/HLD traceability using the [PM review checklist](docs/brand/product-manager-personality.md#review-process) in the personality doc.
+- **Optional**: When you have a designated PM GitHub user or team, add a [CODEOWNERS](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners) file so `docs/product/` and `docs/brand/` automatically request that reviewer.
+
 ## Coming soon
 
-- Branching and PR workflow
-- Code style and testing expectations
-- Review and merge process
+- Branching and PR workflow (branch naming, base branch)
+- Code style and testing expectations (lint, coverage)
 
 Check back or open an issue to request contributing guidelines for a specific area.

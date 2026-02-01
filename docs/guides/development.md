@@ -201,6 +201,14 @@ This is optional; do it once per workspace if you want shared memory from day on
 - **Full graph (Elite/Team):** **graph(action="ingest")** builds richer module/call/dataflow layers when available.
 - **Tagging:** Use stable doc IDs (PRD-XXX, ADR-XXX, TP-XXX) and **Related** / **Implements** in docs so ContextStream can relate content. See [ContextStream mapping](contextstream-mapping.md) for parallels (PRD ↔ plans, docs ↔ memory, lessons, to-dos) and labeling guidance. **PRs:** Fill the PR template **Traceability** (Implements: TP-XXX, PRD: PRD-XXX) and optionally capture an implementation event with PR URL and doc paths so the knowledge graph UI shows [PR ↔ Tech Plan ↔ PRD](contextstream-mapping.md#14-linking-pull-requests-to-tech-plans-and-prds-graph-visible).
 
+### Automated knowledge ingest (optional)
+
+If you want every doc pushed into ContextStream (or another Knowledge Center), use the GitHub-API ingestion script and workflow:
+
+- **Script:** `scripts/contextstream-ingest.js`
+- **Workflow:** `.github/workflows/contextstream-ingest.yml`
+- **Setup and metadata mapping:** [ContextStream knowledge ingest](contextstream-ingest.md)
+
 ### Optional: editor rule
 
 A Cursor rule in `.cursor/rules/` tells the AI to use ContextStream when available (init/context for project context, ContextStream search before broad Grep/Read, graph for dependencies/impact). No change needed unless you want to adjust that behavior.

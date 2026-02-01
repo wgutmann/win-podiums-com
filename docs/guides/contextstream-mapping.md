@@ -164,6 +164,7 @@ ContextStream’s **graph** builds relationships between code and decisions. Use
 ### Where this is documented
 
 - [Development guide – AI tooling](development.md#ai-tooling-optional): setup and one-time bootstrap.
+- [ContextStream knowledge ingest](contextstream-ingest.md): GitHub API ingestion flow and metadata mapping.
 - This section: graph usage (ingest_local, dependencies, impact, optional full ingest).
 
 ---

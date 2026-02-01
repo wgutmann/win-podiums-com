@@ -30,6 +30,9 @@
 - name: prd:PRD-009
   color: '0E8A16'
   description: ContextStream and Agent/Cursor Interactions
+- name: prd:PRD-010
+  color: '0E8A16'
+  description: Brand and Design
 
 # Tech plans (SimHub POC)
 - name: tech-plan:TP-SPOC-001
@@ -70,3 +73,6 @@
 - name: tech-plan:TP-009
   color: '1D76DB'
   description: ContextStream and Cursor Rules
+- name: tech-plan:TP-010
+  color: '1D76DB'
+  description: Brand Alignment (Gate, landing, design-system)

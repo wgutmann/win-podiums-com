@@ -45,6 +45,7 @@ ContextStream builds its node graph from **indexed repo content**, **explicit li
 | **Guides** (development, deployment) | Each other, Next Steps, Phase 1 scope, API README, ContextStream mapping |
 | **SimHub POC PRD** ([docs/product/simhub-plugin-poc/001-simhub-plugin-poc.md](../product/simhub-plugin-poc/001-simhub-plugin-poc.md)) | Phase 1 scope, SimHub Plugin LLD, API plugin, authentication.md, ADR-002, ADR-003, SimHub POC tech plans ([docs/tech-plans/simhub-plugin-poc/](../tech-plans/simhub-plugin-poc/)) |
 | **Tech Plan (SimHub POC)** ([docs/tech-plans/simhub-plugin-poc/](../tech-plans/simhub-plugin-poc/)) | PRD-001 SimHub Plugin POC, SimHub Plugin LLD, API plugin, authentication.md, ADR-002, ADR-003 |
+| **Pull request (GitHub)** | Declare **Implements: TP-XXX**, **PRD: PRD-XXX** in the PR template (Traceability section). Optionally capture an implementation event with PR URL and TP/PRD doc paths so the knowledge graph UI shows PR ↔ TP ↔ PRD. See [§1.4](#14-linking-pull-requests-to-tech-plans-and-prds-graph-visible). |
 
 **Knowledge graph**: So ContextStream’s graph links the PRD to its tech plans, the SimHub POC PRD and each tech plan include a ContextStream-friendly blurb at the top with stable IDs: **PRD-001** (SimHub Plugin POC) and **TP-SPOC-001** through **TP-SPOC-005** (docs/tech-plans/simhub-plugin-poc/). The PRD lists **Technical Plans**: TP-SPOC-001–005 with paths; each tech plan lists **Implements**: PRD-001 with path. Keep these blurbs and links so the knowledge graph can associate “PRD-001” and “TP-SPOC-XXX” with the correct nodes.
 
@@ -80,6 +81,51 @@ Use this checklist so PRDs and tech plans stay linked and indexed as desired:
 - **Index READMEs**: Product area README (e.g. `docs/product/telemetry-proof-system/README.md`) lists PRDs with a **Technical Plan** column linking to each TP. Tech-plans area README lists TPs with an **Implements** column linking to each PRD.
 - **After adding or changing PRDs/tech plans**: Run **project(action="ingest_local")** (or equivalent) so the graph is updated.
 - **Optionally**: When capturing a decision that connects a PRD to its tech plan, include both doc paths in the capture so a decision node links to both document nodes in the graph.
+
+### 1.4 Linking pull requests to tech plans and PRDs (graph-visible)
+
+**Requirement:** GitHub pull requests must link to tech plans and PRDs so the ContextStream knowledge graph shows **PR ↔ Tech Plan ↔ PRD**. Tech plans already map back to a PRD via **Implements** in each tech plan doc; PRs are linked by declaring stable IDs in the PR and by capturing an implementation event that references the PR and the doc paths.
+
+#### In the repo (required)
+
+1. **PR template**  
+   Every PR must fill the **Traceability** section with stable IDs:
+   - **Implements (Tech Plan):** one or more `TP-XXX` IDs (e.g. `TP-SPOC-001`) or `none` if the PR is doc-only/infra.
+   - **PRD:** the `PRD-XXX` ID this work traces to (e.g. `PRD-001`) or `none`.
+
+   See [.github/PULL_REQUEST_TEMPLATE.md](../../.github/PULL_REQUEST_TEMPLATE.md). Using the same IDs as in the tech plan and PRD docs lets ContextStream (and GitHub integration) associate the PR with the same document nodes.
+
+2. **Optional GitHub labels**  
+   For filter and UI clarity, you can add labels such as `tech-plan: TP-SPOC-001` and `prd: PRD-001`. If ContextStream indexes PR labels, these reinforce the link; they also help humans see traceability in the GitHub UI.
+
+#### Making the link visible in the ContextStream knowledge graph UI
+
+ContextStream’s graph is built from **indexed repo content** (document nodes), **explicit doc links** (Related/Implements → edges between docs), and **captured events** (decision/implementation nodes with file paths or code_refs). GitHub-connected PRs become **memory events** and are searchable; to make **PR ↔ Tech Plan ↔ PRD** show up as connected nodes in the graph UI:
+
+1. **Capture an implementation event when a PR is opened or merged**  
+   Use ContextStream MCP:  
+   `session(action="capture", event_type="implementation", title="PR #&lt;number&gt;: &lt;short summary&gt; (TP-XXX)", content="&lt;PR URL&gt;. Implements TP-XXX, PRD-XXX. &lt;one-line summary&gt;.", ...)`  
+   Include in the content (or code_refs if the MCP supports it) the **file paths** of the tech plan and PRD docs, e.g.:
+   - `docs/tech-plans/simhub-plugin-poc/001-plugin-skeleton-sdk-config.md`
+   - `docs/product/simhub-plugin-poc/001-simhub-plugin-poc.md`
+
+   That creates an **implementation** node linked to those document nodes. The implementation node’s title/content reference the PR, so in the graph UI you see: PR (in content) → implementation node → TP doc node → PRD doc node (TP docs already link to PRD via Implements).
+
+2. **Who captures**  
+   - **Manual:** Author or reviewer runs the capture once per PR (e.g. when opening or merging), using the PR template’s TP-XXX and PRD-XXX.  
+   - **Automated (optional):** A GitHub Action on `pull_request` (opened/synchronize) or `pull_request_target` (merged) can call the ContextStream API to create the same event, using the Traceability section or labels; the Action needs a ContextStream API key in repo secrets.
+
+3. **Chain in the graph**  
+   - **PR** (declared in implementation event content) → **implementation** node (with doc paths) → **TP document** node → **PRD document** node.  
+   - Tech plans already have **Implements** → PRD in the repo; after ingest, TP and PRD are already linked. The implementation event adds the PR to that chain so the graph shows PR ↔ TP ↔ PRD.
+
+#### Summary
+
+| Step | Purpose |
+|------|--------|
+| PR template: Implements (TP-XXX), PRD (PRD-XXX) | Declare traceability; same IDs as docs so search and graph can associate PR with TP and PRD. |
+| Optional labels `tech-plan: TP-XXX`, `prd: PRD-XXX` | GitHub UI and filters; may reinforce ContextStream indexing. |
+| Capture implementation event with PR URL + TP and PRD doc paths | Creates a graph node that links the PR (in content) to the TP and PRD document nodes so the link is **visible in the ContextStream knowledge graph UI**. |
 
 ---
 
@@ -170,3 +216,4 @@ See [ContextStream MCP docs](https://contextstream.io/docs/mcp/tools) for full t
 - **Graph**: run **project(ingest_local)** and use **graph(dependencies, impact)**; optionally **graph(ingest)** for full graph; link decisions to file/module paths.
 - **Tagging**: stable IDs (PRD-XXX, ADR-XXX, TP-XXX), Related/Implements, index READMEs, diagram labels, cross-links so ContextStream can build useful metadata and relate content.
 - **Tool reference**: See [section 4](#4-contextstream-tool-reference) for the tools this repo uses (session_init, context_smart, search, session, project, graph, memory); update if the MCP server API changes.
+- **PR ↔ Tech Plan ↔ PRD**: PR template requires **Traceability** (Implements: TP-XXX, PRD: PRD-XXX). Capture an implementation event with PR URL and TP/PRD doc paths so the link is visible in the ContextStream knowledge graph UI. Tech plans already map to PRD via Implements in the repo. See [§1.4](#14-linking-pull-requests-to-tech-plans-and-prds-graph-visible).

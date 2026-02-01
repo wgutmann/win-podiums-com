@@ -12,6 +12,8 @@ Brand and design documentation for WinPodiums: visual design system, web presenc
 
 ## Traceability
 
+**PRD-010** ([Brand and Design](../product/brand/001-brand-and-design.md)) — design-system, web-presence, and PM personality implement PRD-010.
+
 Brand and design docs trace to:
 
 - **Phase 1 scope** ([phase-1-mvp-scope.md](../product/phase-1-mvp-scope.md)) — static Gate, landing, auth

@@ -8,6 +8,9 @@ on:
   push:
     branches: [main]
     paths: ['.github/labels.yaml']
+  pull_request:
+    branches: [main]
+    paths: ['.github/labels.yaml']
 
 permissions:
   issues: write

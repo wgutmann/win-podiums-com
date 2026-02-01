@@ -25,6 +25,7 @@ Deliver a minimal SimHub plugin (POC) that proves: (1) the plugin loads and runs
 - API base URL is configurable (e.g. `http://localhost:8787` for local dev).
 - Manual token auth is only exposed when a feature flag (e.g. debug mode) is on; it is not a user-facing auth option.
 - POC learnings are captured for Phase 1 and future tech plans.
+- POC is complete when the checklist in [TP-SPOC-005](../../tech-plans/simhub-plugin-poc/005-poc-testing-completion.md) (manual E2E + minimum automated tests) is satisfied.
 
 ## User Stories
 

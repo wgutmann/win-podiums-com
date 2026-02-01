@@ -89,6 +89,18 @@ Do not commit `.dev.vars`. Create it from `.dev.vars.example`.
 
 The plugin targets .NET Framework 4.8 and SimHub on Windows. Build and run on the host (Visual Studio or MSBuild). Deploy the built DLL to `C:\Program Files (x86)\SimHub\Plugins`. Point the plugin at `http://localhost:8787` when the API is running in Docker. See `apps/plugin/README.md`. Official SimHub docs sometimes refer to the SimHub install root for plugin DLLs; this repo uses the `Plugins` subfolder unless your SimHub version requires otherwise.
 
+### SimHub Plugin POC — development handoff
+
+**Start here for plugin implementation.** Requirements and implementation order are defined in:
+
+| Doc | Purpose |
+|-----|---------|
+| [PRD-001: SimHub Plugin POC](../product/simhub-plugin-poc/001-simhub-plugin-poc.md) | What to build and why; success criteria; POC complete when [TP-SPOC-005](../tech-plans/simhub-plugin-poc/005-poc-testing-completion.md) checklist is satisfied. |
+| [Tech plans TP-SPOC-001–005](../tech-plans/simhub-plugin-poc/README.md) | Implementation specs; implement in order 001 → 002 → 003 → 004 → 005. |
+| [SimHub Plugin LLD](../design/components/simhub-plugin.md) | Target architecture; POC implements minimal subset (browser PKCE, heartbeat, minimal UI). |
+
+**Implementation order:** TP-SPOC-001 (skeleton, SDK, config) → 002 (auth PKCE, token storage) → 003 (API client, heartbeat) → 004 (minimal SimHub UI) → 005 (testing, POC completion). Manual E2E and minimum automated tests per TP-005 define “POC complete.”
+
 ## Wrangler bindings (D1, R2, KV)
 
 - **D1 and R2**: `apps/api/wrangler.toml` defines bindings for local dev (`winpodiums-dev-db`, `winpodiums-dev-storage`). Docker runs Wrangler with the same config.
@@ -163,6 +175,7 @@ After ContextStream is connected, you can bootstrap project memory once so new s
 | Terraform out of scope | Not part of default workflow until explicitly introduced | [AGENTS.md](../../AGENTS.md) |
 | Phase 1 scope | Auth, minimal Worker, basic plugin, static Gate, D1/KV; single env first | [phase-1-mvp-scope.md](../product/phase-1-mvp-scope.md) |
 | Phase 1 out of scope | Full Telemetry Proof, luxury UI, Discord roles, leaderboards, full anti-cheat LLD deferred to Phase 2+ | [phase-1-mvp-scope.md](../product/phase-1-mvp-scope.md) |
+| PRD-001 SimHub POC | Plugin POC: browser PKCE, heartbeat, minimal UI; complete when TP-SPOC-005 (manual E2E + min automated tests) satisfied | [001-simhub-plugin-poc.md](../product/simhub-plugin-poc/001-simhub-plugin-poc.md) |
 | Free Cloudflare security only | Use only free security features (DDoS, SSL, WAF, Bot Fight); no paid add-ons for baseline | [001-free-cloudflare-security.md](../product/cloudflare-security/001-free-cloudflare-security.md) |
 | Never commit secrets | Do not commit .dev.vars, .env, or tokens; rotate if ever exposed | [AGENTS.md](../../AGENTS.md), [SECURITY.md](../../SECURITY.md) |
 

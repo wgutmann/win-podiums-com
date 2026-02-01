@@ -53,6 +53,7 @@ A merit-based luxury community for elite sim racers, verified through real-time 
 - Main entry: `apps/plugin/WinPodiums.Plugin/Core/PluginMain.cs`
 - Project: `apps/plugin/WinPodiums.Plugin/WinPodiums.Plugin.csproj` (.NET Framework 4.8)
 - See `apps/plugin/README.md` and [SimHub Plugin LLD](../../docs/design/components/simhub-plugin.md)
+- **Development handoff:** [PRD-001 SimHub Plugin POC](../../docs/product/simhub-plugin-poc/001-simhub-plugin-poc.md) and [TP-SPOC-001–005](../../docs/tech-plans/simhub-plugin-poc/README.md); implement in order 001→002→003→004→005. POC complete per [TP-SPOC-005](../../docs/tech-plans/simhub-plugin-poc/005-poc-testing-completion.md). See [Development guide — SimHub Plugin POC](../../docs/guides/development.md#simhub-plugin-poc--development-handoff).
 
 ## Development Workflow
 
@@ -90,3 +91,4 @@ Project rules in [.cursor/rules/](.cursor/rules/) apply when editing matching fi
 3. ~~Set up repo structure~~ (Worker in `apps/api/`, plugin in `apps/plugin/`, wrangler.toml)
 4. ~~Implement Phase 1~~ — real Discord OAuth, D1 migrations (local schema applied), plugin auth + heartbeat
 5. **Pick up**: Create D1 tables (already done locally), configure Discord + `.dev.vars`, run and test with Docker (`docker compose up`, `npm test` in apps/api); then deploy when ready (see [Next Steps](../../docs/architecture/next-steps.md)).
+6. **SimHub plugin POC**: PRD-001 and TP-SPOC-001–005 are aligned; implement in order 001→002→003→004→005. See [Development guide — SimHub Plugin POC handoff](../../docs/guides/development.md#simhub-plugin-poc--development-handoff).

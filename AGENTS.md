@@ -2,7 +2,7 @@
 
 Project-level guidance for AI agents working in this repo.
 
-**ContextStream session bootstrap:** On the first message of every new chat, before anything else, call `session_init` (repo folder path + user message as context_hint) then `context_smart` (user message). This loads smart context from ContextStream automatically so the session has project memory and decisions from the start.
+**ContextStream bootstrap (mandatory, no exceptions):** When ContextStream MCP is available, **every new chat** you must do this first, before any other tool or reply: (1) call `session_init(folder_path=<repo root>, context_hint=<user's message or "WinPodiums Phase 1 MVP">)` then (2) call `context_smart(user_message=<user's message>)`. On **every subsequent message** in that chat, call `context_smart(user_message=<current message>)` at the start of your turn. Do not skip these; they load project memory and decisions. If ContextStream is unavailable, fall back to reading this file and [docs/architecture/next-steps.md](docs/architecture/next-steps.md).
 
 ## Current phase
 
@@ -23,7 +23,7 @@ Project-level guidance for AI agents working in this repo.
 ## Conventions
 
 - Prefer skills in `.cursor/skills` for domain-specific tasks.
-- **ContextStream (when MCP enabled):** (1) **Every new session:** call `session_init` (repo folder path + short context hint) then `context_smart`. If ContextStream MCP is unavailable or returns no useful context, fall back to reading [AGENTS.md](AGENTS.md) and [docs/architecture/next-steps.md](docs/architecture/next-steps.md). (2) **Before Grep/Read:** use ContextStream `search` (hybrid/semantic) first for code or docs. (3) **Decisions:** recall or capture via session/memory tools; after significant choices, capture with file path. (4) **Refactors:** use `graph(dependencies|impact)` before changing code. (5) **Lessons:** use `capture_lesson` when the user corrects a mistake. See [development guide](docs/guides/development.md#ai-tooling-optional) and `.cursor/rules/contextstream.mdc`.
+- **ContextStream (when MCP enabled):** (1) **Every new session (mandatory):** first action must be `session_init` then `context_smart`; on every later message, call `context_smart` at the start of your turn—do not skip. (2) **Before Grep/Read:** use ContextStream `search` (hybrid/semantic) first for code or docs. (3) **Decisions:** recall or capture via session/memory tools; after significant choices, capture with file path. (4) **Refactors:** use `graph(dependencies|impact)` before changing code. (5) **Lessons:** use `capture_lesson` when the user corrects a mistake. If ContextStream is unavailable, fall back to [AGENTS.md](AGENTS.md) and [docs/architecture/next-steps.md](docs/architecture/next-steps.md). See [development guide](docs/guides/development.md#ai-tooling-optional) and `.cursor/rules/contextstream.mdc`.
 - **Documentation**: Use the cursor-project-docs skill; canonical docs in `docs/`. Follow PRD → HLD → Tech Plan.
 - **Implementation order**: Follow [docs/architecture/next-steps.md](docs/architecture/next-steps.md). Layout: `apps/api/` (Worker), `apps/plugin/` (SimHub plugin). Current step: test locally, then deploy (Wrangler); Terraform is not in scope.
 - Do not commit secrets, tokens, or `.dev.vars` / `.env` files with credentials.

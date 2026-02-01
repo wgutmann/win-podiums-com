@@ -506,9 +506,8 @@ async function updateUserProfile(discordId: string, updates: Partial<User>, env:
 
 ## Related Documentation
 
-- [Cloudflare D1 Docs](https://developers.cloudflare.com/d1/)
-- [Workers KV Docs](https://developers.cloudflare.com/kv/)
-- [SQLite Documentation](https://www.sqlite.org/docs.html)
-- [Cost Optimization ADR](../../architecture/decisions/005-cost-optimized-cloudflare.md)
-- [Design diagrams](../diagrams/README.md) — Mermaid diagrams (entity-relationship, etc.)
-- [API Data Contracts](../../api/) — Request/response schemas
+- **Diagrams**: [Entity-relationship diagram](../diagrams/entity-relationship.mmd) (source), [Diagrams README](../diagrams/README.md)
+- **Architecture**: [ADR-001 Cloudflare Stack](../../architecture/decisions/001-cloudflare-stack.md), [ADR-005 Cost-Optimized](../../architecture/decisions/005-cost-optimized-cloudflare.md), [Cost Optimization Summary](../../architecture/cost-optimization-summary.md)
+- **API**: [API README](../../api/README.md), [OpenAPI spec](../../api/openapi.yaml) — Request/response schemas
+- **Code**: D1 migrations in `apps/api/migrations/` (e.g. `0001_initial_schema.sql`)
+- **External**: [Cloudflare D1 Docs](https://developers.cloudflare.com/d1/), [Workers KV Docs](https://developers.cloudflare.com/kv/), [SQLite Documentation](https://www.sqlite.org/docs.html)

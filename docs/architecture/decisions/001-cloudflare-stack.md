@@ -1,5 +1,7 @@
 # ADR-001: Cloudflare Stack for Hosting
 
+**Doc type**: ADR | **ID**: ADR-001 | **Related**: [Phase 1 scope](../../product/phase-1-mvp-scope.md), [HLD](../high-level-design.md), [ADR-002](002-discord-oauth.md), [API README](../../api/README.md)
+
 **Status**: Accepted  
 **Date**: 2026-01-31  
 **Deciders**: Architecture Team
@@ -97,8 +99,12 @@ We will use **100% Cloudflare's edge platform stack**, optimized for cost:
 
 ## Related Decisions
 
-- [ADR-004: Cloudflare-Only Architecture](004-cloudflare-only-architecture.md) - Detailed analysis of 100% Cloudflare approach
-- [ADR-005: Cost-Optimized Cloudflare](005-cost-optimized-cloudflare.md) - Cost optimization strategies and patterns
+- [HLD](../high-level-design.md) — System overview and Phase 1 checklist
+- [Phase 1 scope](../../product/phase-1-mvp-scope.md) — MVP deliverables (Workers, D1, R2, KV)
+- [ADR-002: Discord OAuth](002-discord-oauth.md) — Sole identity provider
+- [ADR-004: Cloudflare-Only Architecture](004-cloudflare-only-architecture.md) — Detailed analysis of 100% Cloudflare approach
+- [ADR-005: Cost-Optimized Cloudflare](005-cost-optimized-cloudflare.md) — Cost optimization strategies and patterns
+- [API README](../../api/README.md) — Endpoint contracts and Worker surface
 
 ## References
 

@@ -155,6 +155,7 @@ var profile = await response.Content.ReadAsAsync<UserProfile>();
 
 ## Related Documentation
 
-- [Discord Integration LLD](../design/integrations/discord-integration.md) — Authentication flow details
-- [SimHub Plugin LLD](../design/components/simhub-plugin.md) — Plugin-side API client
-- [Database Schema](../design/data-models/database-schema.md) — Data models and entities
+- **Architecture**: [High-Level Design](../architecture/high-level-design.md), [Next Steps](../architecture/next-steps.md), [Phase 1 scope](../product/phase-1-mvp-scope.md)
+- **Specs**: [OpenAPI spec](./openapi.yaml), [Authentication API](./authentication.md), [Plugin API](./plugin.md), [User profile](./user-profile.md)
+- **Design**: [Discord Integration LLD](../design/integrations/discord-integration.md) — Auth flows; [SimHub Plugin LLD](../design/components/simhub-plugin.md) — Plugin API client; [Database Schema](../design/data-models/database-schema.md) — Data models
+- **Code**: Worker implementation in `apps/api/`; config in `apps/api/wrangler.toml`; D1 schema in `apps/api/migrations/`

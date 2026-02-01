@@ -27,6 +27,39 @@
 
 ---
 
+## 1.1 Node and relationship map (for ContextStream graph)
+
+ContextStream builds its node graph from **indexed repo content**, **explicit links in docs** (Related/Implements), and **decisions captured with file paths or code_refs**. The more of these connections you add, the richer the graph.
+
+### Doc-to-doc relationships to add and maintain
+
+| From | To (link from "From" doc) |
+|------|---------------------------|
+| **PRD / Phase 1 scope** | HLD, Next Steps, ADRs 001–006, API README, Tech Plans, Design LLDs |
+| **HLD** | Phase 1 scope, Next Steps, ADRs 001–006, API README, Design README, Guides |
+| **Next Steps** | HLD, Phase 1 scope, Development, Deployment, API README, ADR-001, ADR-002 |
+| **ADR-001 … ADR-006** | HLD, Phase 1 scope, related ADRs, API README, design docs that implement the decision |
+| **Tech Plan (TP-XXX)** | PRD it implements (Implements), related TPs, API spec, SimHub/design LLD |
+| **API README** | HLD, Phase 1 scope, Next Steps, OpenAPI spec, authentication.md, plugin.md, Design (database-schema, Discord LLD) |
+| **Design LLDs** (SimHub, Discord, DB schema, security) | HLD, Phase 1 scope, ADRs, API README, related LLDs, entity-relationship diagram |
+| **Guides** (development, deployment) | Each other, Next Steps, Phase 1 scope, API README, ContextStream mapping |
+
+### Doc-to-code relationships
+
+- In **API README** and **Next Steps**: link to `apps/api/`, `apps/api/wrangler.toml`, `apps/api/migrations/`, `docs/api/openapi.yaml`.
+- In **Phase 1 scope** and **SimHub plugin LLD**: link to `apps/plugin/`, `apps/plugin/WinPodiums.Plugin/`.
+- When **capturing decisions** in ContextStream, include `code_refs` or at least **file path** (e.g. `apps/api/src/index.ts`, `docs/architecture/decisions/001-cloudflare-stack.md`) so the graph links the decision node to that file/module.
+
+### READMEs as hubs
+
+Each major area should have a **README** that lists documents and diagrams with short descriptions. ContextStream indexes these; they become hubs that connect sections. Ensure:
+
+- `docs/architecture/README.md` — links to HLD, Next Steps, ADRs, Cost Optimization, Diagrams, Design, API, Guides.
+- `docs/design/` — has a README listing Components, Data Models, Integrations, Diagrams, Security LLD with links.
+- `docs/product/README.md`, `docs/tech-plans/README.md`, `docs/api/README.md` — list sibling docs and cross-link to architecture/design.
+
+---
+
 ## 2. Leveraging the ContextStream Graph
 
 ContextStream’s **graph** builds relationships between code and decisions. Use it so the AI can answer “what depends on X?” and “what breaks if I change Y?”.
@@ -45,7 +78,7 @@ ContextStream’s **graph** builds relationships between code and decisions. Use
    If you have Full Graph, **graph(action="ingest")** builds module/call/dataflow/type layers. Run when you want richer impact analysis; document in the dev guide that “full graph ingest” is optional and tier-dependent.
 
 4. **Link decisions to code**  
-   When you capture a **decision** in ContextStream, include the **file path** or **module name** (e.g. `apps/api`, `docs/architecture/decisions/001-cloudflare-stack.md`) in the content. That helps ContextStream associate “this decision” with “this part of the repo” in the graph.
+   When you capture a **decision** in ContextStream, include the **file path** or **module name** (e.g. `apps/api`, `docs/architecture/decisions/001-cloudflare-stack.md`) in the content. If the MCP supports it, use **code_refs** (e.g. `[{ "file_path": "apps/api/wrangler.toml" }]`) so the graph links the decision node to those files. That helps ContextStream associate “this decision” with “this part of the repo” in the graph.
 
 ### Where this is documented
 
@@ -97,7 +130,7 @@ This repo relies on the following ContextStream MCP tools (consolidated domain t
 | **search** | Code/docs search; use `mode=hybrid` or `mode=semantic`. Prefer before Grep/Read. |
 | **session** | `action=capture` (event_type=decision|implementation|task|…), `action=recall`, `action=get_lessons`, `action=capture_lesson`. |
 | **project** | `action=ingest_local` — index the repo (code + docs). Run once after clone or first use; repeat after major changes. |
-| **graph** | `action=dependencies`, `action=impact` (target=…), `action=ingest` (full graph, Elite/Team). Use before refactors. |
+| **graph** | `action=dependencies`, `action=impact` (target=…), `action=ingest` (full graph, Elite/Team). Also `action=related` (node_id), `action=path` (source_id, target_id), `action=decisions` — use these to surface more node relationships. Use before refactors. |
 | **memory** | `action=create_task` for tasks tied to a plan; use with reminder for “do this before deploy”. |
 
 See [ContextStream MCP docs](https://contextstream.io/docs/mcp/tools) for full tool catalog and parameters.

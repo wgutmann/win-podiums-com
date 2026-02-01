@@ -196,6 +196,14 @@ GitHub Actions run on push and pull requests to `main` (path filters apply so on
 | **security** (`.github/workflows/security.yml`) | Secret scanning (TruffleHog), npm and .NET dependency audits, CodeQL (TypeScript + C#). |
 | **CI** (`.github/workflows/ci.yml`) | TypeScript typecheck, ESLint, plugin build (.NET), lockfile check (`apps/api/package-lock.json`), OpenAPI validation (Spectral). Triggered when `apps/api/`, `apps/plugin/`, or `docs/api/` change. |
 
+## Related
+
+- [Deployment](deployment.md) — Deploy Worker with Wrangler
+- [Next Steps](../architecture/next-steps.md) — Recommended order of work (test locally, deploy)
+- [Phase 1 scope](../product/phase-1-mvp-scope.md) — MVP deliverables and trace to docs
+- [API README](../api/README.md) — Endpoint surface and OpenAPI spec
+- [ContextStream mapping](contextstream-mapping.md) — AI tooling (ContextStream MCP, graph, tagging)
+
 ## TBD
 
 - Optional Docker setup for building the SimHub plugin (e.g. Windows container or CI-only).

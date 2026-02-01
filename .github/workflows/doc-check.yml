@@ -45,7 +45,7 @@ jobs:
       - name: Link checker
         uses: lycheeverse/lychee-action@v2
         with:
-          args: --verbose --no-progress --cache --cache-max-age 1d "./docs/**/*.md" "./README.md" "./AGENTS.md" "./CONTRIBUTING.md" "./SECURITY.md" "./apps/plugin/README.md" "./infra/terraform/README.md"
+          args: --verbose --no-progress --cache --max-cache-age 1d "./docs/**/*.md" "./README.md" "./AGENTS.md" "./CONTRIBUTING.md" "./SECURITY.md" "./apps/plugin/README.md" "./infra/terraform/README.md"
           fail: true
 
   mermaid-validate:
@@ -61,6 +61,8 @@ jobs:
           cache: "npm"
 
       - name: Validate Mermaid (.mmd)
+        env:
+          PUPPETEER_ARGS: "--no-sandbox --disable-setuid-sandbox"
         run: |
           npx @mermaid-js/mermaid-cli@latest --version
           for f in docs/architecture/diagrams/data-flow.mmd docs/architecture/diagrams/system-overview.mmd docs/design/diagrams/entity-relationship.mmd; do

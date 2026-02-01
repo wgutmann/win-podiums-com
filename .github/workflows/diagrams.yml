@@ -18,6 +18,10 @@ on:
       - "docs/design/diagrams/**"
       - ".github/workflows/diagrams.yml"
 
+concurrency:
+  group: diagrams-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   validate:
     name: Validate Mermaid diagrams

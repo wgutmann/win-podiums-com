@@ -13,7 +13,7 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
-    labels: ["dependencies", "security"]
+    # Add labels here after creating them in repo: Settings → Labels (e.g. dependencies, security)
     commit-message:
       prefix: deps(npm)
 
@@ -24,7 +24,6 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 5
-    labels: ["dependencies", "security"]
     commit-message:
       prefix: deps(nuget)
 
@@ -35,6 +34,5 @@ updates:
       interval: weekly
       day: monday
     open-pull-requests-limit: 3
-    labels: ["dependencies", "security"]
     commit-message:
       prefix: ci(actions)

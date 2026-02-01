@@ -10,6 +10,8 @@ WinPodiums uses Cloudflare D1 (SQLite-based edge database) for storing user prof
 
 ## Entity Relationship Diagram
 
+See [entity-relationship.mmd](../diagrams/entity-relationship.mmd) for the full Mermaid diagram.
+
 ```
 User (1) ──────< (*) AuthToken
 User (1) ──────< (*) RaceResult

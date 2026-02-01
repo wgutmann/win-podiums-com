@@ -327,6 +327,7 @@ Key architectural decisions are documented as ADRs in [`decisions/`](decisions/)
 - [ADR-001: Cloudflare Stack](decisions/001-cloudflare-stack.md) — Why Cloudflare Workers/D1/R2
 - [ADR-002: Discord OAuth](decisions/002-discord-oauth.md) — Why Discord as sole identity provider
 - [ADR-003: Hybrid Auth Paths](decisions/003-hybrid-auth-paths.md) — Why support both web-first and plugin-first
+- [ADR-006: Security Choices](decisions/006-security-choices.md) — Secrets, Cloudflare free security, CI, test coverage
 
 ## Related Documentation
 

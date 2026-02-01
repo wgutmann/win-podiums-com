@@ -33,6 +33,7 @@
 3. API: **http://localhost:8787**
    - Health: **http://localhost:8787/health** or **http://localhost:8787/api/health**
    - Gate: **http://localhost:8787/** or **http://localhost:8787/gate**
+   - **API docs (Swagger):** **http://localhost:8787/api-docs** — each endpoint is documented in Swagger; spec source is `docs/api/openapi.yaml`.
 4. Live reload: edits under `apps/api/src/` are reflected (volume mount). Config in `wrangler.toml` is baked into the image; rebuild to change it.
 
 Compose uses `env_file: ./apps/api/.dev.vars` so the container gets the same secrets the Worker expects. The Dockerfile sets `CLOUDFLARE_INCLUDE_PROCESS_ENV=true` so Wrangler passes those env vars into the Worker (config match). Wrangler is started with `--ip 0.0.0.0` so the API is reachable from the host (port 8787) for tests and the plugin.
@@ -62,7 +63,7 @@ If the API is not running, `npm test` will fail with a clear message: "Start Doc
 
 ### Smoke test
 
-`apps/api/test/smoke.js` fetches `GET /api/health` and asserts `{ ok: true, env: "dev" }`. It ensures the Worker in Docker is up and that `ENVIRONMENT` matches `wrangler.toml` (Docker and Worker config 1:1).
+`apps/api/test/smoke.js` validates (1) Docker and Worker config match — `GET /api/health` returns `{ ok: true, env: "dev" }` — and (2) **API documentation loads**: `GET /api-docs` and `GET /api-docs/openapi.yaml` are reachable and return Swagger UI and a valid OpenAPI 3 spec. Each API endpoint is documented in `docs/api/openapi.yaml` and surfaced in Swagger.
 
 **CI**: GitHub Actions runs the same test on push/PR to `main` when `apps/api/`, Dockerfile, or compose change (`.github/workflows/worker-test.yml`): build Docker, start API, run smoke test.
 

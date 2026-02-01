@@ -1,0 +1,75 @@
+# Entity-Relationship Diagram (D1 schema)
+
+D1 database schema: users, auth_tokens, race_results, plugin_installations, manual_tokens, qr_auth_sessions, rate_limit_logs. See [database schema](../data-models/database-schema.md).
+
+Source: [entity-relationship.mmd](entity-relationship.mmd)
+
+```mermaid
+%% Entity-Relationship Diagram — D1 schema (see database-schema.md)
+erDiagram
+    users ||--o{ auth_tokens : has
+    users ||--o{ race_results : has
+    users ||--o{ plugin_installations : has
+    users ||--o{ rate_limit_logs : has
+    users ||--o{ qr_auth_sessions : has
+    users ||--o{ manual_tokens : has
+
+    users {
+        string discord_id PK
+        string discord_username
+        string verification_state
+        string auth_method
+        datetime first_verified_at
+        int total_podiums
+        datetime last_active_at
+        datetime created_at
+    }
+
+    auth_tokens {
+        int id PK
+        string user_discord_id FK
+        string token_hash
+        datetime expires_at
+        datetime created_at
+    }
+
+    race_results {
+        int id PK
+        string user_discord_id FK
+        string session_id
+        string track_car
+        int position
+        datetime created_at
+    }
+
+    plugin_installations {
+        int id PK
+        string user_discord_id FK
+        string plugin_version
+        datetime last_seen_at
+        datetime created_at
+    }
+
+    manual_tokens {
+        int id PK
+        string user_discord_id FK
+        string token_hash
+        datetime expires_at
+        datetime created_at
+    }
+
+    qr_auth_sessions {
+        string id PK
+        string user_discord_id FK
+        string state
+        datetime expires_at
+        datetime created_at
+    }
+
+    rate_limit_logs {
+        int id PK
+        string user_discord_id FK
+        string endpoint
+        datetime created_at
+    }
+```

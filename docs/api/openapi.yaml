@@ -13,6 +13,8 @@ servers:
   - url: http://localhost:8787/api
     description: Local development (Wrangler)
 tags:
+  - name: System
+    description: Health and operational endpoints
   - name: Authentication
     description: Discord OAuth2 flows and token handling
   - name: Plugin
@@ -20,6 +22,28 @@ tags:
   - name: Profile
     description: User profile data and preferences
 paths:
+  /health:
+    get:
+      tags:
+        - System
+      summary: Health check
+      description: Returns API health and environment. No auth required.
+      responses:
+        "200":
+          description: API is healthy.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ok:
+                    type: boolean
+                    example: true
+                  env:
+                    type: string
+                    example: dev
+                required:
+                  - ok
   /auth/discord/callback:
     post:
       tags:
@@ -83,6 +107,16 @@ paths:
         - Authentication
       summary: Manual token validation
       description: Validates a manually provided token and returns session info.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [token]
+              properties:
+                token:
+                  type: string
+                  description: One-time token from /auth/token-generate
       responses:
         "200":
           description: Token validation success.
@@ -92,6 +126,24 @@ paths:
                 $ref: "#/components/schemas/SuccessResponse"
         "400":
           $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /auth/token-generate:
+    post:
+      tags:
+        - Authentication
+      summary: Create one-time manual token
+      description: Creates a one-time token for the plugin. Requires session cookie (web login) or Bearer token.
+      security:
+        - cookieAuth: []
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Token created.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
         "401":
           $ref: "#/components/responses/Unauthorized"
   /plugin/verify:
@@ -117,8 +169,17 @@ paths:
     post:
       tags:
         - Plugin
-      summary: Plugin health check
-      description: Sends a plugin heartbeat to keep session active.
+      summary: Plugin heartbeat
+      description: Sends a plugin heartbeat to keep session active. Optional body with version.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                version:
+                  type: string
+                  example: "1.0.0"
       responses:
         "200":
           description: Heartbeat accepted.
@@ -135,7 +196,7 @@ paths:
       tags:
         - Plugin
       summary: Download plugin installer
-      description: Downloads a plugin installer by type.
+      description: Downloads a plugin installer by type. Not yet implemented (returns 404).
       parameters:
         - name: type
           in: path
@@ -185,7 +246,7 @@ paths:
       tags:
         - Profile
       summary: Public profile
-      description: Returns a public profile if enabled.
+      description: Returns a public profile if enabled. Not yet implemented (returns 404).
       parameters:
         - name: discordId
           in: path
@@ -202,6 +263,17 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: Discord access token (from /auth/discord/exchange or /auth/token-exchange)
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: wp_session
+      description: Session cookie set after web login at /auth/discord
   schemas:
     SuccessResponse:
       type: object

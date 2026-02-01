@@ -11,7 +11,9 @@ Use this skill when the user asks to **document the repo**, **create PRDs**, **c
 
 **Flow**: (1) Start with PRDs to define product requirements. (2) Create HLD for system architecture. (3) Create Tech Plans for implementation details. (4) Populate Cursor's doc section (`.cursor/docs/`) for indexing context.
 
-**ContextStream (when available):** Before creating or editing docs, use ContextStream `search` to find related PRDs, ADRs, tech plans. After adding or updating a key doc (PRD, ADR, tech plan), capture a short decision in ContextStream with title and path (e.g. "Added ADR-001" → `docs/architecture/decisions/001-cloudflare-stack.md`). See [ContextStream mapping](../../../docs/guides/contextstream-mapping.md).
+**Consistency**: Apply the [Consistency checklist](#consistency-checklist-when-creating-or-updating-docs) for every new or updated PRD, ADR, tech plan, or key guide (Related/Implements, optional Doc type | ID, bootstrap table, diagram READMEs). Align to [documentation-standards](../../../docs/standards/documentation-standards.md).
+
+**ContextStream (when available):** Before creating or editing docs, use ContextStream `search` to find related PRDs, ADRs, tech plans. After adding or updating a key doc (PRD, ADR, tech plan), capture a short decision in ContextStream with title and path. If it's a key decision, add it to "Suggested decisions to capture" in [docs/guides/development.md](../../../docs/guides/development.md#optional-one-time-bootstrap). See [ContextStream mapping](../../../docs/guides/contextstream-mapping.md).
 
 ## Scope
 
@@ -22,11 +24,12 @@ Use this skill when the user asks to **document the repo**, **create PRDs**, **c
 
 When writing or updating repo docs, consult and apply practices from:
 
+- **Canonical standard**: [docs/standards/documentation-standards.md](../../../docs/standards/documentation-standards.md) — folder structure, metadata, Related/Implements, naming, ContextStream-friendly structure. All new or updated docs must align to this.
 - **GitHub docs**: Repository best practices, about README, contributing guidelines, security policy. See [reference.md](reference.md) for curated links.
 - **Technical design docs**: PRD → HLD → Tech Plan workflow, GitLab architecture workflow, Microsoft engineering playbook. See [reference.md](reference.md) for curated links.
 - **Other reputable sources**: Open-source documentation guides or standards referenced in reference.md.
 
-Do not invent documentation structure; align to GitHub conventions, industry design doc practices, and the referenced best practices.
+Do not invent documentation structure; align to the canonical standard, GitHub conventions, and the referenced best practices.
 
 ## Documentation Hierarchy
 
@@ -96,54 +99,27 @@ PRD (Product Requirements) → HLD (Architecture) → Tech Plans (Implementation
 
 ### Documentation Folder Structure
 
-Organize documentation in `docs/` with clear separation by document type:
+Organize documentation in `docs/` per [documentation-standards](../../../docs/standards/documentation-standards.md):
 
 ```
 docs/
-├── product/                      # Product Requirements Documents (PRDs)
-│   ├── README.md                 # PRD index and overview
-│   ├── phase-1-mvp-scope.md      # Phase / feature scope
-│   └── {feature-area}/           # Feature-specific PRDs (e.g. telemetry-proof-system/)
-├── architecture/                 # High-Level Design (HLD)
-│   ├── README.md                 # Architecture overview and index
-│   ├── high-level-design.md      # System-wide HLD
-│   ├── decisions/                # Architecture Decision Records (ADRs)
-│   │   ├── 001-cloudflare-stack.md
-│   │   └── 002-discord-oauth.md
-│   └── diagrams/                 # Mermaid or image files
-│       └── system-overview.mmd
-├── tech-plans/                   # Tech Plans (Implementation Specs)
-│   ├── README.md                 # Tech plans index
-│   ├── components/               # Component-specific tech plans
-│   │   ├── simhub-plugin.md
-│   │   ├── web-frontend.md
-│   │   └── api-workers.md
-│   ├── data-models/              # Database schemas, entities
-│   │   └── database-schema.md
-│   └── integrations/             # Integration-specific tech plans
-│       ├── discord-integration.md
-│       └── simhub-telemetry.md
-├── api/
-│   ├── README.md                 # API overview
-│   ├── authentication.md         # Auth endpoints
-│   ├── plugin.md                 # Plugin endpoints
-│   └── user-profile.md           # Profile endpoints
-├── guides/
-│   ├── development.md            # Developer setup
-│   ├── deployment.md             # Deployment guide
-│   └── troubleshooting.md        # Common issues
-└── brand/
-    ├── design-system.md          # Visual design guidelines
-    └── ux-patterns.md            # UX interaction patterns
+├── product/                      # PRDs (phase-1-mvp-scope.md, {feature-area}/)
+├── architecture/                 # HLD, decisions/ (ADRs), diagrams/ (system-overview.mmd, data-flow.mmd), next-steps.md
+├── tech-plans/                   # Tech plans by feature-area (e.g. telemetry-proof-system/)
+├── design/                       # Component LLDs: components/, data-models/, integrations/, diagrams/ (entity-relationship.mmd)
+├── api/                          # API README, openapi.yaml (all endpoints; Swagger at /api-docs), authentication.md, plugin.md, user-profile.md. Each Worker endpoint must be in openapi.yaml; smoke test ensures API documentation loads.
+├── guides/                       # development.md, deployment.md, contextstream-mapping.md
+├── standards/                    # documentation-standards.md (canonical)
+└── brand/                        # design-system.md
 ```
 
 **Key principles**:
 - PRDs in `docs/product/` — ALWAYS create these FIRST
 - HLD in `docs/architecture/` — system-wide architecture, created AFTER PRD approval
-- Tech Plans in `docs/tech-plans/` — implementation details, created AFTER HLD approval
-- API specs in `docs/api/` — interface contracts (can be part of tech plans)
-- Guides in `docs/guides/` — how-to, procedural
-- Keep each file focused on one subject
+- Tech Plans in `docs/tech-plans/{feature-area}/` — implementation specs, created AFTER HLD approval
+- Component LLDs in `docs/design/` (components/, data-models/, integrations/)
+- Diagrams in `docs/architecture/diagrams/` and `docs/design/diagrams/` — list in READMEs; link from architecture README and from database-schema to entity-relationship.mmd
+- Every PRD, ADR, tech plan must have **Related** (and **Implements** for tech plans); optional **Doc type | ID | Related** line at top
 - Use `README.md` as index for each subdirectory
 
 ### Document Creation Workflow
@@ -240,6 +216,20 @@ When existing documentation doesn't follow the PRD → HLD → Tech Plan hierarc
 - Each Tech Plan should reference which HLD component it implements
 - Use consistent naming: `PRD-001`, `HLD-001`, `TP-001` for cross-references
 
+## Documentation consistency (canonical)
+
+To keep documentation consistent across the repo and with ContextStream:
+
+1. **Canonical standard**: [docs/standards/documentation-standards.md](../../../docs/standards/documentation-standards.md) defines folder structure, metadata (Status, Version, Date, Owner), **Related** / **Implements**, naming (PRD-XXX, ADR-XXX, TP-XXX), and ContextStream-friendly structure. All new or updated docs must align.
+
+2. **Every PRD, ADR, tech plan**: Include **Related** in the metadata (and **Implements** for tech plans). Optionally add a single line after the title: `**Doc type**: ADR | **ID**: ADR-001 | **Related**: [links]`. See existing ADRs and [contextstream-mapping](../../../docs/guides/contextstream-mapping.md#3-tagging-and-labeling-for-better-contextstream-metadata).
+
+3. **New key decisions**: When adding a new ADR or product decision that should be recalled by AI, add it to the "Suggested decisions to capture" table in [docs/guides/development.md](../../../docs/guides/development.md#optional-one-time-bootstrap) so ContextStream bootstrap stays in sync.
+
+4. **Diagrams**: Place Mermaid `.mmd` files in `docs/architecture/diagrams/` or `docs/design/diagrams/`. List them in the diagram folder README; add direct links from [docs/architecture/README.md](../../../docs/architecture/README.md#diagrams). For the D1 schema, link from [database-schema.md](../../../docs/design/data-models/database-schema.md) to `entity-relationship.mmd`.
+
+5. **Plans and roadmaps**: For next-steps or implementation roadmaps, use ContextStream `session(action="capture_plan", ...)` so the plan appears in ContextStream; reference the repo doc path in the plan description.
+
 ## ContextStream parallels (optional)
 
 When ContextStream MCP is enabled, repo docs map to ContextStream memory for better AI context:
@@ -247,21 +237,32 @@ When ContextStream MCP is enabled, repo docs map to ContextStream memory for bet
 | Repo | ContextStream | Usage |
 |------|---------------|--------|
 | **PRD** | Plans + decisions | Capture key product decisions as `event_type="decision"`; optional `capture_plan` with steps; link content to `docs/product/`. |
-| **ADR / Tech Plan** | Decisions + implementation | After writing/updating an ADR or tech plan, capture a short decision (title + path to doc). |
+| **ADR / Tech Plan** | Decisions + implementation | After writing/updating an ADR or tech plan, capture a short decision (title + path to doc). If it's a key decision, add to development.md "Suggested decisions to capture" table. |
 | **Technical docs** | Indexed repo + memory | Use **Related** / **Implements** and stable IDs (PRD-XXX, ADR-XXX, TP-XXX) in every doc so ContextStream can relate content. |
-| **Diagrams** (Mermaid, .mmd) | Indexed as file content | Use consistent headings/filenames and link from READMEs (e.g. architecture README) so diagram content is discoverable. |
+| **Diagrams** (Mermaid, .mmd) | Indexed + decision | Place in architecture/diagrams/ or design/diagrams/; list in READMEs. Optionally capture a decision that references diagram paths so they surface in context_smart. |
 | **Lessons** (mistakes) | ContextStream only | Use `capture_lesson` for "don't repeat this"; keep procedures in `docs/guides/`. |
-| **To-dos / tasks** | Tasks + reminders | Repo checklist = human source; ContextStream tasks/reminders for AI-aware follow-up. |
+| **To-dos / tasks** | Tasks + reminders | Repo checklist = human source; ContextStream tasks/reminders or `capture_plan` for roadmaps. |
 
 See [ContextStream mapping](../../../docs/guides/contextstream-mapping.md) for full parallels, graph usage (ingest_local, dependencies, impact), and tagging guidance.
+
+## Consistency checklist (when creating or updating docs)
+
+Before finishing any new or updated PRD, ADR, tech plan, or key guide:
+
+- [ ] **Related** (and **Implements** for tech plans) in metadata; stable IDs (PRD-XXX, ADR-XXX, TP-XXX) in title.
+- [ ] Optional **Doc type | ID | Related** line at top of key docs (see [contextstream-mapping](../../../docs/guides/contextstream-mapping.md#3-tagging-and-labeling-for-better-contextstream-metadata)).
+- [ ] If adding a new key decision (ADR or product decision): add a row to "Suggested decisions to capture" in [docs/guides/development.md](../../../docs/guides/development.md#optional-one-time-bootstrap).
+- [ ] If adding a diagram: place in `docs/architecture/diagrams/` or `docs/design/diagrams/`; add to folder README; add link from architecture README (or from database-schema to entity-relationship.mmd).
+- [ ] Folder and file names align to [documentation-standards](../../../docs/standards/documentation-standards.md).
 
 ## Anti-Patterns
 
 - **Do not skip PRDs**: Always define WHAT before HOW. Technical design without product requirements leads to building the wrong thing.
 - **Do not mix abstraction levels**: Keep PRDs, HLDs, and Tech Plans separate. Each has a different audience and purpose.
 - **Do not start coding before Tech Plans**: Implementation details should be documented before coding begins.
-- **Do not invent documentation structure**: Align to the PRD → HLD → Tech Plan workflow.
+- **Do not invent documentation structure**: Align to the canonical standard and PRD → HLD → Tech Plan workflow.
 - **Do not duplicate content**: Use links and references to maintain single source of truth.
+- **Do not omit Related/Implements**: Every PRD, ADR, and tech plan must list Related (and Implements for tech plans).
 - **Do not populate `.cursor/docs/` with content that contradicts canonical docs**.
 
 ## Additional Resources

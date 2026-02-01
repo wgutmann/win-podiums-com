@@ -1,0 +1,9 @@
+# Git branch agnostic
+
+Agents must **not** assume or rely on the user's current git branch.
+
+- Do **not** run `git branch`, `git status`, or similar for context unless the user explicitly asks.
+- Do **not** infer or reference "current branch" (e.g. "on main", "your branch") unless the user stated it.
+- Give **branch-neutral** advice: e.g. "before pushing" not "before pushing to main"; "the default branch" when referring to main/primary.
+
+This keeps agent behavior independent of local branch state.

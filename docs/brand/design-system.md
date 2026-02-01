@@ -4,6 +4,8 @@
 **Brand Philosophy**: "The Podium Invitation" — Luxury, Merit-Based, Dignified Recognition  
 **Version**: 1.0
 
+**Doc type**: Design | **ID**: DC-DS | **Related**: [web-presence](web-presence.md), [phase-1-mvp-scope](../product/phase-1-mvp-scope.md), [ADR-003](../architecture/decisions/003-hybrid-auth-paths.md), [product-manager-personality](product-manager-personality.md), [HLD](../architecture/high-level-design.md), [brand README](README.md)
+
 ## Brand Positioning
 
 WinPodiums is a **luxury community** for **elite sim racers**. Every design decision must reinforce:
@@ -66,7 +68,7 @@ WinPodiums is a **luxury community** for **elite sim racers**. Every design deci
 
 ### Headline Font (Serif)
 
-**Family**: "Playfair Display" or "Cormorant Garamond"
+**Family**: "Playfair Display" (primary); "Cormorant Garamond" is an optional alternative.
 - **Character**: Elegant, classic, high-end editorial
 - **Weights**: 300 (Light) for subtitles, 400 (Regular) for headlines
 - **Letter Spacing**: +0.05em (spaced-out for dignified feel)
@@ -390,7 +392,7 @@ For developers: Export as CSS variables or JavaScript/TypeScript constants.
   --color-error: #8B0000;
   --color-info: #4A5568;
   
-  /* Typography */
+  /* Typography — headline: Playfair Display primary; optional: Cormorant Garamond */
   --font-headline: 'Playfair Display', serif;
   --font-body: 'Inter', sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
@@ -433,7 +435,7 @@ For developers: Export as CSS variables or JavaScript/TypeScript constants.
 
 ## Implementation Checklist
 
-- [ ] Load fonts (Playfair Display, Inter, JetBrains Mono)
+- [ ] Load fonts (Playfair Display primary; Inter, JetBrains Mono; optional headline: Cormorant Garamond)
 - [ ] Define CSS variables for colors, spacing, typography
 - [ ] Create component library (buttons, cards, status indicators)
 - [ ] Implement light-leak animation for verification moment

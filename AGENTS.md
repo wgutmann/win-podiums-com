@@ -2,7 +2,7 @@
 
 Project-level guidance for AI agents working in this repo.
 
-**ContextStream bootstrap (mandatory, no exceptions):** When ContextStream MCP is available, **every new chat** you must do this first, before any other tool or reply: (1) call `session_init(folder_path=<repo root>, context_hint=<user's message or "WinPodiums Phase 1 MVP">)` then (2) call `context_smart(user_message=<user's message>)`. On **every subsequent message** in that chat, call `context_smart(user_message=<current message>)` at the start of your turn. Do not skip these; they load project memory and decisions. If ContextStream is unavailable, fall back to reading this file and [docs/architecture/next-steps.md](docs/architecture/next-steps.md).
+**ContextStream (when MCP is available):** Follow [.cursor/rules/contextstream.mdc](.cursor/rules/contextstream.mdc). First message: **init** then **context**; every later message: **context** at the start of your turn; before Grep/Read: **search**(hybrid/semantic) first. If ContextStream is unavailable, fall back to this file and [docs/architecture/next-steps.md](docs/architecture/next-steps.md).
 
 ## Current phase
 
@@ -16,7 +16,7 @@ Project-level guidance for AI agents working in this repo.
 - **SimHub**: Plugin work; use the simhub-plugin-builder skill when relevant.
 - **Discord**: Auth and integrations; use the discord-authentication skill when relevant.
 - **Docker**: Dev environment; use the docker-dev-environment skill. Run and test locally with Docker; tests run against the Dockerized API so config stays 1:1.
-- **GitHub**: Change control, PRs, secrets; use the github-change-control skill when relevant.
+- **GitHub**: Change control, PRs, secrets; use the github-change-control skill when relevant. PRs must use the PR template with Traceability, Doc links, and traceability labels (see [CONTRIBUTING](CONTRIBUTING.md) and [ContextStream mapping §1.4](docs/guides/contextstream-mapping.md#14-linking-pull-requests-to-tech-plans-and-prds-graph-visible)). When introducing a new PRD or tech plan, add traceability-mapping and labels in the same PR; labels sync on PR open.
 - **Security**: Secrets hygiene, auth, Cloudflare security, CI security, test coverage for security-sensitive code; use the security skill. Canonical choices: [ADR-006 Security Choices](docs/architecture/decisions/006-security-choices.md).
 - **Terraform**: **Out of scope until explicitly introduced as a feature.** The directory `infra/terraform/` exists but is not part of the standard workflow. Do not run, document, or depend on Terraform in guides or next steps unless the user explicitly asks for Terraform/infra-as-code as a feature.
 - **Project subagents** (`.cursor/agents/`): Testing, API contract, local bootstrap, deployment, telemetry proof, and CI are subagents only (not skills). Delegate to the matching subagent; do not add skills with those names. One subagent per domain; no duplicates. See [.cursor/agents/README.md](.cursor/agents/README.md).
@@ -28,9 +28,10 @@ Project-level guidance for AI agents working in this repo.
 
 ## Conventions
 
+
 - **Leveragable lessons:** See [docs/guides/leveragable-lessons.md](docs/guides/leveragable-lessons.md) for the 12 project lessons. Apply them when making changes.
 - Prefer skills in `.cursor/skills` for domain-specific tasks.
-- **ContextStream (when MCP enabled):** (1) **Every new session (mandatory):** first action must be `session_init` then `context_smart`; on every later message, call `context_smart` at the start of your turn—do not skip. (2) **Before Grep/Read:** use ContextStream `search` (hybrid/semantic) first for code or docs. (3) **Decisions:** recall or capture via session/memory tools; after significant choices, capture with file path. (4) **Refactors:** use `graph(dependencies|impact)` before changing code. (5) **Lessons:** use `capture_lesson` when the user corrects a mistake. If ContextStream is unavailable, fall back to [AGENTS.md](AGENTS.md) and [docs/architecture/next-steps.md](docs/architecture/next-steps.md). See [development guide](docs/guides/development.md#ai-tooling-optional) and `.cursor/rules/contextstream.mdc`.
+- **ContextStream (when MCP enabled):** See [.cursor/rules/contextstream.mdc](.cursor/rules/contextstream.mdc) for bootstrap, search-first, decisions, graph, and lessons. If ContextStream is unavailable, fall back to this file and [docs/architecture/next-steps.md](docs/architecture/next-steps.md). See [development guide](docs/guides/development.md#ai-tooling-optional).
 - **Documentation**: Use the cursor-project-docs skill; canonical docs in `docs/`. Follow PRD → HLD → Tech Plan.
 - **Implementation order**: Follow [docs/architecture/next-steps.md](docs/architecture/next-steps.md). Layout: `apps/api/` (Worker), `apps/plugin/` (SimHub plugin). Current step: test locally, then deploy (Wrangler); Terraform is not in scope.
 - Do not commit secrets, tokens, or `.dev.vars` / `.env` files with credentials.

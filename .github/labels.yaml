@@ -1,0 +1,78 @@
+# Traceability labels for PR ↔ Tech Plan ↔ PRD (ContextStream).
+# Sync to GitHub via .github/workflows/sync-labels.yml.
+# Resolve doc paths via .github/traceability-mapping.yaml.
+
+# PRDs
+- name: prd:PRD-001
+  color: '0E8A16'
+  description: SimHub Plugin POC
+- name: prd:PRD-002
+  color: '0E8A16'
+  description: Telemetry Heartbeat System
+- name: prd:PRD-003
+  color: '0E8A16'
+  description: Heartbeat Validation
+- name: prd:PRD-004
+  color: '0E8A16'
+  description: Race Submission Requirements
+- name: prd:PRD-005
+  color: '0E8A16'
+  description: Telemetry Continuity Validation
+- name: prd:PRD-006
+  color: '0E8A16'
+  description: Challenge-Response System
+- name: prd:PRD-007
+  color: '0E8A16'
+  description: Free Cloudflare Security Integration
+- name: prd:PRD-008
+  color: '0E8A16'
+  description: GitHub Labels and PR Traceability
+- name: prd:PRD-009
+  color: '0E8A16'
+  description: ContextStream and Agent/Cursor Interactions
+- name: prd:PRD-010
+  color: '0E8A16'
+  description: Brand and Design
+
+# Tech plans (SimHub POC)
+- name: tech-plan:TP-SPOC-001
+  color: '1D76DB'
+  description: Plugin Skeleton, SDK, Config
+- name: tech-plan:TP-SPOC-002
+  color: '1D76DB'
+  description: Auth (PKCE, Token Storage)
+- name: tech-plan:TP-SPOC-003
+  color: '1D76DB'
+  description: API Client and Heartbeat
+- name: tech-plan:TP-SPOC-004
+  color: '1D76DB'
+  description: Minimal SimHub UI
+- name: tech-plan:TP-SPOC-005
+  color: '1D76DB'
+  description: POC Testing and Completion
+
+# Tech plans (Telemetry Proof System)
+- name: tech-plan:TP-001
+  color: '1D76DB'
+  description: Telemetry Heartbeat System
+- name: tech-plan:TP-002
+  color: '1D76DB'
+  description: Heartbeat Validation
+- name: tech-plan:TP-003
+  color: '1D76DB'
+  description: Race Submission Requirements
+- name: tech-plan:TP-004
+  color: '1D76DB'
+  description: Telemetry Continuity Validation
+- name: tech-plan:TP-005
+  color: '1D76DB'
+  description: Challenge-Response System
+- name: tech-plan:TP-008
+  color: '1D76DB'
+  description: Labels and Traceability
+- name: tech-plan:TP-009
+  color: '1D76DB'
+  description: ContextStream and Cursor Rules
+- name: tech-plan:TP-010
+  color: '1D76DB'
+  description: Brand Alignment (Gate, landing, design-system)

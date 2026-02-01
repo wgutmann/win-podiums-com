@@ -1,5 +1,8 @@
 using System;
 using System.Threading.Tasks;
+using System.Windows.Media;
+using GameReaderCommon;
+using SimHub.Plugins;
 using WinPodiums.Plugin.Auth;
 using WinPodiums.Plugin.Services;
 
@@ -7,23 +10,42 @@ namespace WinPodiums.Plugin.Core
 {
     /// <summary>
     /// SimHub plugin entry point. Phase 1: manual token auth + one heartbeat API call.
-    /// When SimHub SDK is added, implement IPlugin and wire these to properties/actions.
-    /// See docs/design/components/simhub-plugin.md.
+    /// Implements IPlugin and IDataPlugin so SimHub loads the DLL. See docs/design/components/simhub-plugin.md.
     /// </summary>
-    public class PluginMain
+    [PluginName("WinPodiums")]
+    [PluginDescription("WinPodiums telemetry verification and podium submission.")]
+    [PluginAuthor("WinPodiums")]
+    public class PluginMain : IPlugin, IDataPlugin
     {
         private ApiClient? _apiClient;
         private string _apiBaseUrl = "https://winpodiums.com";
 
-        public void Init()
+        /// <summary>Instance of the current plugin manager (set by SimHub).</summary>
+        public PluginManager PluginManager { get; set; } = null!;
+
+        /// <summary>Left menu icon (24x24). Null uses default.</summary>
+        public ImageSource? PictureIcon => null;
+
+        /// <summary>Short title in SimHub left menu.</summary>
+        public string LeftMenuTitle => "WinPodiums";
+
+        /// <summary>Called once after plugin startup. Keeps existing Init logic.</summary>
+        public void Init(PluginManager pluginManager)
         {
+            PluginManager = pluginManager;
             _apiClient = new ApiClient(_apiBaseUrl);
-            // TODO: Add SimHub SDK reference and implement IPlugin.Init(PluginManager)
         }
 
-        public void End()
+        /// <summary>Called every game data update. No-op for POC (position detection deferred).</summary>
+        public void DataUpdate(PluginManager pluginManager, ref GameData data)
         {
-            // TODO: Implement IPlugin.End(PluginManager)
+            // Phase 1: no telemetry processing; heartbeat is triggered separately.
+        }
+
+        /// <summary>Called at plugin manager stop. Keeps existing End logic.</summary>
+        public void End(PluginManager pluginManager)
+        {
+            _apiClient = null;
         }
 
         /// <summary>

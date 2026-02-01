@@ -55,16 +55,32 @@ When handling change control or repo governance:
 - [ ] Add patterns to .gitignore and update docs with secure workflows.
 - [ ] Suggest secret scanning and pre-commit checks when relevant.
 
+## PR traceability (required)
+
+When **creating or updating a PR**, the agent must:
+
+1. **Fill the PR template** (Summary, **Traceability** with Implements: TP-XXX and PRD: PRD-XXX, **Doc links** to PRD/TP docs, Risk, Test plan, Rollback, Product impact). Resolve doc paths from [.github/traceability-mapping.yaml](../../../.github/traceability-mapping.yaml) for Doc links and for ContextStream implementation events.
+2. **Apply traceability labels** from [.github/labels.yaml](../../../.github/labels.yaml) (e.g. `prd:PRD-001`, `tech-plan:TP-SPOC-001`) so the GitHub UI and ContextStream can associate the PR with the tech plan and PRD. Use the traceability mapping to pick the correct labels for the declared TP-XXX and PRD-XXX.
+3. **When adding a new PRD or tech plan**: Add entries to `.github/traceability-mapping.yaml` and `.github/labels.yaml` in the same PR. The Sync labels workflow runs on PRs that change `labels.yaml`, so new labels are available when the PR is opened; apply them to the PR. Do not create a separate labels-only branch.
+
+See [.github/PULL_REQUEST_TEMPLATE.md](../../../.github/PULL_REQUEST_TEMPLATE.md) and [ContextStream mapping §1.4](../../../docs/guides/contextstream-mapping.md#14-linking-pull-requests-to-tech-plans-and-prds-graph-visible).
+
 ## Output Templates
 
 ### PR Description Template
 
-Use this when drafting a PR summary:
+Use this when drafting a PR summary (include Traceability and Doc links per the PR template):
 
 ```
 ## Summary
 - [what changed]
 - [why it changed]
+
+## Traceability (ContextStream / knowledge graph)
+- Implements (Tech Plan): [TP-XXX or none]
+- PRD: [PRD-XXX or none]
+- Doc links: [links from .github/traceability-mapping.yaml]
+- Labels: [prd:PRD-XXX, tech-plan:TP-XXX from .github/labels.yaml]
 
 ## Risk
 - [low/medium/high] [brief rationale]

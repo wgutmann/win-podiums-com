@@ -1,0 +1,30 @@
+# Sync traceability labels from .github/labels.yaml to the repository.
+# See docs/guides/contextstream-mapping.md and CONTRIBUTING.md.
+
+name: Sync labels
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/labels.yaml']
+  pull_request:
+    branches: [main]
+    paths: ['.github/labels.yaml']
+
+permissions:
+  issues: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/labels.yaml
+
+      - uses: EndBug/label-sync@v2
+        with:
+          config-file: .github/labels.yaml
+          delete-other-labels: false
+          token: ${{ secrets.GITHUB_TOKEN }}

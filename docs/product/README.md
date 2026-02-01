@@ -23,7 +23,10 @@ Each PRD includes:
 
 ## Feature Areas
 
+- [Brand and Design](brand/) - Design system, web presence, PM personality; Gate and landing align to brand (PRD-010, TP-010)
 - [Cloudflare Security](cloudflare-security/) - Free Cloudflare security (DDoS, SSL, WAF, Bot Fight, Zero Trust, Worker rate limiting)
+- [ContextStream and Agents](contextstream-agents/) - ContextStream MCP integration and agent/Cursor interaction rules (PRD-009, TP-009)
+- [GitHub Traceability](github-traceability/) - Labels as code, traceability mapping, PR template (PRD-008, TP-008)
 - [SimHub Plugin POC](simhub-plugin-poc/) - Minimal plugin proof-of-concept (browser auth primary; manual token debug-only, feature-flagged; one verification API call)
 - [Telemetry Proof System](telemetry-proof-system/) - Multi-layered security system
 

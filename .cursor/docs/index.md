@@ -52,7 +52,8 @@ A merit-based luxury community for elite sim racers, verified through real-time 
 ### SimHub Plugin
 - Main entry: `apps/plugin/WinPodiums.Plugin/Core/PluginMain.cs`
 - Project: `apps/plugin/WinPodiums.Plugin/WinPodiums.Plugin.csproj` (.NET Framework 4.8)
-- See `apps/plugin/README.md` and [SimHub Plugin LLD](../../docs/design/components/simhub-plugin.md)
+- **Install**: [Plugin installation](../../apps/plugin/README.md#installation) — build, copy `WinPodiums.Plugin.dll` to `C:\Program Files (x86)\SimHub\Plugins`, restart SimHub
+- See [plugin README](../../apps/plugin/README.md) and [SimHub Plugin LLD](../../docs/design/components/simhub-plugin.md)
 - **Development handoff:** [PRD-001 SimHub Plugin POC](../../docs/product/simhub-plugin-poc/001-simhub-plugin-poc.md) and [TP-SPOC-001–005](../../docs/tech-plans/simhub-plugin-poc/README.md); implement in order 001→002→003→004→005. POC complete per [TP-SPOC-005](../../docs/tech-plans/simhub-plugin-poc/005-poc-testing-completion.md). See [Development guide — SimHub Plugin POC](../../docs/guides/development.md#simhub-plugin-poc--development-handoff).
 
 ## Development Workflow
@@ -65,7 +66,7 @@ A merit-based luxury community for elite sim racers, verified through real-time 
 
 ## Skills & Conventions
 
-This project uses [Cursor Skills](.cursor/skills/) for domain-specific tasks:
+Skills are loaded from this repo's **`.cursor/skills/`** (works in worktrees). This project uses [Cursor Skills](.cursor/skills/) for domain-specific tasks:
 - `cloudflare-workers` — Workers, D1, R2, KV, Wrangler; use when configuring or implementing Cloudflare edge/API
 - `simhub-plugin-builder` — SimHub plugin development
 - `discord-authentication` — Discord OAuth2 implementation

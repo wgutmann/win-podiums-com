@@ -86,17 +86,28 @@ Use this checklist so PRDs and tech plans stay linked and indexed as desired:
 
 **Requirement:** GitHub pull requests must link to tech plans and PRDs so the ContextStream knowledge graph shows **PR ↔ Tech Plan ↔ PRD**. Tech plans already map back to a PRD via **Implements** in each tech plan doc; PRs are linked by declaring stable IDs in the PR and by capturing an implementation event that references the PR and the doc paths.
 
+#### Traceability mapping and labels (source of truth)
+
+- **Doc ID → path:** Canonical mapping is [.github/traceability-mapping.yaml](../../.github/traceability-mapping.yaml). Use it to resolve TP-XXX and PRD-XXX to repo-relative file paths for PR **Doc links** and for ContextStream `code_refs` when capturing implementation events.
+- **Labels as code:** Traceability labels are defined in [.github/labels.yaml](../../.github/labels.yaml) and synced to GitHub via [.github/workflows/sync-labels.yml](../../.github/workflows/sync-labels.yml). Label names follow `prd:PRD-XXX` and `tech-plan:TP-XXX` so they can be parsed and resolved to paths via the traceability mapping (e.g. for automation that creates implementation events from PR labels).
+
+#### Adding new PRD or tech plan labels
+
+When you add a new PRD or tech plan (new PRD-XXX or TP-XXX), add the corresponding entries to [.github/traceability-mapping.yaml](../../.github/traceability-mapping.yaml) and [.github/labels.yaml](../../.github/labels.yaml) **in the same PR** as the new doc. The [Sync labels](../../.github/workflows/sync-labels.yml) workflow runs on PRs that change `labels.yaml` (and on push to main), so the new labels are created when the PR is opened—you can then apply them to your PR. No need to create a separate labels-only branch.
+
 #### In the repo (required)
 
 1. **PR template**  
-   Every PR must fill the **Traceability** section with stable IDs:
+   Every PR must fill the **Traceability** section with stable IDs, **Doc links**, and **Labels**:
    - **Implements (Tech Plan):** one or more `TP-XXX` IDs (e.g. `TP-SPOC-001`) or `none` if the PR is doc-only/infra.
    - **PRD:** the `PRD-XXX` ID this work traces to (e.g. `PRD-001`) or `none`.
+   - **Doc links:** Markdown links to the PRD and tech plan doc(s) using the [traceability mapping](../../.github/traceability-mapping.yaml) (e.g. [PRD-001](docs/product/simhub-plugin-poc/001-simhub-plugin-poc.md), [TP-SPOC-001](docs/tech-plans/simhub-plugin-poc/001-plugin-skeleton-sdk-config.md)).
+   - **Labels:** Apply traceability labels from [.github/labels.yaml](../../.github/labels.yaml) (e.g. `prd:PRD-001`, `tech-plan:TP-SPOC-001`).
 
-   See [.github/PULL_REQUEST_TEMPLATE.md](../../.github/PULL_REQUEST_TEMPLATE.md). Using the same IDs as in the tech plan and PRD docs lets ContextStream (and GitHub integration) associate the PR with the same document nodes.
+   See [.github/PULL_REQUEST_TEMPLATE.md](../../.github/PULL_REQUEST_TEMPLATE.md). Using the same IDs as in the tech plan and PRD docs (and the mapping for paths) lets ContextStream (and GitHub integration) associate the PR with the same document nodes.
 
-2. **Optional GitHub labels**  
-   For filter and UI clarity, you can add labels such as `tech-plan: TP-SPOC-001` and `prd: PRD-001`. If ContextStream indexes PR labels, these reinforce the link; they also help humans see traceability in the GitHub UI.
+2. **GitHub labels**  
+   Apply the traceability labels from `.github/labels.yaml` (e.g. `prd:PRD-001`, `tech-plan:TP-SPOC-001`) so the GitHub UI and any automation can resolve PR → TP/PRD. If ContextStream indexes PR labels, these reinforce the link.
 
 #### Making the link visible in the ContextStream knowledge graph UI
 
@@ -105,7 +116,7 @@ ContextStream’s graph is built from **indexed repo content** (document nodes),
 1. **Capture an implementation event when a PR is opened or merged**  
    Use ContextStream MCP:  
    `session(action="capture", event_type="implementation", title="PR #&lt;number&gt;: &lt;short summary&gt; (TP-XXX)", content="&lt;PR URL&gt;. Implements TP-XXX, PRD-XXX. &lt;one-line summary&gt;.", ...)`  
-   Include in the content (or code_refs if the MCP supports it) the **file paths** of the tech plan and PRD docs, e.g.:
+   Use [.github/traceability-mapping.yaml](../../.github/traceability-mapping.yaml) to get the **file paths** for the TP-XXX and PRD-XXX declared in the PR; include those paths in the content or in **code_refs** (if the MCP supports it), e.g.:
    - `docs/tech-plans/simhub-plugin-poc/001-plugin-skeleton-sdk-config.md`
    - `docs/product/simhub-plugin-poc/001-simhub-plugin-poc.md`
 
@@ -123,9 +134,10 @@ ContextStream’s graph is built from **indexed repo content** (document nodes),
 
 | Step | Purpose |
 |------|--------|
-| PR template: Implements (TP-XXX), PRD (PRD-XXX) | Declare traceability; same IDs as docs so search and graph can associate PR with TP and PRD. |
-| Optional labels `tech-plan: TP-XXX`, `prd: PRD-XXX` | GitHub UI and filters; may reinforce ContextStream indexing. |
-| Capture implementation event with PR URL + TP and PRD doc paths | Creates a graph node that links the PR (in content) to the TP and PRD document nodes so the link is **visible in the ContextStream knowledge graph UI**. |
+| Traceability mapping [.github/traceability-mapping.yaml](../../.github/traceability-mapping.yaml) | Canonical doc ID → path; use for Doc links and for ContextStream `code_refs`. |
+| Labels as code [.github/labels.yaml](../../.github/labels.yaml) | Traceability labels synced to GitHub; apply on PRs for UI and automation. |
+| PR template: Implements (TP-XXX), PRD (PRD-XXX), Doc links, Labels | Declare traceability; same IDs as docs; links and labels so search and graph associate PR with TP and PRD. |
+| Capture implementation event with PR URL + TP and PRD doc paths (from mapping) | Creates a graph node that links the PR (in content) to the TP and PRD document nodes so the link is **visible in the ContextStream knowledge graph UI**. |
 
 ---
 
@@ -190,19 +202,19 @@ This is optional; the main gain is from **Related** / **Implements** and consist
 
 ## 4. ContextStream tool reference
 
-This repo relies on the following ContextStream MCP tools (consolidated domain tools, v0.4.x). If the MCP server API changes, update this reference and the ContextStream rule.
+This repo relies on the following ContextStream MCP tools (consolidated domain tools, v0.4.x). **Use the exact tool names your MCP client exposes.** The server often exposes **init** and **context** (docs may say session_init and context_smart). If the MCP server API changes, update this reference and the ContextStream rule.
 
 | Tool / action | Purpose |
 |---------------|---------|
-| **session_init** | Add session in ContextStream; pass repo folder path and short context hint. Call at start of each new session. |
-| **context_smart** | Load project context (and relevant lessons) for the current message. Call after session_init. |
-| **search** | Code/docs search; use `mode=hybrid` or `mode=semantic`. Prefer before Grep/Read. |
-| **session** | `action=capture` (event_type=decision|implementation|task|…), `action=recall`, `action=get_lessons`, `action=capture_lesson`. |
-| **project** | `action=ingest_local` — index the repo (code + docs). Run once after clone or first use; repeat after major changes. |
+| **init** (session_init) | Add session in ContextStream; pass repo folder path and short context hint. Call at start of each new session. |
+| **context** (context_smart) | Load project context (and relevant lessons) for the current message. Call with format=minified, max_tokens=400 (or 800 for complex queries). Call after init. |
+| **search** | Code/docs search; use `mode=hybrid` or `mode=semantic`. Prefer before Grep/Read. Prefer **output_format=paths** for file discovery, **output_format=count** for "how many" or existence checks; use **full** only when content is needed. |
+| **session** | `action=capture` (event_type=decision|implementation|task|…); include **file path** or **code_refs** in content so the graph links the decision to the doc/module. Also `action=recall`, `action=get_lessons`, `action=capture_lesson`. |
+| **project** | `action=index_status` — check if repo is indexed; if not or stale, run `action=ingest_local`. `action=ingest_local` — index the repo (code + docs). Run once after clone or first use; repeat after major changes. |
 | **graph** | `action=dependencies`, `action=impact` (target=…), `action=ingest` (full graph, Elite/Team). Also `action=related` (node_id), `action=path` (source_id, target_id), `action=decisions` — use these to surface more node relationships. Use before refactors. |
 | **memory** | `action=create_task` for tasks tied to a plan; use with reminder for “do this before deploy”. |
 
-See [ContextStream MCP docs](https://contextstream.io/docs/mcp/tools) for full tool catalog and parameters.
+If ContextStream is configured with Router or progressive mode, fewer tools may be exposed; use the tools your client lists. See [ContextStream MCP docs](https://contextstream.io/docs/mcp/tools) for full tool catalog and parameters.
 
 ---
 
@@ -215,5 +227,5 @@ See [ContextStream MCP docs](https://contextstream.io/docs/mcp/tools) for full t
 - **To-dos** = repo checklist + ContextStream **tasks** / **reminders** for AI-aware follow-up.
 - **Graph**: run **project(ingest_local)** and use **graph(dependencies, impact)**; optionally **graph(ingest)** for full graph; link decisions to file/module paths.
 - **Tagging**: stable IDs (PRD-XXX, ADR-XXX, TP-XXX), Related/Implements, index READMEs, diagram labels, cross-links so ContextStream can build useful metadata and relate content.
-- **Tool reference**: See [section 4](#4-contextstream-tool-reference) for the tools this repo uses (session_init, context_smart, search, session, project, graph, memory); update if the MCP server API changes.
-- **PR ↔ Tech Plan ↔ PRD**: PR template requires **Traceability** (Implements: TP-XXX, PRD: PRD-XXX). Capture an implementation event with PR URL and TP/PRD doc paths so the link is visible in the ContextStream knowledge graph UI. Tech plans already map to PRD via Implements in the repo. See [§1.4](#14-linking-pull-requests-to-tech-plans-and-prds-graph-visible).
+- **Tool reference**: See [section 4](#4-contextstream-tool-reference) for the tools this repo uses (init, context, search, session, project, graph, memory); update if the MCP server API changes.
+- **PR ↔ Tech Plan ↔ PRD**: PR template requires **Traceability** (Implements: TP-XXX, PRD: PRD-XXX), **Doc links** (from [.github/traceability-mapping.yaml](../../.github/traceability-mapping.yaml)), and **Labels** (from [.github/labels.yaml](../../.github/labels.yaml)). Capture an implementation event with PR URL and TP/PRD doc paths (from the mapping) so the link is visible in the ContextStream knowledge graph UI. See [§1.4](#14-linking-pull-requests-to-tech-plans-and-prds-graph-visible).

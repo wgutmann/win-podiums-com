@@ -33,6 +33,7 @@
 3. API: **http://localhost:8787**
    - Health: **http://localhost:8787/health** or **http://localhost:8787/api/health**
    - Gate: **http://localhost:8787/** or **http://localhost:8787/gate**
+   - **API docs (Swagger):** **http://localhost:8787/api-docs** — each endpoint is documented in Swagger; spec source is `docs/api/openapi.yaml`.
 4. Live reload: edits under `apps/api/src/` are reflected (volume mount). Config in `wrangler.toml` is baked into the image; rebuild to change it.
 
 Compose uses `env_file: ./apps/api/.dev.vars` so the container gets the same secrets the Worker expects. The Dockerfile sets `CLOUDFLARE_INCLUDE_PROCESS_ENV=true` so Wrangler passes those env vars into the Worker (config match). Wrangler is started with `--ip 0.0.0.0` so the API is reachable from the host (port 8787) for tests and the plugin.
@@ -62,11 +63,7 @@ If the API is not running, `npm test` will fail with a clear message: "Start Doc
 
 ### Smoke test
 
-`apps/api/test/smoke.js` runs against the Dockerized API and checks:
-
-- **Health**: `GET /api/health` → `{ ok: true, env: "dev" }` (Worker and Docker config 1:1).
-- **404**: `GET /api/nonexistent` → 404 and JSON `{ success: false, error: "not_found" }`.
-- **401**: `POST /api/plugin/verify` without auth → 401 and JSON `{ success: false, error: "unauthorized" }`.
+`apps/api/test/smoke.js` runs against the Dockerized API and validates: (1) Docker and Worker config match — `GET /api/health` returns `{ ok: true, env: "dev" }`; (2) error shapes — 404 for unknown routes (`GET /api/nonexistent`) and 401 for protected routes without auth (`POST /api/plugin/verify`); (3) **API documentation loads** — `GET /api-docs` and `GET /api-docs/openapi.yaml` are reachable (Swagger UI and valid OpenAPI 3 spec). Each API endpoint is documented in `docs/api/openapi.yaml` and surfaced in Swagger.
 
 **CI**: GitHub Actions runs the same test on push/PR to `main` when `apps/api/`, Dockerfile, or compose change (`.github/workflows/worker-test.yml`): build Docker, start API, run smoke test.
 
@@ -195,7 +192,7 @@ GitHub Actions run on push and pull requests to `main` (path filters apply so on
 
 | Workflow | Purpose |
 |----------|---------|
-| **worker-test** (`.github/workflows/worker-test.yml`) | Build Docker, start API, run smoke test (health, 404, 401). Triggered when `apps/api/`, Dockerfile, or compose change. |
+| **worker-test** (`.github/workflows/worker-test.yml`) | Build Docker, start API, run smoke test (health, 404, 401, API docs). Triggered when `apps/api/`, Dockerfile, or compose change. |
 | **security** (`.github/workflows/security.yml`) | Secret scanning (TruffleHog), npm and .NET dependency audits, CodeQL (TypeScript + C#). |
 | **CI** (`.github/workflows/ci.yml`) | TypeScript typecheck, ESLint, plugin build (.NET), lockfile check (`apps/api/package-lock.json`), OpenAPI validation (Spectral). Triggered when `apps/api/`, `apps/plugin/`, or `docs/api/` change. |
 

@@ -1,0 +1,110 @@
+# Security: secret scanning, dependency audits, and code scanning (SAST).
+# Runs on push to main and on pull requests; blocks merge if critical issues are found.
+name: Security
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  security-events: write
+  actions: read
+
+jobs:
+  # --- Secret scanning (commits and working tree) ---
+  secrets:
+    name: Secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: TruffleHog (secrets)
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          extra_args: --only-verified
+
+  # --- Dependency vulnerability checks ---
+  deps-npm:
+    name: npm audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "20"
+          cache: "npm"
+          cache-dependency-path: apps/api/package-lock.json
+
+      - name: Install and audit (API)
+        run: |
+          cd apps/api && npm ci
+          npm audit --audit-level=high
+
+  deps-dotnet:
+    name: .NET vulnerable packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore and list vulnerable packages
+        run: |
+          cd apps/plugin/WinPodiums.Plugin
+          dotnet restore
+          OUT=$(dotnet list package --vulnerable --include-transitive 2>&1) || true
+          echo "$OUT"
+          # Fail only when dotnet reports that vulnerabilities exist (not on "has no vulnerable packages")
+          if echo "$OUT" | grep -qE "has the following vulnerable|following package.*have known vulnerabilities"; then
+            echo "::error::Vulnerable NuGet package(s) found. Update or remove them."
+            exit 1
+          fi
+
+  # --- Code scanning (SAST) with CodeQL ---
+  codeql:
+    name: CodeQL
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      actions: read
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [javascript-typescript, csharp]
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v3
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-extended
+
+      - name: Setup .NET
+        if: matrix.language == 'csharp'
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Build C# project
+        if: matrix.language == 'csharp'
+        run: |
+          cd apps/plugin/WinPodiums.Plugin
+          dotnet build --configuration Release
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v3
+        with:
+          category: "/language:${{ matrix.language }}"

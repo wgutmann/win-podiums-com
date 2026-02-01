@@ -67,6 +67,7 @@ ContextStream indexes file content and builds metadata from structure and links.
 | **Index READMEs** | Each major area (`docs/architecture/`, `docs/product/`, `docs/tech-plans/`, etc.) should have a README that lists documents and diagrams with short descriptions. ContextStream indexes these; they become “hubs” that connect sections. |
 | **Diagram labels** | For Mermaid or `.mmd` files, use a clear heading or filename (e.g. `system-overview.mmd`, “## System Overview Diagram”). Reference them from the architecture README (or design README) so “diagram” content is discoverable. |
 | **Cross-links between related areas** | Link PRD → HLD → Tech Plan → API docs (and back) so that when ContextStream indexes, “related” content is one hop away. |
+| **API docs (OpenAPI / Swagger)** | Each Worker endpoint is documented in **docs/api/openapi.yaml**; Swagger UI is served at **/api-docs**. Keep the spec in sync when adding or changing routes; smoke test ensures API documentation loads. |
 
 ### Optional: explicit labels in doc body
 

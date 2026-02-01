@@ -21,6 +21,7 @@ import {
   getProfile,
   recordHeartbeat,
 } from "./lib/user";
+import type { AuthMethod } from "./lib/user";
 import { openApiYaml } from "./openapi-spec";
 
 export interface Env {

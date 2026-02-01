@@ -245,6 +245,17 @@ All documents must include:
 ### All → API Specs
 - Documents reference API specs: `[API Specification](../../api/...)`
 
+### ContextStream-friendly structure
+
+Consistent IDs and cross-links help AI tools (e.g. [ContextStream](https://contextstream.io)) index and relate content. Use:
+
+- **Stable document IDs** in titles and in Related/Implements: `PRD-XXX`, `ADR-XXX`, `TP-XXX`.
+- **Related / Implements** in every PRD, ADR, and Technical Plan so related docs are one hop away.
+- **Index READMEs** in each major area that list documents and diagrams with short descriptions.
+- **Diagram labels**: clear filenames or headings (e.g. `system-overview.mmd`, `## System Overview Diagram`) and links from the architecture or design README.
+
+See [ContextStream mapping](../guides/contextstream-mapping.md) for full parallels (PRD↔plans, docs↔memory, lessons, to-dos), graph usage, and tagging.
+
 ## Index Files
 
 Each directory must have a `README.md` that:
@@ -279,9 +290,11 @@ Each directory must have a `README.md` that:
 ## Examples
 
 See:
-- [PRD Template](../product/templates/prd-template.md)
-- [Technical Plan Template](../tech-plans/templates/technical-plan-template.md)
-- [ADR Template](../architecture/decisions/template.md)
+- [Product (PRD) index](../product/README.md) and [Phase 1 scope](../product/phase-1-mvp-scope.md) for PRD structure
+- [Tech plans index](../tech-plans/README.md) for Technical Plan structure
+- [Architecture decisions](../architecture/decisions/) for ADR format (e.g. 001-cloudflare-stack.md)
+
+Templates (prd-template, technical-plan-template, ADR template) can be added under `docs/product/`, `docs/tech-plans/`, and `docs/architecture/decisions/` when needed.
 
 ## Related Documentation
 

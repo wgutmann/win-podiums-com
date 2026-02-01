@@ -24,6 +24,7 @@ A merit-based luxury community for elite sim racers, verified through real-time 
 ### Developer Guides
 - [Development Setup](../../docs/guides/development.md) — Run and test locally with Docker; tests run against the Dockerized API
 - [Deployment Guide](../../docs/guides/deployment.md) — Release process (TBD)
+- [ContextStream mapping](../../docs/guides/contextstream-mapping.md) — Repo docs ↔ ContextStream parallels (PRD↔plans, diagrams, lessons, to-dos), graph usage, tagging
 
 ## Project Summary
 

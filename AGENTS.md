@@ -20,6 +20,7 @@ Project-level guidance for AI agents working in this repo.
 ## Conventions
 
 - Prefer skills in `.cursor/skills` for domain-specific tasks.
+- **ContextStream (when MCP enabled):** (1) **Every new session:** call `session_init` (repo folder path + short context hint) then `context_smart`. If ContextStream MCP is unavailable or returns no useful context, fall back to reading [AGENTS.md](AGENTS.md) and [docs/architecture/next-steps.md](docs/architecture/next-steps.md). (2) **Before Grep/Read:** use ContextStream `search` (hybrid/semantic) first for code or docs. (3) **Decisions:** recall or capture via session/memory tools; after significant choices, capture with file path. (4) **Refactors:** use `graph(dependencies|impact)` before changing code. (5) **Lessons:** use `capture_lesson` when the user corrects a mistake. See [development guide](docs/guides/development.md#ai-tooling-optional) and `.cursor/rules/contextstream.mdc`.
 - **Documentation**: Use the cursor-project-docs skill; canonical docs in `docs/`. Follow PRD → HLD → Tech Plan.
 - **Implementation order**: Follow [docs/architecture/next-steps.md](docs/architecture/next-steps.md). Layout: `apps/api/` (Worker), `apps/plugin/` (SimHub plugin). Current step: test locally, then deploy (Wrangler); Terraform is not in scope.
 - Do not commit secrets, tokens, or `.dev.vars` / `.env` files with credentials.

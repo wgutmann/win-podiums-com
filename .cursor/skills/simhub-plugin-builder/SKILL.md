@@ -9,6 +9,8 @@ description: Build SimHub plugins with C#/.NET: scaffold projects, set up build/
 
 Use this skill when the user asks to build or maintain SimHub plugins. Follow the checklists and confirm any SimHub SDK requirements directly from the installed SDK or official docs.
 
+**ContextStream (when available):** Before scaffolding or changing the plugin, use ContextStream `search` for "SimHub", "plugin", "PluginMain", "ApiClient" to find existing structure in `apps/plugin/`. After plugin structure or API-client decisions, capture in ContextStream (event_type=decision) with path to `apps/plugin/` or relevant doc.
+
 ## New Plugin Workflow
 
 Checklist:

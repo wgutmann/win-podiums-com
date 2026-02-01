@@ -32,11 +32,8 @@ WinPodiums is a **microservices architecture** deployed on **Cloudflare Edge Net
 
 ## Diagrams
 
-Key architecture diagrams:
-
-- [System Overview](diagrams/system-overview.mmd) — Component relationships
-- [Data Flow](diagrams/data-flow.mmd) — Request/response patterns
-- [Auth Flows](../design/integrations/discord-integration.md#sequence-diagrams) — Authentication sequences
+- [Diagrams folder](diagrams/README.md) — Place `system-overview.mmd`, `data-flow.mmd` here when added
+- [Auth Flows](../design/integrations/discord-integration.md#sequence-diagrams) — Authentication sequences (inline Mermaid in Discord integration doc)
 
 ## For Developers
 

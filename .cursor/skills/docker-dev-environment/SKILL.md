@@ -11,6 +11,8 @@ Use this skill when the user asks to create or standardize a **Docker** or **Doc
 
 **Flow**: (1) Detect existing Docker artifacts. (2) Choose minimal setup (Dockerfile-only vs Compose). (3) Ensure local and repo config stay in parity. (4) Provide run/debug/monitor workflows and verify them. (5) Define local and CI tests for Docker stability.
 
+**ContextStream (when available):** Before changing Docker/Compose, use ContextStream `search` for "Docker", "compose", "wrangler", "Worker" to find existing setup and parity decisions. After Docker/parity decisions, capture in ContextStream (event_type=decision) with path to Dockerfile, compose.yaml, or docs/guides/development.md.
+
 ## Scope
 
 - **In scope**: Dockerfile and Docker Compose creation, local/repo config parity, execution (build/run), debugging (shell, logs, env, networks), monitoring (stats, state, disk, cleanup), and validation in CI.

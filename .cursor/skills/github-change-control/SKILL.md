@@ -12,6 +12,8 @@ When handling change control or repo governance:
 2. Apply the relevant checklist below.
 3. Provide output as a checklist plus a concise template when needed.
 
+**ContextStream (when available):** Before editing CONTRIBUTING, SECURITY, .gitignore, or CHANGELOG, use ContextStream `search` for "branch protection", "secrets", "CONTRIBUTING" to find existing policy. Recall or capture change-control decisions (e.g. branch protection, secret policy) in ContextStream with path to the doc.
+
 ## Change Control Checklist
 
 - [ ] Scope: summarize what is changing and why.

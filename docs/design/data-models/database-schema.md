@@ -508,5 +508,5 @@ async function updateUserProfile(discordId: string, updates: Partial<User>, env:
 - [Workers KV Docs](https://developers.cloudflare.com/kv/)
 - [SQLite Documentation](https://www.sqlite.org/docs.html)
 - [Cost Optimization ADR](../../architecture/decisions/005-cost-optimized-cloudflare.md)
-- [Data Model Diagram](../diagrams/entity-relationship.mmd)
+- [Design diagrams](../diagrams/README.md) — Add `entity-relationship.mmd` when ready
 - [API Data Contracts](../../api/) — Request/response schemas

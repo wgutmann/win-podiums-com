@@ -11,6 +11,8 @@ Use this skill when the user asks to **document the repo**, **create PRDs**, **c
 
 **Flow**: (1) Start with PRDs to define product requirements. (2) Create HLD for system architecture. (3) Create Tech Plans for implementation details. (4) Populate Cursor's doc section (`.cursor/docs/`) for indexing context.
 
+**ContextStream (when available):** Before creating or editing docs, use ContextStream `search` to find related PRDs, ADRs, tech plans. After adding or updating a key doc (PRD, ADR, tech plan), capture a short decision in ContextStream with title and path (e.g. "Added ADR-001" → `docs/architecture/decisions/001-cloudflare-stack.md`). See [ContextStream mapping](../../../docs/guides/contextstream-mapping.md).
+
 ## Scope
 
 - **In scope**: How we document the repository — GitHub repo docs (README, CONTRIBUTING, SECURITY, CHANGELOG, etc.), product requirements (PRDs), high-level design (HLD), tech plans (implementation specs), and populating `.cursor/docs/` from them.
@@ -98,15 +100,10 @@ Organize documentation in `docs/` with clear separation by document type:
 
 ```
 docs/
-├── prd/                          # Product Requirements Documents
+├── product/                      # Product Requirements Documents (PRDs)
 │   ├── README.md                 # PRD index and overview
-│   ├── winpodiums-core.md        # Core product PRD
-│   ├── features/                 # Feature-specific PRDs
-│   │   ├── authentication.md
-│   │   ├── podium-verification.md
-│   │   └── member-dashboard.md
-│   └── templates/
-│       └── prd-template.md       # PRD template for new features
+│   ├── phase-1-mvp-scope.md      # Phase / feature scope
+│   └── {feature-area}/           # Feature-specific PRDs (e.g. telemetry-proof-system/)
 ├── architecture/                 # High-Level Design (HLD)
 │   ├── README.md                 # Architecture overview and index
 │   ├── high-level-design.md      # System-wide HLD
@@ -141,7 +138,7 @@ docs/
 ```
 
 **Key principles**:
-- PRDs in `docs/prd/` — ALWAYS create these FIRST
+- PRDs in `docs/product/` — ALWAYS create these FIRST
 - HLD in `docs/architecture/` — system-wide architecture, created AFTER PRD approval
 - Tech Plans in `docs/tech-plans/` — implementation details, created AFTER HLD approval
 - API specs in `docs/api/` — interface contracts (can be part of tech plans)
@@ -153,7 +150,7 @@ docs/
 
 ```
 1. PRD Phase
-   └── Create PRD in docs/prd/
+   └── Create PRD in docs/product/
    └── Get stakeholder approval
    └── PRD defines WHAT and WHY
 
@@ -216,7 +213,7 @@ When existing documentation doesn't follow the PRD → HLD → Tech Plan hierarc
 
 ### If starting with an HLD that's too detailed:
 
-1. **Extract PRD content**: User stories, acceptance criteria, feature requirements → `docs/prd/`
+1. **Extract PRD content**: User stories, acceptance criteria, feature requirements → `docs/product/`
 2. **Keep HLD content**: Architecture diagrams, component responsibilities, technology choices → `docs/architecture/`
 3. **Move to Tech Plans**: API specs, database schemas, detailed sequences, code patterns → `docs/tech-plans/`
 
@@ -242,6 +239,21 @@ When existing documentation doesn't follow the PRD → HLD → Tech Plan hierarc
 - Each HLD section should reference which PRD requirements it addresses
 - Each Tech Plan should reference which HLD component it implements
 - Use consistent naming: `PRD-001`, `HLD-001`, `TP-001` for cross-references
+
+## ContextStream parallels (optional)
+
+When ContextStream MCP is enabled, repo docs map to ContextStream memory for better AI context:
+
+| Repo | ContextStream | Usage |
+|------|---------------|--------|
+| **PRD** | Plans + decisions | Capture key product decisions as `event_type="decision"`; optional `capture_plan` with steps; link content to `docs/product/`. |
+| **ADR / Tech Plan** | Decisions + implementation | After writing/updating an ADR or tech plan, capture a short decision (title + path to doc). |
+| **Technical docs** | Indexed repo + memory | Use **Related** / **Implements** and stable IDs (PRD-XXX, ADR-XXX, TP-XXX) in every doc so ContextStream can relate content. |
+| **Diagrams** (Mermaid, .mmd) | Indexed as file content | Use consistent headings/filenames and link from READMEs (e.g. architecture README) so diagram content is discoverable. |
+| **Lessons** (mistakes) | ContextStream only | Use `capture_lesson` for "don't repeat this"; keep procedures in `docs/guides/`. |
+| **To-dos / tasks** | Tasks + reminders | Repo checklist = human source; ContextStream tasks/reminders for AI-aware follow-up. |
+
+See [ContextStream mapping](../../../docs/guides/contextstream-mapping.md) for full parallels, graph usage (ingest_local, dependencies, impact), and tagging guidance.
 
 ## Anti-Patterns
 

@@ -69,6 +69,10 @@ Use **user OAuth2** when the plugin acts on behalf of a signed-in user (e.g. "Lo
 - [ ] Request only the bot permissions the plugin needs (invite URL / OAuth2 URL with `bot` scope and minimal permissions).
 - [ ] Isolate bot token storage and usage from user OAuth2 tokens; use separate config/key names.
 
+## ContextStream (when available)
+
+- Before adding or changing auth code, use ContextStream `search` (mode=hybrid) for "Discord OAuth", "token exchange", "PKCE", "plugin auth" to find existing flows in `apps/api/` and `apps/plugin/`. After auth-related decisions (e.g. scopes, PKCE, redirect URI), capture in ContextStream (event_type=decision) with path to Worker or plugin file.
+
 ## Additional Notes
 
 - Always confirm current Discord OAuth2 endpoints and required parameters in the official docs.

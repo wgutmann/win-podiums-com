@@ -7,6 +7,7 @@ alwaysApply: false
 # Documentation Rules
 
 - Follow **PRD → HLD → Tech Plan**: product requirements first, then architecture, then implementation specs. Use the cursor-project-docs skill and [documentation-standards.md](../../docs/standards/documentation-standards.md).
+- **ContextStream (when available):** Before creating or editing docs, use ContextStream `search` to find related PRDs, ADRs, tech plans. After adding or updating a key doc, capture a short decision in ContextStream with path to the doc (e.g. "Added PRD-001" → `docs/product/...`).
 - Keep each doc focused on one subject. Use `README.md` as the index in each subdirectory.
 - **docs/product/** — PRDs (what and why). **docs/architecture/** — HLD and ADRs (how at system level). **docs/tech-plans/** — implementation specs (how at code level). **docs/design/** — component and integration design.
 - When adding or changing docs, maintain traceability: HLD sections reference PRD requirements; tech plans reference HLD components. Use consistent cross-references (e.g. PRD-001, ADR-002).

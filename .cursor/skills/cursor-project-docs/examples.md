@@ -139,7 +139,7 @@ High-level structure; derived from README and codebase.
 - [Main executable, API entry, or config]
 ```
 
-## Template: docs/prd/[feature-name].md (PRD)
+## Template: docs/product/[feature-name].md (PRD)
 
 ```markdown
 # PRD: [Feature Name]
@@ -228,7 +228,7 @@ High-level structure; derived from README and codebase.
 - [Link to competitive analysis]
 ```
 
-## Template: docs/prd/README.md (PRD Index)
+## Template: docs/product/README.md (PRD Index)
 
 ```markdown
 # Product Requirements Documents
@@ -517,7 +517,7 @@ Each Tech Plan should:
 | CONTRIBUTING | index.md link; conventions.md key rules |
 | SECURITY | index.md link |
 | CHANGELOG | index.md link |
-| docs/prd/* | index.md link to PRD index |
+| docs/product/* | index.md link to PRD index |
 | docs/architecture/high-level-design.md | architecture.md summary; link to full HLD |
 | docs/tech-plans/* | architecture.md component list; links to tech plans |
 | docs/api/* | index.md link to API docs location |

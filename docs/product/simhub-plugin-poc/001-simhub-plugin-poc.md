@@ -1,6 +1,6 @@
-# PRD-001: SimHub Plugin POC
+# PRD-SPOC-001: SimHub Plugin POC
 
-**Doc type**: PRD | **ID**: PRD-001 | **Related**: [Phase 1 MVP Scope](../phase-1-mvp-scope.md), [SimHub Plugin LLD](../../design/components/simhub-plugin.md), [API plugin](../../api/plugin.md), [ADR-002](../../architecture/decisions/002-discord-oauth.md), [ADR-003](../../architecture/decisions/003-hybrid-auth-paths.md) | **Technical Plans**: [TP-SPOC-001](../../tech-plans/simhub-plugin-poc/001-plugin-skeleton-sdk-config.md), [TP-SPOC-002](../../tech-plans/simhub-plugin-poc/002-auth-pkce-token-storage.md), [TP-SPOC-003](../../tech-plans/simhub-plugin-poc/003-api-client-heartbeat.md), [TP-SPOC-004](../../tech-plans/simhub-plugin-poc/004-minimal-simhub-ui.md), [TP-SPOC-005](../../tech-plans/simhub-plugin-poc/005-poc-testing-completion.md) (docs/tech-plans/simhub-plugin-poc/)
+**Doc type**: PRD | **ID**: PRD-SPOC-001 | **Related**: [Phase 1 MVP Scope](../phase-1-mvp-scope.md), [SimHub Plugin LLD](../../design/components/simhub-plugin.md), [API plugin](../../api/plugin.md), [ADR-002](../../architecture/decisions/002-discord-oauth.md), [ADR-003](../../architecture/decisions/003-hybrid-auth-paths.md) | **Technical Plans**: [TP-SPOC-001](../../tech-plans/simhub-plugin-poc/001-plugin-skeleton-sdk-config.md), [TP-SPOC-002](../../tech-plans/simhub-plugin-poc/002-auth-pkce-token-storage.md), [TP-SPOC-003](../../tech-plans/simhub-plugin-poc/003-api-client-heartbeat.md), [TP-SPOC-004](../../tech-plans/simhub-plugin-poc/004-minimal-simhub-ui.md), [TP-SPOC-005](../../tech-plans/simhub-plugin-poc/005-poc-testing-completion.md) (docs/tech-plans/simhub-plugin-poc/)
 
 **Status**: Draft  
 **Version**: 1.0  

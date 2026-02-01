@@ -1,6 +1,6 @@
 # TP-SPOC-005: POC Testing and Completion
 
-**Doc type**: Technical Plan | **ID**: TP-SPOC-005 | **Implements**: [PRD-001: SimHub Plugin POC](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md) | **Related**: [SimHub Plugin LLD](../../design/components/simhub-plugin.md), [API plugin](../../api/plugin.md), [001: Plugin Skeleton](001-plugin-skeleton-sdk-config.md), [002: Auth (PKCE, Token Storage)](002-auth-pkce-token-storage.md), [003: API Client and Heartbeat](003-api-client-heartbeat.md), [004: Minimal SimHub UI](004-minimal-simhub-ui.md), [Development guide](../../guides/development.md), [Next steps](../../architecture/next-steps.md)
+**Doc type**: Technical Plan | **ID**: TP-SPOC-005 | **Implements**: [PRD-SPOC-001: SimHub Plugin POC](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md) | **Related**: [SimHub Plugin LLD](../../design/components/simhub-plugin.md), [API plugin](../../api/plugin.md), [001: Plugin Skeleton](001-plugin-skeleton-sdk-config.md), [002: Auth (PKCE, Token Storage)](002-auth-pkce-token-storage.md), [003: API Client and Heartbeat](003-api-client-heartbeat.md), [004: Minimal SimHub UI](004-minimal-simhub-ui.md), [Development guide](../../guides/development.md), [Next steps](../../architecture/next-steps.md)
 
 **Status**: Draft  
 **Version**: 1.0  
@@ -35,7 +35,8 @@ graph TB
 
 ### Automated Tests (Minimum)
 
-- **API client – token exchange**: Mock or stub `POST /api/auth/token-exchange` (and optionally `POST /api/auth/discord/exchange`). Assert request URL, method, body shape (e.g. `token` or `code`, `code_verifier`, `redirect_uri`); assert response parsing (access_token, discord_id or equivalent). Protects against contract drift.
+- **API client – PKCE exchange (primary)**: Mock or stub `POST /api/auth/discord/exchange`. Assert request URL, method, body shape (`code`, `code_verifier`, `redirect_uri`); assert response parsing (access_token, discord_id or equivalent). Protects against contract drift for the primary auth path.
+- **API client – token exchange (debug only)**: Optionally mock or stub `POST /api/auth/token-exchange`. Assert request body (`token`); assert response parsing. Secondary coverage for debug-only manual token flow.
 - **API client – heartbeat**: Mock or stub `POST /api/plugin/heartbeat`. Assert request URL, method, Authorization header (Bearer), body shape (e.g. `version`); assert 200 success and 401/400 failure handling. Protects against contract drift.
 - **Token storage** (optional): Unit test Save → Load round-trip (real DPAPI on dev machine or mock that stores in memory); Clear removes data. Ensures storage logic does not regress.
 
@@ -89,7 +90,7 @@ graph TB
 
 ## Related Documentation
 
-- [PRD-001: SimHub Plugin POC](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md)
+- [PRD-SPOC-001: SimHub Plugin POC](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md)
 - [SimHub Plugin LLD](../../design/components/simhub-plugin.md)
 - [API plugin](../../api/plugin.md)
 - [001: Plugin Skeleton](001-plugin-skeleton-sdk-config.md)

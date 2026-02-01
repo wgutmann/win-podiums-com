@@ -39,6 +39,8 @@ sequenceDiagram
 
 ### Plugin Browser Launch Authentication
 
+Plugin uses a **fixed loopback port** (54321) so exactly one redirect URI is registered in the Discord app; this is recommended for security (one known URI to audit). See [TP-SPOC-002](../../tech-plans/simhub-plugin-poc/002-auth-pkce-token-storage.md) for Discord redirect URI configuration.
+
 ```mermaid
 sequenceDiagram
     participant Plugin
@@ -48,11 +50,11 @@ sequenceDiagram
     participant DB as D1 Database
 
     Plugin->>Plugin: Generate PKCE verifier/challenge
-    Plugin->>Plugin: Start loopback listener on port 54321
+    Plugin->>Plugin: Start loopback listener on port 54321 (fixed)
     Plugin->>Browser: Open Discord OAuth URL
     Browser->>Discord: User sees auth prompt
     Discord->>Browser: User grants permissions
-    Discord->>Browser: Redirect to localhost:54321/callback
+    Discord->>Browser: Redirect to 127.0.0.1:54321/callback
     Browser->>Plugin: Deliver auth code via loopback
     Plugin->>API: "POST /api/auth/discord/exchange (code + verifier)"
     API->>Discord: Exchange code for tokens

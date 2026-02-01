@@ -1,6 +1,6 @@
 # TP-SPOC-003: API Client and Heartbeat
 
-**Doc type**: Technical Plan | **ID**: TP-SPOC-003 | **Implements**: [PRD-001: SimHub Plugin POC](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md) | **Related**: [SimHub Plugin LLD](../../design/components/simhub-plugin.md), [API plugin](../../api/plugin.md), [ADR-002](../../architecture/decisions/002-discord-oauth.md), [001: Plugin Skeleton](001-plugin-skeleton-sdk-config.md), [002: Auth (PKCE, Token Storage)](002-auth-pkce-token-storage.md), [004: Minimal SimHub UI](004-minimal-simhub-ui.md)
+**Doc type**: Technical Plan | **ID**: TP-SPOC-003 | **Implements**: [PRD-SPOC-001: SimHub Plugin POC](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md) | **Related**: [SimHub Plugin LLD](../../design/components/simhub-plugin.md), [API plugin](../../api/plugin.md), [ADR-002](../../architecture/decisions/002-discord-oauth.md), [001: Plugin Skeleton](001-plugin-skeleton-sdk-config.md), [002: Auth (PKCE, Token Storage)](002-auth-pkce-token-storage.md), [004: Minimal SimHub UI](004-minimal-simhub-ui.md)
 
 **Status**: Draft  
 **Version**: 1.0  
@@ -100,7 +100,7 @@ graph LR
 
 ## Related Documentation
 
-- [PRD-001: SimHub Plugin POC](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md)
+- [PRD-SPOC-001: SimHub Plugin POC](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md)
 - [SimHub Plugin LLD](../../design/components/simhub-plugin.md)
 - [API plugin](../../api/plugin.md)
 - [001: Plugin Skeleton](001-plugin-skeleton-sdk-config.md)

@@ -2,13 +2,13 @@
 
 This directory contains the Product Requirements Document (PRD) for the SimHub plugin proof-of-concept. The POC validates plugin–API–auth integration and SimHub load before investing in full telemetry-proof and UI.
 
-**ContextStream**: PRD-001 and tech plans TP-SPOC-001–005 use stable IDs and **Related** / **Implements** for knowledge graph linking. See [ContextStream mapping](../guides/contextstream-mapping.md).
+**ContextStream**: PRD-001 and tech plans TP-SPOC-001–005 use stable IDs and **Related** / **Implements** for knowledge graph linking. See [ContextStream mapping](../../guides/contextstream-mapping.md).
 
 ## Documents
 
 | Document | Status | Version | Technical Plan | Description |
 |----------|--------|---------|----------------|-------------|
-| [PRD-001: SimHub Plugin POC](001-simhub-plugin-poc.md) | Draft | 1.0 | [TP-SPOC-001](../tech-plans/simhub-plugin-poc/001-plugin-skeleton-sdk-config.md)–[005](../tech-plans/simhub-plugin-poc/005-poc-testing-completion.md) | Minimal plugin: browser auth (PKCE) primary; manual token debug-only, feature-flagged; one verification API call (heartbeat) |
+| [PRD-001: SimHub Plugin POC](001-simhub-plugin-poc.md) | Draft | 1.0 | [TP-SPOC-001](../../tech-plans/simhub-plugin-poc/001-plugin-skeleton-sdk-config.md)–[005](../../tech-plans/simhub-plugin-poc/005-poc-testing-completion.md) | Minimal plugin: browser auth (PKCE) primary; manual token debug-only, feature-flagged; one verification API call (heartbeat) |
 
 ## Overview
 

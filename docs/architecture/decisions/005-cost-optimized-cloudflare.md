@@ -406,4 +406,4 @@ await env.DB.prepare('DELETE FROM race_results WHERE session_date < ?').bind(one
 - [Cloudflare D1 Pricing](https://developers.cloudflare.com/d1/platform/pricing/)
 - [Cloudflare R2 Pricing](https://developers.cloudflare.com/r2/pricing/)
 - [Workers KV Pricing](https://developers.cloudflare.com/kv/platform/pricing/)
-- [Cloudflare Queues Pricing](https://developers.cloudflare.com/queues/pricing/)
+- [Cloudflare Queues Pricing](https://developers.cloudflare.com/queues/platform/pricing/)

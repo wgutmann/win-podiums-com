@@ -446,6 +446,10 @@ For developers: Export as CSS variables or JavaScript/TypeScript constants.
 
 ## Related Documentation
 
+- [Brand index](README.md) — Design system, documentation template, GitHub repo template
+- [Documentation template](documentation-template.md) — Styling and structure for Markdown docs
+- [GitHub repo template](github-repo-template.md) — Repo description, README structure, PR/issue templates
+- [Documentation standards](../standards/documentation-standards.md) — Doc types, naming, metadata
 - [Figma Design File](https://figma.com/...) — (TBD: Once mockups are created)
 - [Component Library](https://storybook-url...) — (TBD: Once Storybook is set up)
 - [Brand Guidelines PDF](./WinPodiums-Brand-Guidelines.pdf) — (TBD: Export for partners)

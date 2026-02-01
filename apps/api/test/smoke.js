@@ -1,6 +1,6 @@
 /**
  * Smoke test: run against the Dockerized API (docker compose up -d).
- * Validates that Docker and Worker config match (health returns ok + env dev).
+ * Cases: health (ok + env dev), 404 (unknown route), 401 (protected route without auth).
  * Run from repo root: docker compose up -d && cd apps/api && npm test
  */
 const API_BASE = process.env.API_BASE || 'http://localhost:8787';
@@ -31,6 +31,32 @@ async function main() {
   }
 
   console.log('Smoke test passed: API health ok, env=%s', data.env);
+
+  // 404: unknown API route
+  res = await fetch(`${API_BASE}/api/nonexistent`);
+  if (res.status !== 404) {
+    console.error('Expected 404 for /api/nonexistent, got:', res.status);
+    process.exit(1);
+  }
+  const notFoundBody = await res.json();
+  if (notFoundBody.success !== false || notFoundBody.error !== 'not_found') {
+    console.error('Expected { success: false, error: "not_found" }, got:', notFoundBody);
+    process.exit(1);
+  }
+  console.log('Smoke test passed: 404 and error shape ok');
+
+  // 401: protected route without Authorization
+  res = await fetch(`${API_BASE}/api/plugin/verify`, { method: 'POST' });
+  if (res.status !== 401) {
+    console.error('Expected 401 for POST /api/plugin/verify without auth, got:', res.status);
+    process.exit(1);
+  }
+  const unauthBody = await res.json();
+  if (unauthBody.success !== false || unauthBody.error !== 'unauthorized') {
+    console.error('Expected { success: false, error: "unauthorized" }, got:', unauthBody);
+    process.exit(1);
+  }
+  console.log('Smoke test passed: 401 and error shape ok');
 }
 
 main();

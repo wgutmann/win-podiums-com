@@ -1,0 +1,2 @@
+# Minimal ruleset for OpenAPI spec validation (used by CI openapi-validate job).
+extends: ["spectral:oas"]

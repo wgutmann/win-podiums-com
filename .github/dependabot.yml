@@ -1,5 +1,4 @@
-# Dependabot: automated dependency and security updates.
-# Opens PRs for vulnerable or outdated packages; use with branch protection and CI.
+# Dependabot: automated dependency and security updates (disabled: open-pull-requests-limit set to 0).
 # https://docs.github.com/en/code-security/dependabot
 
 version: 2
@@ -12,7 +11,7 @@ updates:
     schedule:
       interval: weekly
       day: monday
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 0
     # Add labels here after creating them in repo: Settings → Labels (e.g. dependencies, security)
     commit-message:
       prefix: deps(npm)
@@ -23,7 +22,7 @@ updates:
     schedule:
       interval: weekly
       day: monday
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 0
     commit-message:
       prefix: deps(nuget)
 
@@ -33,6 +32,6 @@ updates:
     schedule:
       interval: weekly
       day: monday
-    open-pull-requests-limit: 3
+    open-pull-requests-limit: 0
     commit-message:
       prefix: ci(actions)

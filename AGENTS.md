@@ -19,6 +19,7 @@ Project-level guidance for AI agents working in this repo.
 - **GitHub**: Change control, PRs, secrets; use the github-change-control skill when relevant.
 - **Security**: Secrets hygiene, auth, Cloudflare security, CI security, test coverage for security-sensitive code; use the security skill. Canonical choices: [ADR-006 Security Choices](docs/architecture/decisions/006-security-choices.md).
 - **Terraform**: **Out of scope until explicitly introduced as a feature.** The directory `infra/terraform/` exists but is not part of the standard workflow. Do not run, document, or depend on Terraform in guides or next steps unless the user explicitly asks for Terraform/infra-as-code as a feature.
+- **Project subagents** (`.cursor/agents/`): Testing, API contract, local bootstrap, deployment, telemetry proof, and CI are subagents only (not skills). Delegate to the matching subagent; do not add skills with those names. One subagent per domain; no duplicates. See [.cursor/agents/README.md](.cursor/agents/README.md).
 
 ## Pre-push: run tests locally
 

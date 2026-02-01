@@ -123,4 +123,4 @@ id = "..."   # Use terraform output kv_namespace_id
 
 - [Database schema](../../design/data-models/database-schema.md) – D1 tables and migrations (Wrangler).
 - [High-level design](high-level-design.md) – Overall architecture.
-- [API](../../api/) – Endpoints and OpenAPI.
+- [API](../../api/README.md) – Endpoints and OpenAPI.

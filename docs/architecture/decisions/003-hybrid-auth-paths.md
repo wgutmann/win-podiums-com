@@ -145,4 +145,3 @@ To support Path B effectively, the plugin offers **three authentication methods*
 ## References
 
 - [OAuth 2.0 for Native Apps (RFC 8252)](https://datatracker.ietf.org/doc/html/rfc8252)
-- [UX Research: Authentication Timing and Conversion](https://www.nngroup.com/articles/authentication-timing/)

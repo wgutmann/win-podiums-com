@@ -56,6 +56,9 @@ nunit-*.xml
 # Node
 node_modules/
 
+# Auto-generated files (build artifacts)
+apps/api/src/openapi-spec.ts
+
 # Secrets and sensitive (never commit API keys, tokens, .env, or local overrides)
 .env
 .env.*

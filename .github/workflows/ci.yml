@@ -31,7 +31,10 @@ jobs:
           cache-dependency-path: apps/api/package-lock.json
 
       - name: Install and typecheck
-        run: npm ci && npm run typecheck
+        run: |
+          npm ci
+          node scripts/inline-openapi.js ../../docs/api/openapi.yaml src/openapi-spec.ts
+          npm run typecheck
 
   api-lint:
     name: ESLint
@@ -50,7 +53,10 @@ jobs:
           cache-dependency-path: apps/api/package-lock.json
 
       - name: Install and lint
-        run: npm ci && npm run lint
+        run: |
+          npm ci
+          node scripts/inline-openapi.js ../../docs/api/openapi.yaml src/openapi-spec.ts
+          npm run lint
 
   plugin-build:
     name: Plugin build

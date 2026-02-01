@@ -15,7 +15,7 @@ module.exports = {
     es2022: true,
     node: true,
   },
-  ignorePatterns: ["node_modules/", "test/"],
+  ignorePatterns: ["node_modules/", "test/", "src/openapi-spec.ts"],
   overrides: [
     {
       files: ["src/**/*.ts"],

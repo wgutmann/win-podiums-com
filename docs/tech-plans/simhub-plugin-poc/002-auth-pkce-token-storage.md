@@ -1,6 +1,6 @@
 # TP-SPOC-002: Auth (PKCE, Token Storage)
 
-**Doc type**: Technical Plan | **ID**: TP-SPOC-002 | **Implements**: [PRD-001: SimHub Plugin POC](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md) | **Related**: [SimHub Plugin LLD](../../design/components/simhub-plugin.md), [API plugin](../../api/plugin.md), [API authentication](../../api/authentication.md), [ADR-002](../../architecture/decisions/002-discord-oauth.md), [ADR-003](../../architecture/decisions/003-hybrid-auth-paths.md), [OpenAPI spec](../../api/openapi.yaml), [001: Plugin Skeleton](001-plugin-skeleton-sdk-config.md), [003: API Client and Heartbeat](003-api-client-heartbeat.md)
+**Doc type**: Technical Plan | **ID**: TP-SPOC-002 | **Implements**: [PRD-SPOC-001: SimHub Plugin POC](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md) | **Related**: [SimHub Plugin LLD](../../design/components/simhub-plugin.md), [API plugin](../../api/plugin.md), [API authentication](../../api/authentication.md), [ADR-002](../../architecture/decisions/002-discord-oauth.md), [ADR-003](../../architecture/decisions/003-hybrid-auth-paths.md), [OpenAPI spec](../../api/openapi.yaml), [001: Plugin Skeleton](001-plugin-skeleton-sdk-config.md), [003: API Client and Heartbeat](003-api-client-heartbeat.md)
 
 **Status**: Draft  
 **Version**: 1.0  
@@ -43,10 +43,10 @@ sequenceDiagram
 
 1. User triggers “Link to Discord” from plugin UI.
 2. Plugin generates PKCE code_verifier and code_challenge (S256), and a random state.
-3. Plugin starts an HTTP loopback listener on an available port (e.g. 127.0.0.1, port in range 50000–60000).
-4. Plugin opens the system browser to the Discord OAuth URL including `redirect_uri=http://127.0.0.1:{port}/callback`, `code_challenge`, `code_challenge_method=S256`, `state`, and `scope=identify`.
+3. Plugin starts an HTTP loopback listener on the fixed port 54321 (see "Loopback Listener" and "Discord App: Redirect URI Configuration" below).
+4. Plugin opens the system browser to the Discord OAuth URL including `redirect_uri=http://127.0.0.1:54321/callback`, `code_challenge`, `code_challenge_method=S256`, `state`, and `scope=identify`.
 5. User signs in with Discord; Discord redirects to the loopback URL with `code` and `state`.
-6. Plugin validates `state`, then calls `POST /api/auth/discord/exchange` with `code`, `code_verifier`, and `redirect_uri`. Request/response schema must align with [OpenAPI spec](../../api/openapi.yaml).
+6. Plugin validates `state`, then calls `POST /api/auth/discord/exchange` with `code`, `code_verifier`, and `redirect_uri` (e.g. `http://127.0.0.1:54321/callback`). Request/response schema must align with [OpenAPI spec](../../api/openapi.yaml).
 7. API returns access token and Discord ID; plugin stores them with DPAPI (user-scoped) via [TokenStorage](../../../apps/plugin/WinPodiums.Plugin/Auth/TokenStorage.cs).
 8. Manual token (debug only): If a feature flag is enabled, plugin may expose a path to paste a one-time token and call `POST /api/auth/token-exchange`. This must be hidden from normal UI and not documented as a primary auth method.
 
@@ -57,12 +57,17 @@ sequenceDiagram
 - **Code verifier**: Cryptographically random string (e.g. 32–64 bytes), base64url-encoded.
 - **Code challenge**: Base64url(SHA256(utf8(code_verifier))). Method `S256`.
 
-### Loopback Listener
+### Loopback Listener (Fixed Port — Recommended for Security)
 
-- Bind to `http://127.0.0.1:{port}/callback/` (or equivalent). Choose an available port (e.g. random in 50000–60000 or try sequential).
+- **Fixed port**: Use a single well-known port so exactly one redirect URI is registered in the Discord app. Canonical port: **54321**. Bind to `http://127.0.0.1:54321/callback/` (or equivalent). Use 127.0.0.1 (not localhost) for consistency.
 - Timeout: e.g. 5 minutes; then close listener and report failure/cancellation.
 - On request: validate `state` query parameter; read `code`; return a simple HTML page (“Success, you can close this window”); then close listener.
 - Use the same `redirect_uri` in the Discord URL and in the exchange request body.
+
+### Discord App: Redirect URI Configuration
+
+- In the Discord Developer Portal, add **exactly one** redirect URI for the plugin: `http://127.0.0.1:54321/callback`. Discord does not support wildcards. A fixed port keeps the surface small and makes configuration auditable.
+- If port 54321 is in use on a developer machine, document the override (e.g. config) and ensure the same URI is registered in Discord for that environment.
 
 ### Token Exchange
 
@@ -72,7 +77,7 @@ sequenceDiagram
 ### Token Storage (DPAPI)
 
 - **Location**: User-scoped, e.g. `%LocalAppData%\WinPodiums\config.dat` (or equivalent). Use [TokenStorage.GetConfigPath()](../../../apps/plugin/WinPodiums.Plugin/Auth/TokenStorage.cs) for consistency.
-- **Format**: Persist access token and Discord ID; encrypt with `ProtectedData.Protect` (DataProtectionScope.CurrentUser). Do not store refresh token in POC unless required by API contract.
+- **Format**: Persist access token and Discord ID; encrypt with `ProtectedData.Protect` (DataProtectionScope.CurrentUser). POC persists only access_token and discord_id; do not store refresh token unless the API contract requires it.
 - **APIs**: Save after successful exchange; Load on startup or when checking IsAuthenticated; Clear on logout.
 
 ### Manual Token (Debug Only)
@@ -130,7 +135,7 @@ sequenceDiagram
 
 ## Related Documentation
 
-- [PRD-001: SimHub Plugin POC](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md)
+- [PRD-SPOC-001: SimHub Plugin POC](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md)
 - [SimHub Plugin LLD](../../design/components/simhub-plugin.md)
 - [API plugin](../../api/plugin.md)
 - [API authentication](../../api/authentication.md)

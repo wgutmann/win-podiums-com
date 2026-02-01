@@ -24,7 +24,7 @@ Each Technical Plan includes:
 
 ## Feature Areas
 
-- [SimHub Plugin POC](simhub-plugin-poc/) — Plugin skeleton, auth (PKCE), API client/heartbeat, minimal UI, POC testing (PRD-001, TP-SPOC-001–005)
+- [SimHub Plugin POC](simhub-plugin-poc/) — Plugin skeleton, auth (PKCE), API client/heartbeat, minimal UI, POC testing (PRD-SPOC-001, TP-SPOC-001–005)
 - [Telemetry Proof System](telemetry-proof-system/) — Multi-layered security implementation
 
 ## Traceability

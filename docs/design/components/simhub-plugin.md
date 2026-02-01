@@ -1,10 +1,19 @@
 # Low-Level Design: SimHub Plugin
 
-**Doc type**: LLD (Component) | **Component**: WinPodiums SimHub Plugin | **Related**: [PRD-001 SimHub Plugin POC](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md), [TP-SPOC-001](../../tech-plans/simhub-plugin-poc/001-plugin-skeleton-sdk-config.md)–[TP-SPOC-005](../../tech-plans/simhub-plugin-poc/005-poc-testing-completion.md), [API plugin](../../api/plugin.md), [ADR-002](../../architecture/decisions/002-discord-oauth.md), [ADR-003](../../architecture/decisions/003-hybrid-auth-paths.md)
+**Doc type**: LLD (Component) | **Component**: WinPodiums SimHub Plugin | **Related**: [PRD-SPOC-001 SimHub Plugin POC](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md), [TP-SPOC-001](../../tech-plans/simhub-plugin-poc/001-plugin-skeleton-sdk-config.md)–[TP-SPOC-005](../../tech-plans/simhub-plugin-poc/005-poc-testing-completion.md), [API plugin](../../api/plugin.md), [ADR-002](../../architecture/decisions/002-discord-oauth.md), [ADR-003](../../architecture/decisions/003-hybrid-auth-paths.md)
 
 **Technology**: C# / .NET Framework 4.8 (WPF)  
 **Platform**: Windows 10/11  
 **Version**: 1.0
+
+**POC vs full design**: This LLD describes the target architecture. For Phase 1 POC scope (browser auth, one heartbeat call, minimal UI only), see [PRD-SPOC-001 SimHub Plugin POC](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md) and [TP-SPOC-001](../../tech-plans/simhub-plugin-poc/001-plugin-skeleton-sdk-config.md)–[TP-SPOC-005](../../tech-plans/simhub-plugin-poc/005-poc-testing-completion.md). Position detection, QR auth, race submission, and full Scrutineering Panel are post-POC.
+
+| In POC scope | Deferred (post-POC) |
+|--------------|---------------------|
+| Browser PKCE auth, DPAPI token storage | QR code auth |
+| One verification API call (heartbeat) | Race submission, HMAC-signed payloads |
+| Minimal UI (Link to Discord, Send heartbeat, status) | Full Scrutineering Panel, telemetry monitoring UI |
+| Plugin loads in SimHub, configurable API base URL | Position detection, telemetry logic |
 
 ## Overview
 
@@ -103,6 +112,8 @@ public class VerificationService
 }
 ```
 
+**Configuration**: All API requests MUST use the configurable base URL (see [PRD-SPOC-001](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md) FR-003 and [TP-SPOC-001](../../tech-plans/simhub-plugin-poc/001-plugin-skeleton-sdk-config.md)). Do not hardcode production URL; use `baseUrl` or equivalent (e.g. `http://localhost:8787` for local dev).
+
 ## Authentication Flows
 
 ### Method 1: Browser Launch (PKCE)
@@ -117,8 +128,8 @@ public class BrowserAuthFlow
         string codeChallenge = PKCEGenerator.GenerateChallenge(codeVerifier);
         string state = GenerateRandomState();
         
-        // 2. Start local loopback listener
-        int port = FindAvailablePort(); // Random port 50000-60000
+        // 2. Start local loopback listener (fixed port; register in Discord app)
+        const int port = 54321; // Canonical plugin redirect port; see TP-SPOC-002
         var listener = new HttpListener();
         listener.Prefixes.Add($"http://127.0.0.1:{port}/callback/");
         listener.Start();
@@ -160,7 +171,7 @@ public class BrowserAuthFlow
         string code, string verifier, int port)
     {
         var response = await _httpClient.PostAsync(
-            "https://winpodiums.com/api/auth/discord/exchange",
+            $"{_baseUrl}/api/auth/discord/exchange", // baseUrl from config (TP-SPOC-001)
             new {
                 code = code,
                 codeVerifier = verifier,
@@ -245,7 +256,7 @@ public class ManualTokenAuthFlow
         
         // 2. Validate and exchange token
         var response = await _httpClient.PostAsync(
-            "https://winpodiums.com/api/auth/token-exchange",
+            $"{_baseUrl}/api/auth/token-exchange", // baseUrl from config (TP-SPOC-001)
             new { token = token.Trim().ToUpper() });
         
         if (!response.IsSuccessStatusCode)
@@ -313,7 +324,7 @@ public class VerificationService
         
         // 3. Submit to API
         var response = await _httpClient.PostAsJsonAsync(
-            "https://winpodiums.com/api/plugin/verify",
+            $"{_baseUrl}/api/plugin/verify", // baseUrl from config (TP-SPOC-001)
             result);
         
         // 4. Parse response
@@ -339,6 +350,8 @@ public class VerificationService
 
 ## Data Storage (DPAPI Encryption)
 
+Canonical implementation: [TokenStorage.cs](../../../apps/plugin/WinPodiums.Plugin/Auth/TokenStorage.cs). It uses optional entropy for `ProtectedData.Protect`; either `null` or application-specific entropy (e.g. fixed bytes) with `DataProtectionScope.CurrentUser` is valid.
+
 ```csharp
 public class TokenStorage
 {
@@ -351,7 +364,7 @@ public class TokenStorage
         var data = JsonConvert.SerializeObject(tokens);
         var encrypted = ProtectedData.Protect(
             Encoding.UTF8.GetBytes(data),
-            null, // null = current user scope
+            null, // or optional entropy; see TokenStorage.cs
             DataProtectionScope.CurrentUser);
         
         Directory.CreateDirectory(Path.GetDirectoryName(_configPath));
@@ -512,7 +525,7 @@ WPF XAML structure:
 
 ## Related Documentation
 
-- [PRD-001: SimHub Plugin POC](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md) — POC scope and success criteria
+- [PRD-SPOC-001: SimHub Plugin POC](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md) — POC scope and success criteria
 - [Tech plans (SimHub POC)](../../tech-plans/simhub-plugin-poc/README.md) — TP-SPOC-001–005 (skeleton, auth, heartbeat, UI, testing)
 - [Discord Integration LLD](../integrations/discord-integration.md) — Detailed auth sequence diagrams
 - [API plugin](../../api/plugin.md) — Plugin endpoint specs (auth, heartbeat)

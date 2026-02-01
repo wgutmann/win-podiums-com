@@ -44,9 +44,9 @@ ContextStream builds its node graph from **indexed repo content**, **explicit li
 | **Design LLDs** (SimHub, Discord, DB schema, security) | HLD, Phase 1 scope, ADRs, API README, related LLDs, entity-relationship diagram |
 | **Guides** (development, deployment) | Each other, Next Steps, Phase 1 scope, API README, ContextStream mapping |
 | **SimHub POC PRD** ([docs/product/simhub-plugin-poc/001-simhub-plugin-poc.md](../product/simhub-plugin-poc/001-simhub-plugin-poc.md)) | Phase 1 scope, SimHub Plugin LLD, API plugin, authentication.md, ADR-002, ADR-003, SimHub POC tech plans ([docs/tech-plans/simhub-plugin-poc/](../tech-plans/simhub-plugin-poc/)) |
-| **Tech Plan (SimHub POC)** ([docs/tech-plans/simhub-plugin-poc/](../tech-plans/simhub-plugin-poc/)) | PRD-001 SimHub Plugin POC, SimHub Plugin LLD, API plugin, authentication.md, ADR-002, ADR-003 |
+| **Tech Plan (SimHub POC)** ([docs/tech-plans/simhub-plugin-poc/](../tech-plans/simhub-plugin-poc/)) | PRD-SPOC-001 SimHub Plugin POC, SimHub Plugin LLD, API plugin, authentication.md, ADR-002, ADR-003 |
 
-**Knowledge graph**: So ContextStream’s graph links the PRD to its tech plans, the SimHub POC PRD and each tech plan include a ContextStream-friendly blurb at the top with stable IDs: **PRD-001** (SimHub Plugin POC) and **TP-SPOC-001** through **TP-SPOC-005** (docs/tech-plans/simhub-plugin-poc/). The PRD lists **Technical Plans**: TP-SPOC-001–005 with paths; each tech plan lists **Implements**: PRD-001 with path. Keep these blurbs and links so the knowledge graph can associate “PRD-001” and “TP-SPOC-XXX” with the correct nodes.
+**Knowledge graph**: So ContextStream’s graph links the PRD to its tech plans, the SimHub POC PRD and each tech plan include a ContextStream-friendly blurb at the top with stable IDs: **PRD-SPOC-001** (SimHub Plugin POC) and **TP-SPOC-001** through **TP-SPOC-005** (docs/tech-plans/simhub-plugin-poc/). The PRD lists **Technical Plans**: TP-SPOC-001–005 with paths; each tech plan lists **Implements**: PRD-SPOC-001 with path. Keep these blurbs and links so the knowledge graph can associate “PRD-001” and “TP-SPOC-XXX” with the correct nodes (distinct from Telemetry Proof PRD-001–005).
 
 ### Doc-to-code relationships
 

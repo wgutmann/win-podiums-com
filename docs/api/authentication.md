@@ -26,6 +26,12 @@ All auth flows use **Discord OAuth2**. Web uses session cookies; plugin uses Bea
 - **Browser / QR** (primary): Plugin opens browser or shows QR; user completes Discord auth; plugin polls `GET /api/auth/qr-status/:sessionId` or exchanges code via `POST /api/auth/discord/exchange`.
 - **Manual token** (debug only, feature-flagged): Not a user-facing option. When a debug feature flag is enabled, user can paste a token from `/auth/token`; `POST /api/auth/token-exchange` validates and returns session info.
 
+## Contract: Plugin PKCE exchange
+
+**POST /api/auth/discord/exchange** — Request body (JSON): `code` (string), `code_verifier` (string), `redirect_uri` (string, e.g. `http://127.0.0.1:54321/callback`). Response (200): JSON with `access_token` and `discord_id` (or equivalent per OpenAPI). See [openapi.yaml](./openapi.yaml) for full request/response schema.
+
+**POST /api/auth/token-exchange** (debug only) — Request body (JSON): `token` (string). Response (200): session/token info. See [openapi.yaml](./openapi.yaml).
+
 ## Responses
 
 - 200: Success (session created or token valid).

@@ -30,6 +30,8 @@ Authorization: Bearer {ACCESS_TOKEN}
 
 - **POST /api/plugin/heartbeat** — Keeps session active. Rate limit: 1 per 5 minutes per user.
 
+**Contract (align with OpenAPI)**: Request: `Authorization: Bearer {accessToken}`; optional JSON body e.g. `{ "version": "1.0.0" }` for plugin version. Response: 200 OK (success); 400/401 (failure). See [openapi.yaml](./openapi.yaml) for full schema.
+
 ## Download
 
 - **GET /api/plugin/download/:type** — Returns installer binary (e.g. by type: `stable`, `beta`). Response is file download.

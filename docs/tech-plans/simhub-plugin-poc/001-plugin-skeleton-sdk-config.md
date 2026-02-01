@@ -1,6 +1,6 @@
 # TP-SPOC-001: Plugin Skeleton, SimHub SDK, and Config
 
-**Doc type**: Technical Plan | **ID**: TP-SPOC-001 | **Implements**: [PRD-001: SimHub Plugin POC](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md) | **Related**: [SimHub Plugin LLD](../../design/components/simhub-plugin.md), [API plugin](../../api/plugin.md), [ADR-002](../../architecture/decisions/002-discord-oauth.md), [ADR-003](../../architecture/decisions/003-hybrid-auth-paths.md), [002: Auth (PKCE, Token Storage)](002-auth-pkce-token-storage.md)
+**Doc type**: Technical Plan | **ID**: TP-SPOC-001 | **Implements**: [PRD-SPOC-001: SimHub Plugin POC](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md) | **Related**: [SimHub Plugin LLD](../../design/components/simhub-plugin.md), [API plugin](../../api/plugin.md), [ADR-002](../../architecture/decisions/002-discord-oauth.md), [ADR-003](../../architecture/decisions/003-hybrid-auth-paths.md), [002: Auth (PKCE, Token Storage)](002-auth-pkce-token-storage.md)
 
 **Status**: Draft  
 **Version**: 1.0  
@@ -9,7 +9,7 @@
 
 ## Overview
 
-This Technical Plan establishes the plugin project skeleton, SimHub SDK wiring, and configurable API base URL so the plugin loads in SimHub and can target local or production API without recompiling. It implements NFR-001 (load in SimHub) and FR-003 (configurable base URL) from PRD-001. Out of scope: full Scrutineering Panel, position detection, telemetry logic.
+This Technical Plan establishes the plugin project skeleton, SimHub SDK wiring, and configurable API base URL so the plugin loads in SimHub and can target local or production API without recompiling. It implements NFR-001 (load in SimHub) and FR-003 (configurable base URL) from PRD-SPOC-001. Out of scope: full Scrutineering Panel, position detection, telemetry logic.
 
 ## Architecture
 
@@ -46,11 +46,12 @@ graph LR
 
 - Add SimHub SDK reference to the project (e.g. `SimHubPlugin.dll` from SimHub install path or Plugins folder). Use HintPath as in the csproj comment block.
 - Implement the SimHub plugin interface required by the SDK (e.g. `IPlugin`, `IDataPlugin` as per SimHub documentation). Wire `Init(PluginManager)`, `DataUpdate(PluginManager, ref GameData)`, and `End(PluginManager)` so the plugin is recognized by SimHub.
-- **“Loads in SimHub”** means the plugin **appears in SimHub’s plugin list/settings and is usable from the SimHub UI** (user can see and interact with the plugin), not only that the DLL loads without crash. Include a short checklist in this TP or the development guide: build → copy DLL to Plugins folder → restart SimHub → confirm plugin appears in list/settings.
+- **“Loads in SimHub”** means the plugin **appears in SimHub’s plugin list/settings and is usable from the SimHub UI** (user can see and interact with the plugin), not only that the DLL loads without crash. **Checklist — Loads in SimHub**: (1) Build plugin DLL for .NET Framework 4.8. (2) Copy DLL (and dependencies if any) to the SimHub Plugins folder (canonical: `C:\Program Files (x86)\SimHub\Plugins`). (3) Restart SimHub. (4) Confirm the plugin appears in SimHub's plugin list/settings and is usable from the SimHub UI. Document SDK version and path in README or development guide.
 
 ### Configurable API Base URL
 
 - **Requirement**: Base URL can be set (e.g. via `SetApiBaseUrl` or config file/settings) without recompiling. All API calls use this base URL.
+- **Definition**: `baseUrl` is the API origin only (e.g. `https://winpodiums.com` or `http://localhost:8787`); the client appends paths such as `/api/plugin/heartbeat` and `/api/auth/discord/exchange`.
 - **Default**: e.g. `https://winpodiums.com`; local dev e.g. `http://localhost:8787`.
 - **Implementation**: Config model or field holding base URL (trimmed, no trailing slash). `PluginMain` (or equivalent) exposes `SetApiBaseUrl(string baseUrl)` and passes the base URL to `ApiClient`. Any new HTTP client or service that calls the API must use the same base URL source.
 
@@ -100,7 +101,7 @@ graph LR
 
 ## Related Documentation
 
-- [PRD-001: SimHub Plugin POC](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md)
+- [PRD-SPOC-001: SimHub Plugin POC](../../product/simhub-plugin-poc/001-simhub-plugin-poc.md)
 - [SimHub Plugin LLD](../../design/components/simhub-plugin.md)
 - [API plugin](../../api/plugin.md)
 - [002: Auth (PKCE, Token Storage)](002-auth-pkce-token-storage.md)

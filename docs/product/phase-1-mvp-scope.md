@@ -12,7 +12,7 @@
 |------|-------------|
 | **Discord OAuth2** | Web flow + plugin flows (browser, QR; manual token debug-only, feature-flagged) per [Discord Integration LLD](../design/integrations/discord-integration.md) |
 | **Minimal Worker** | Auth endpoints (stub or real) + health + at least one non-auth endpoint (e.g. `GET /api/profile/me`) using D1/KV; config via `wrangler.toml` (same for Docker and wrangler dev, 1:1) |
-| **Basic SimHub plugin** | Position detection deferred; minimal auth (browser primary; manual token only as debug feature-flag), one call to verification API (heartbeat) per [SimHub plugin LLD](../design/components/simhub-plugin.md) and [SimHub Plugin POC PRD](simhub-plugin-poc/001-simhub-plugin-poc.md) |
+| **Basic SimHub plugin** | Position detection deferred; minimal auth (browser primary; manual token only as debug feature-flag), one call to verification API (heartbeat) per [SimHub plugin LLD](../design/components/simhub-plugin.md) and [PRD-SPOC-001 SimHub Plugin POC](simhub-plugin-poc/001-simhub-plugin-poc.md) |
 | **Static Gate** | Landing page (Worker-served or static) linking to Discord auth and plugin download |
 | **Member state** | Pending / verified (stored in D1 when implemented) |
 | **Infrastructure** | D1, R2, KV (created in Cloudflare; bindings in `wrangler.toml`). Single environment (e.g. `dev`) first. Terraform is not in scope until explicitly introduced as a feature. |
@@ -21,7 +21,7 @@
 
 | Area | Deferred to Phase 2+ |
 |------|----------------------|
-| **Full Telemetry Proof** | Heartbeat, validation, continuity, challenge-response (PRDs/tech plans 001–005) |
+| **Full Telemetry Proof** | Phase 1 includes one plugin heartbeat call to the API; full Telemetry Proof (validation, continuity, challenge-response per PRDs/tech plans 001–005) is Phase 2+. |
 | **Luxury UI** | Full design-system polish; Phase 1 is functional, not pixel-perfect |
 | **Discord roles** | Automatic role assignment; community/bot features |
 | **Leaderboards** | Public leaderboards and rankings |

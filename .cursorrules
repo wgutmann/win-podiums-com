@@ -70,6 +70,7 @@ search(mode="hybrid", query="function implementation") → done (results include
 - **On [RULES_NOTICE]**: Use `generate_rules()` to update rules
 - **After completing work**: Always capture decisions/insights with `session(action="capture")`
 - **On mistakes/corrections**: Immediately capture lessons with `session(action="capture_lesson")`
+- **Before pushing to remote**: Run local tests; at least 80% of tests must pass before pushing. See [Run tests before push](docs/guides/development.md#run-tests-before-push). Block or warn on push if the threshold is not met.
 
 ### Search Mode Selection
 
@@ -113,5 +114,5 @@ To manage existing plans/tasks:
 - Unlink task from plan: `memory(action="update_task", task_id="<uuid>", plan_id=null)`
 - Delete: `memory(action="delete_task", task_id="<uuid>")` or `memory(action="delete_event", event_id="<plan_uuid>")`
 
-Full docs: https://contextstream.io/docs/mcp/tools
+Full docs: [ContextStream MCP tools](https://contextstream.io/docs/mcp/tools)
 <!-- END ContextStream -->

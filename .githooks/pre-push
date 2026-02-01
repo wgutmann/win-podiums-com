@@ -1,0 +1,7 @@
+#!/bin/sh
+# Pre-push: run local tests; block push unless at least 80% pass.
+# See docs/guides/development.md#run-tests-before-push
+
+cd "$(git rev-parse --show-toplevel)" || exit 1
+node scripts/pre-push-check.js
+exit $?

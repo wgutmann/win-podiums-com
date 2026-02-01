@@ -45,10 +45,7 @@ async function main() {
 
   // 401: protected route without Authorization
   res = await fetch(`${API_BASE}/api/plugin/verify`, { method: 'POST' });
-  // #region agent log
   const unauthBody = await res.json().catch(() => ({}));
-  fetch('http://127.0.0.1:7242/ingest/1d72bcc7-cc87-407b-8d82-421bf27576d3', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ location: 'smoke.js:POST /api/plugin/verify', message: 'response', data: { status: res.status, body: unauthBody }, timestamp: Date.now(), sessionId: 'debug-session', hypothesisId: 'H4' }) }).catch(() => {});
-  // #endregion
   if (res.status !== 401) {
     console.error('Expected 401 for POST /api/plugin/verify without auth, got:', res.status);
     process.exit(1);

@@ -60,7 +60,7 @@ When in doubt, align to ADR-006. When you add a new security choice, update ADR-
 - [ ] **API**: Smoke test exists and runs in CI ([apps/api/test/smoke.js](../../../apps/api/test/smoke.js), `npm test`, [.github/workflows/worker-test.yml](../../../.github/workflows/worker-test.yml)). New security-sensitive routes (auth, token exchange, profile, heartbeat) must be covered by smoke or unit tests.
 - [ ] **Plugin**: Security-sensitive code (token storage, API client, auth flows) should have unit or integration tests before production. Phase 1 may have minimal tests; add as we add features.
 - [ ] **Do not merge** without tests for new auth, token, or profile/heartbeat logic. CI (Worker test + Security workflow) must pass.
-- [ ] Run locally: `docker compose up -d && cd apps/api && npm test` to validate API before pushing.
+- [ ] **Before pushing to a remote branch:** Run local tests; **at least 80% of tests must pass** before pushing. Run locally: `docker compose up -d && cd apps/api && npm test` plus typecheck, lint, plugin build, OpenAPI validation per [Run tests before push](../../../docs/guides/development.md#run-tests-before-push). Block or warn on push if the threshold is not met.
 
 ## Related Docs and Skills
 

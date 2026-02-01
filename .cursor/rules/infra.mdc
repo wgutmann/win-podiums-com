@@ -11,3 +11,4 @@ alwaysApply: false
 - Use Terraform for **plan** and **validate** only (e.g. in PRs or locally). Keep `apply` for when the Worker app is in place.
 - Infra lives in `infra/terraform/`. Use `terraform.tfvars.example` as the template; real `terraform.tfvars` is gitignored.
 - When adding or changing resources, ensure outputs (e.g. D1 database name, R2 bucket name, KV namespace id) match what a future Worker `wrangler.toml` will need to bind.
+- **Before pushing to remote:** Run local tests; at least 80% must pass (see [development guide](../../docs/guides/development.md#run-tests-before-push)).

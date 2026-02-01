@@ -16,5 +16,6 @@ When the ContextStream MCP server is available:
 - **Lessons:** When the user corrects a mistake or says "don’t do X again", use **session(action="capture_lesson", ...)** with trigger, impact, prevention, keywords.
 - **Tagging:** Repo docs use stable IDs (PRD-XXX, ADR-XXX, TP-XXX) and **Related** / **Implements**. See [ContextStream mapping](../../docs/guides/contextstream-mapping.md).
 - **API docs:** Each Worker endpoint is documented in **docs/api/openapi.yaml** and served in Swagger at **/api-docs**. Smoke test ensures API documentation loads. When adding or changing API routes, update the OpenAPI spec and keep endpoints in sync.
+- **Before pushing to remote:** Run local tests; **at least 80% of tests must pass** before pushing. See [Run tests before push](../../docs/guides/development.md#run-tests-before-push). Block or warn on push if the threshold is not met.
 
 Do not duplicate [AGENTS.md](../../AGENTS.md) stack or phase here; ContextStream complements it with persistent memory and code intelligence.

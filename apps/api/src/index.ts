@@ -66,10 +66,6 @@ export default {
     const method = request.method;
     const baseUrl = `${url.protocol}//${url.host}`;
 
-    // #region agent log
-    if (method === "POST" && path.includes("plugin")) fetch("http://127.0.0.1:7242/ingest/1d72bcc7-cc87-407b-8d82-421bf27576d3", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ location: "index.ts:fetch:entry", message: "request", data: { path, method }, timestamp: Date.now(), sessionId: "debug-session", hypothesisId: "H1,H2" }) }).catch(() => {});
-    // #endregion
-
     // Health
     if (path === "/health" || path === "/api/health") {
       return jsonResponse({ ok: true, env: env.ENVIRONMENT ?? "dev" });
@@ -188,12 +184,16 @@ export default {
       }
     }
 
+    // POST /api/plugin/verify — stub (match by path so CI/Docker always hit)
+    if (method === "POST" && (path === "/api/plugin/verify" || path === "/api/plugin/verify/")) {
+      const auth = await getAuth(request, env);
+      if (!auth) return errorResponse("unauthorized", "Missing or invalid authorization", 401);
+      return jsonResponse({ success: true, data: { message: "stub" } });
+    }
+
     // API prefix
     if (path.startsWith("/api/")) {
-      const rest = path.slice(4);
-      // #region agent log
-      if (method === "POST" && rest.includes("plugin")) fetch("http://127.0.0.1:7242/ingest/1d72bcc7-cc87-407b-8d82-421bf27576d3", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ location: "index.ts:api-block", message: "rest", data: { rest, restEqualsPluginVerify: rest === "plugin/verify" }, timestamp: Date.now(), sessionId: "debug-session", hypothesisId: "H1" }) }).catch(() => {});
-      // #endregion
+      const rest = path.slice(4).replace(/\/$/, "");
 
       // POST /api/auth/discord/callback — server-side web callback (if frontend posts code)
       if (method === "POST" && rest === "auth/discord/callback") {
@@ -421,20 +421,8 @@ export default {
         return jsonResponse({ success: true, data: { accepted: true } });
       }
 
-      // POST /api/plugin/verify — stub
-      if (method === "POST" && rest === "plugin/verify") {
-        // #region agent log
-        fetch("http://127.0.0.1:7242/ingest/1d72bcc7-cc87-407b-8d82-421bf27576d3", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ location: "index.ts:plugin-verify-handler", message: "hit", data: {}, timestamp: Date.now(), sessionId: "debug-session", hypothesisId: "H3,H4" }) }).catch(() => {});
-        // #endregion
-        const auth = await getAuth(request, env);
-        if (!auth) return errorResponse("unauthorized", "Missing or invalid authorization", 401);
-        return jsonResponse({ success: true, data: { message: "stub" } });
-      }
     }
 
-    // #region agent log
-    if (method === "POST" && path.includes("plugin")) fetch("http://127.0.0.1:7242/ingest/1d72bcc7-cc87-407b-8d82-421bf27576d3", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ location: "index.ts:fallback-404", message: "returning 404", data: { path, method, rest: path.startsWith("/api/") ? path.slice(4) : null }, timestamp: Date.now(), sessionId: "debug-session", hypothesisId: "H1,H2,H5" }) }).catch(() => {});
-    // #endregion
     return errorResponse("not_found", "Not found", 404);
   },
 };

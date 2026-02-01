@@ -1,5 +1,7 @@
 # ADR-004: Cloudflare-Only Architecture (100% Cloudflare)
 
+**Doc type**: ADR | **ID**: ADR-004 | **Related**: [HLD](../high-level-design.md), [ADR-001 Cloudflare Stack](001-cloudflare-stack.md), [ADR-005 Cost-Optimized](005-cost-optimized-cloudflare.md)
+
 **Status**: Under Review  
 **Date**: 2026-01-31  
 **Deciders**: Architecture Team
@@ -240,6 +242,12 @@ export default {
 - ✅ All real-time needs (Workers WebSockets + Durable Objects)
 
 **Recommendation**: **Proceed with 100% Cloudflare architecture**. No external cloud services needed beyond Discord (which is required for identity/community integration).
+
+## Related
+
+- [HLD](../high-level-design.md) — System overview
+- [ADR-001: Cloudflare Stack](001-cloudflare-stack.md) — Core stack decision
+- [ADR-005: Cost-Optimized Cloudflare](005-cost-optimized-cloudflare.md) — Cost patterns
 
 ## References
 

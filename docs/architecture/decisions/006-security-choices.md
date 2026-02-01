@@ -42,9 +42,9 @@ We adopt the following security choices and test-coverage expectations.
 
 ### 5. Test coverage
 
-- **API**: Smoke test against running API (Docker or wrangler). [apps/api/test/smoke.js](../../../apps/api/test/smoke.js) and `npm test`; [.github/workflows/worker-test.yml](../../../.github/workflows/worker-test.yml) runs on push/PR when API or Docker change. New API routes or auth flows must be covered by smoke or unit tests; do not merge without tests for security-sensitive paths (auth, token exchange, profile, heartbeat).
+- **API**: Smoke test against running API (Docker or wrangler). [apps/api/test/smoke.js](../../../apps/api/test/smoke.js) and `npm test`; run locally. New API routes or auth flows must be covered by smoke or unit tests; do not merge without tests for security-sensitive paths (auth, token exchange, profile, heartbeat).
 - **Plugin**: Unit tests and integration tests as the plugin grows; Phase 1 may have minimal automated tests but security-sensitive code (token storage, API client) should have tests before production.
-- **Coverage goal**: Critical paths (auth, token handling, profile, heartbeat) must have test coverage; expand to broader coverage as we add features. CI must pass (Worker test + Security workflow) before merge.
+- **Coverage goal**: Critical paths (auth, token handling, profile, heartbeat) must have test coverage; expand to broader coverage as we add features. CI must pass (Security + CI workflows) before merge.
 
 ## Rationale
 
@@ -68,4 +68,3 @@ We adopt the following security choices and test-coverage expectations.
 - [ADR-002: Discord OAuth](002-discord-oauth.md)
 - [ADR-005: Cost-Optimized Cloudflare](005-cost-optimized-cloudflare.md)
 - [.github/workflows/security.yml](../../../.github/workflows/security.yml) — CI security checks
-- [.github/workflows/worker-test.yml](../../../.github/workflows/worker-test.yml) — API smoke test

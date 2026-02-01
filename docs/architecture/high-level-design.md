@@ -1,5 +1,7 @@
 # High-Level Design: WinPodiums
 
+**Doc type**: HLD | **ID**: HLD | **Related**: [Phase 1 scope](../product/phase-1-mvp-scope.md), [Next Steps](next-steps.md), [ADR-001 Cloudflare Stack](decisions/001-cloudflare-stack.md), [API README](../api/README.md)
+
 **Version**: 1.0  
 **Last Updated**: 2026-01-31  
 **Status**: Draft
@@ -234,7 +236,7 @@ See [Integration Flows](../design/integrations/) for detailed sequence diagrams.
 - **Production**: `winpodiums.com` with protected main branch
 
 ### CI/CD
-- GitHub Actions: **worker-test** (Docker + smoke), **security** (secrets, audits, CodeQL), **CI** (typecheck, lint, plugin build, lockfile, OpenAPI validation)
+- GitHub Actions: **security** (secrets, audits, CodeQL), **CI** (typecheck, lint, plugin build, lockfile, OpenAPI validation)
 - Automated deployment on merge to `main` (Workers)
 - Plugin releases via GitHub Releases + R2 upload
 
@@ -331,7 +333,9 @@ Key architectural decisions are documented as ADRs in [`decisions/`](decisions/)
 
 ## Related Documentation
 
-- **Low-Level Design**: [Design Docs](../design/) — Component-specific implementation details
-- **API Specifications**: [API Docs](../api/) — Endpoint contracts and schemas
+- **Scope and sequence**: [Phase 1 scope](../product/phase-1-mvp-scope.md), [Next Steps](next-steps.md)
+- **Decisions**: [ADR-001 Cloudflare Stack](decisions/001-cloudflare-stack.md), [ADR-002 Discord OAuth](decisions/002-discord-oauth.md), [ADR-003 Hybrid Auth](decisions/003-hybrid-auth-paths.md), [ADR-006 Security](decisions/006-security-choices.md)
+- **Low-Level Design**: [Design README](../design/README.md) — Components, data models, integrations, diagrams
+- **API Specifications**: [API README](../api/README.md), [OpenAPI spec](../api/openapi.yaml) — Endpoint contracts and schemas
 - **Visual Design**: [Brand Guidelines](../brand/) — Color palette, typography, animations
-- **Developer Guides**: [Guides](../guides/) — Setup, deployment, troubleshooting
+- **Developer Guides**: [Development](../guides/development.md), [Deployment](../guides/deployment.md)

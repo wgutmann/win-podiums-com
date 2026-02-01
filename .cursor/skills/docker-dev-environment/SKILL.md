@@ -100,6 +100,8 @@ See [reference.md](reference.md) for curated links to specific Docker and Compos
 
 ## Testing Workflow
 
+- **Before pushing to a remote branch:** Run local tests; at least 80% of tests must pass. See [Run tests before push](../../../docs/guides/development.md#run-tests-before-push) and [AGENTS.md](../../../AGENTS.md). Block or warn on push if the threshold is not met.
+
 ### Local (Docker environment validation)
 - [ ] Build image(s) and start container(s) cleanly.
 - [ ] Run a minimal smoke test (health endpoint or one CLI command).

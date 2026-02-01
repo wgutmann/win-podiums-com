@@ -25,6 +25,7 @@ WinPodiums is a **microservices architecture** deployed on **Cloudflare Edge Net
 
 ## Quick Links
 
+- [Design README](../design/README.md) — Index of LLDs (components, data models, integrations, diagrams)
 - [Component Design](../design/components/) — Low-level implementation details
 - [API Documentation](../api/) — Endpoint specifications
 - [Brand Guidelines](../brand/) — Visual design system

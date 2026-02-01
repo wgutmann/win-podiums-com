@@ -20,6 +20,11 @@ Project-level guidance for AI agents working in this repo.
 - **Security**: Secrets hygiene, auth, Cloudflare security, CI security, test coverage for security-sensitive code; use the security skill. Canonical choices: [ADR-006 Security Choices](docs/architecture/decisions/006-security-choices.md).
 - **Terraform**: **Out of scope until explicitly introduced as a feature.** The directory `infra/terraform/` exists but is not part of the standard workflow. Do not run, document, or depend on Terraform in guides or next steps unless the user explicitly asks for Terraform/infra-as-code as a feature.
 
+## Pre-push: run tests locally
+
+- **Before pushing to a remote branch**, run local tests; **at least 80% of tests must pass** before pushing. See [Run tests before push](docs/guides/development.md#run-tests-before-push) in the development guide for commands (CI-equivalent typecheck, lint, plugin build, worker smoke, OpenAPI validation). Agents must run or advise running these checks and block or warn on push if the pass threshold is not met.
+- **Enforce with a git hook:** Contributors can run `git config core.hooksPath .githooks` once per clone so git (and Cursor) blocks push until the pre-push check passes (≥80%). Hook runs `scripts/pre-push-check.js`.
+
 ## Conventions
 
 - Prefer skills in `.cursor/skills` for domain-specific tasks.

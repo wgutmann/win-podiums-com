@@ -1,5 +1,7 @@
 # ADR-002: Discord OAuth as Sole Identity Provider
 
+**Doc type**: ADR | **ID**: ADR-002 | **Related**: [Phase 1 scope](../../product/phase-1-mvp-scope.md), [HLD](../high-level-design.md), [ADR-001](001-cloudflare-stack.md), [ADR-003 Hybrid Auth](003-hybrid-auth-paths.md), [Discord Integration LLD](../../design/integrations/discord-integration.md), [API README](../../api/README.md)
+
 **Status**: Accepted  
 **Date**: 2026-01-31  
 **Deciders**: Architecture Team
@@ -85,6 +87,14 @@ We will use **Discord OAuth2** as the **sole identity provider**, with no altern
 ### Magic Links (Email-based)
 - **Pros**: Passwordless, simple UX
 - **Cons**: Email deliverability issues, requires email storage, slower authentication flow
+
+## Related
+
+- [ADR-001: Cloudflare Stack](001-cloudflare-stack.md) — Hosting stack
+- [ADR-003: Hybrid Auth Paths](003-hybrid-auth-paths.md) — Web-first vs plugin-first
+- [Phase 1 scope](../../product/phase-1-mvp-scope.md) — MVP deliverables
+- [Discord Integration LLD](../../design/integrations/discord-integration.md) — OAuth flows and plugin methods
+- [API README](../../api/README.md) — Auth endpoints
 
 ## References
 

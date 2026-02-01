@@ -1,8 +1,9 @@
 /**
  * Unit tests for response helpers (jsonResponse, errorResponse).
+ * Group: required — runs first; optional tests run only if all required pass.
  */
 import { describe, it, expect } from "vitest";
-import { jsonResponse, errorResponse } from "../src/lib/response";
+import { jsonResponse, errorResponse } from "../../src/lib/response";
 
 describe("response", () => {
   it("jsonResponse returns 200 and JSON body", () => {
@@ -33,7 +34,12 @@ describe("response", () => {
       400,
       { field: "token" }
     );
-    const body = await res.json() as { success: boolean; error: string; message: string; details?: object };
+    const body = (await res.json()) as {
+      success: boolean;
+      error: string;
+      message: string;
+      details?: object;
+    };
     expect(body.success).toBe(false);
     expect(body.error).toBe("validation_error");
     expect(body.message).toBe("Invalid input");

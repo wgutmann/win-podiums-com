@@ -1,5 +1,7 @@
 # ADR-005: Cost-Optimized Cloudflare Architecture
 
+**Doc type**: ADR | **ID**: ADR-005 | **Related**: [HLD](../high-level-design.md), [ADR-001 Cloudflare Stack](001-cloudflare-stack.md), [ADR-004 Cloudflare-Only](004-cloudflare-only-architecture.md), [Cost Optimization Summary](../cost-optimization-summary.md), [Database Schema](../../design/data-models/database-schema.md)
+
 **Status**: Accepted  
 **Date**: 2026-01-31  
 **Deciders**: Architecture Team
@@ -390,10 +392,18 @@ await env.DB.prepare('DELETE FROM race_results WHERE session_date < ?').bind(one
 4. **Archive to R2** reduces storage costs by 14x
 5. **Remove unnecessary services** (Durable Objects, AI until Phase 4)
 
+## Related
+
+- [HLD](../high-level-design.md) — System overview
+- [ADR-001: Cloudflare Stack](001-cloudflare-stack.md) — Core stack
+- [ADR-004: Cloudflare-Only](004-cloudflare-only-architecture.md) — 100% Cloudflare analysis
+- [Cost Optimization Summary](../cost-optimization-summary.md) — Cost narrative
+- [Database Schema](../../design/data-models/database-schema.md) — D1/KV usage and caching
+
 ## References
 
 - [Cloudflare Workers Pricing](https://developers.cloudflare.com/workers/platform/pricing/)
 - [Cloudflare D1 Pricing](https://developers.cloudflare.com/d1/platform/pricing/)
 - [Cloudflare R2 Pricing](https://developers.cloudflare.com/r2/pricing/)
-- [Workers KV Pricing](https://developers.cloudflare.com/kv/pricing/)
+- [Workers KV Pricing](https://developers.cloudflare.com/kv/platform/pricing/)
 - [Cloudflare Queues Pricing](https://developers.cloudflare.com/queues/pricing/)

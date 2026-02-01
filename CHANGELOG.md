@@ -22,6 +22,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **GitHub Action Worker test (2026-01-31)**: `.github/workflows/worker-test.yml` — on push/PR to main (when `apps/api/`, Dockerfile, or compose change): build Docker, start API, run smoke test against it.
 - **npm audit (2026-01-31)**: Upgraded wrangler from ^3.91.0 to ^4.61.1 in `apps/api` to resolve 4 moderate vulnerabilities (esbuild GHSA-67mh-4wv8-2f99, undici GHSA-g9mf-h72j-4rw9). Docker build and smoke test verified.
 
+### Removed
+
+- **Worker test workflow (2026-01-31)**: `.github/workflows/worker-test.yml` removed. API smoke and unit tests are run locally (Docker + `npm test` / `npm run test:unit`); CI runs typecheck, lint, plugin build, lockfile check, OpenAPI validation, and security checks only.
+
 ---
 
 ## [0.1.0-alpha] — Planning

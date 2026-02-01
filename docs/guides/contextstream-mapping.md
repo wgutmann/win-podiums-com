@@ -91,6 +91,10 @@ Use this checklist so PRDs and tech plans stay linked and indexed as desired:
 - **Doc ID → path:** Canonical mapping is [.github/traceability-mapping.yaml](../../.github/traceability-mapping.yaml). Use it to resolve TP-XXX and PRD-XXX to repo-relative file paths for PR **Doc links** and for ContextStream `code_refs` when capturing implementation events.
 - **Labels as code:** Traceability labels are defined in [.github/labels.yaml](../../.github/labels.yaml) and synced to GitHub via [.github/workflows/sync-labels.yml](../../.github/workflows/sync-labels.yml). Label names follow `prd:PRD-XXX` and `tech-plan:TP-XXX` so they can be parsed and resolved to paths via the traceability mapping (e.g. for automation that creates implementation events from PR labels).
 
+#### Adding new PRD or tech plan labels
+
+When you add a new PRD or tech plan (new PRD-XXX or TP-XXX), add the corresponding entries to [.github/traceability-mapping.yaml](../../.github/traceability-mapping.yaml) and [.github/labels.yaml](../../.github/labels.yaml) **in the same PR** as the new doc. The [Sync labels](../../.github/workflows/sync-labels.yml) workflow runs on PRs that change `labels.yaml` (and on push to main), so the new labels are created when the PR is opened—you can then apply them to your PR. No need to create a separate labels-only branch.
+
 #### In the repo (required)
 
 1. **PR template**  

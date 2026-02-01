@@ -32,7 +32,9 @@ SimHub plugin for WinPodiums: monitors telemetry, detects podium finishes, and s
 
 To install the WinPodiums plugin in SimHub: build the plugin, copy the DLL to SimHub's Plugins folder, and restart SimHub.
 
-1. **Copy** only `WinPodiums.Plugin.dll` from `WinPodiums.Plugin/bin/Release/net48/` to `C:\Program Files (x86)\SimHub\Plugins`. Writing to that folder usually requires elevation (e.g. run as Administrator).
+**Deploy script (from repo root):** Run `.\scripts\deploy-plugin.ps1` to build and copy the plugin to SimHub's Plugins folder. Copying to Program Files usually requires running PowerShell as Administrator. Override the SimHub path with `$env:SIMHUB_PLUGINS` if SimHub is installed elsewhere.
+
+**Manual:** **Copy** only `WinPodiums.Plugin.dll` from `WinPodiums.Plugin/bin/Release/net48/` to `C:\Program Files (x86)\SimHub\Plugins`. Writing to that folder usually requires elevation (e.g. run as Administrator).
 2. **Restart SimHub** (or start it if not running). SimHub loads plugins from the Plugins folder and invokes `IPlugin.Init(PluginManager)`.
 3. **Confirm** the plugin appears in SimHub’s plugin list/settings as **WinPodiums** (see [SimHub Plugin LLD](../../docs/design/components/simhub-plugin.md)).
 4. **Troubleshooting:** If the plugin fails to load with a `FileNotFoundException` (or "Could not load file or assembly 'Newtonsoft.Json'"), copy `Newtonsoft.Json.dll` from the same build output folder (`WinPodiums.Plugin/bin/Release/net48/`) into `C:\Program Files (x86)\SimHub\Plugins` and restart SimHub. SimHub usually provides Newtonsoft.Json from its own folder, so this is only needed in some setups.

@@ -22,7 +22,7 @@
 
 **Implemented in Phase 1 (Step 4):**
 
-- **Worker**: Real Discord OAuth (web: `/auth/discord`, callback; plugin: `POST /api/auth/discord/exchange`, `POST /api/auth/token-exchange`, `GET /api/auth/qr-status/:id` stub). `GET /api/profile/me` and `POST /api/plugin/heartbeat` use D1/KV. Static Gate at `/` and `/gate`; token page at `/auth/token`. Secrets: see `apps/api/.dev.vars.example`.
+- **Worker**: Real Discord OAuth (web: `/auth/discord`, callback; plugin: `POST /api/auth/discord/exchange`, `POST /api/auth/token-exchange`, `GET /api/auth/qr-status/:id` stub). `GET /api/profile/me` and `POST /api/plugin/heartbeat` use D1/KV. Dynamic Gate at `/` and `/gate` (login state + logout); token page at `/auth/token` (login state + logout); **GET /auth/logout** clears session and redirects to Gate. Secrets: see `apps/api/.dev.vars.example`.
 - **D1**: Initial-schema SQL `0001_initial_schema.sql` (CREATE TABLE for users, auth_tokens, qr_auth_sessions, manual_tokens, race_results, plugin_installations, rate_limit_logs). No data—just empty tables. Run the command above when you want the Worker to have a DB to write to.
 - **Plugin**: Browser auth (PKCE) primary; manual token **debug-only, feature-flagged** (`AuthenticateWithManualTokenAsync` when flag on). One verification call (`SendHeartbeatAsync`). DPAPI storage; API client in `Services/ApiClient.cs`. SimHub SDK not yet referenced (position detection / IPlugin wiring deferred).
 
@@ -43,7 +43,7 @@
 | **Brand** | ✅ Present | Design system doc |
 | **Repo governance** | ✅ Present | AGENTS.md, .gitignore, CONTRIBUTING.md, SECURITY.md, CHANGELOG.md (stubs) |
 | **Repo structure** | ✅ Done | Worker in `apps/api/` (wrangler.toml for D1/R2/KV), SimHub plugin in `apps/plugin/` |
-| **Worker (Phase 1)** | ✅ Done | Real Discord OAuth (web + plugin exchange/token-exchange), D1 initial-schema SQL (create tables), profile/me with D1/KV, heartbeat, Gate + `/auth/token` |
+| **Worker (Phase 1)** | ✅ Done | Real Discord OAuth (web + plugin exchange/token-exchange), D1 initial-schema SQL (create tables), profile/me with D1/KV, heartbeat, dynamic Gate + token page (login state + logout), GET /auth/logout |
 | **Plugin (Phase 1)** | ✅ Done | Browser auth (PKCE) primary; manual token debug-only, feature-flagged; heartbeat API call, DPAPI storage, API client; SimHub SDK/position detection not yet wired |
 
 ### What Is Not Done Yet

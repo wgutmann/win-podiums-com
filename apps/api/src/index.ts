@@ -86,17 +86,52 @@ export default {
       });
     }
 
-    // Gate (static landing) — enhanced with auth and plugin links
+    // Gate (dynamic landing: login state + logout + auth result feedback)
     if (path === "/" || path === "/gate") {
-      const html = getGateHtml(baseUrl);
+      let gateUser: { discordId: string; discordUsername?: string | null } | null = null;
+      try {
+        const auth = await getAuth(request, env);
+        if (auth && env.DB) {
+          const profile = await getProfile(env.DB, env.CACHE, auth.discordId);
+          gateUser = {
+            discordId: auth.discordId,
+            discordUsername: profile?.discord_username ?? null,
+          };
+        } else if (auth) {
+          gateUser = { discordId: auth.discordId, discordUsername: null };
+        }
+      } catch {
+        // On any error, show Gate as not logged in
+      }
+      const flash = {
+        error: url.searchParams.get("error") ?? undefined,
+        message: url.searchParams.get("message") ?? undefined,
+        loginSuccess: url.searchParams.get("login") === "success",
+      };
+      const html = getGateHtml(baseUrl, gateUser, flash);
       return new Response(html, {
         headers: { "Content-Type": "text/html; charset=utf-8" },
       });
     }
 
-    // Token generation page (requires login; cookie sent by browser)
+    // Token generation page (login state + logout for consistency)
     if (method === "GET" && path === "/auth/token") {
-      const html = getTokenPageHtml(baseUrl);
+      let tokenUser: { discordId: string; discordUsername?: string | null } | null = null;
+      try {
+        const auth = await getAuth(request, env);
+        if (auth && env.DB) {
+          const profile = await getProfile(env.DB, env.CACHE, auth.discordId);
+          tokenUser = {
+            discordId: auth.discordId,
+            discordUsername: profile?.discord_username ?? null,
+          };
+        } else if (auth) {
+          tokenUser = { discordId: auth.discordId, discordUsername: null };
+        }
+      } catch {
+        // On any error, show as not logged in
+      }
+      const html = getTokenPageHtml(baseUrl, tokenUser);
       return new Response(html, {
         headers: { "Content-Type": "text/html; charset=utf-8" },
       });
@@ -160,7 +195,7 @@ export default {
           tokens.refresh_token,
           expiresAt
         );
-        let redirectTo = `${baseUrl}/gate`;
+        let redirectTo = `${baseUrl}/gate?login=success`;
         if (storedRedirect && storedRedirect !== redirectUri) redirectTo = storedRedirect;
         if (!env.SESSION_SECRET) {
           return Response.redirect(redirectTo, 302);
@@ -181,6 +216,18 @@ export default {
         const msg = e instanceof Error ? e.message : "Auth failed";
         return Response.redirect(`${baseUrl}/gate?error=auth&message=${encodeURIComponent(msg)}`, 302);
       }
+    }
+
+    // Logout (clear session cookie, redirect to Gate)
+    if (method === "GET" && path === "/auth/logout") {
+      const clearCookie = `${SESSION_COOKIE}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`;
+      return new Response(null, {
+        status: 302,
+        headers: {
+          Location: `${baseUrl}/gate`,
+          "Set-Cookie": clearCookie,
+        },
+      });
     }
 
     // POST /api/plugin/verify — stub (match by path so CI/Docker always hit)
@@ -426,8 +473,48 @@ export default {
   },
 };
 
-function getGateHtml(baseUrl: string): string {
+type GateFlash = {
+  error?: string;
+  message?: string;
+  loginSuccess?: boolean;
+};
+
+function getGateHtml(
+  baseUrl: string,
+  user: { discordId: string; discordUsername?: string | null } | null = null,
+  flash: GateFlash = {}
+): string {
   const loginUrl = `${baseUrl}/auth/discord`;
+  const logoutUrl = `${baseUrl}/auth/logout`;
+  const loginBlock = user
+    ? `<div class="card">
+    <p><strong>Logged in</strong>${user.discordUsername ? ` as <strong>${escapeHtml(user.discordUsername)}</strong>` : " (Discord)"}.</p>
+    <p><a href="${logoutUrl}" class="btn btn-secondary">Log out</a></p>
+  </div>`
+    : `<div class="card">
+    <p><strong>Log in with Discord</strong> to link your account and get the plugin.</p>
+    <p><a href="${loginUrl}" class="btn">Log in with Discord</a></p>
+  </div>`;
+
+  let flashBlock = "";
+  if (flash.error) {
+    let msg = gateErrorLabel(flash.error);
+    if (flash.message) {
+      try {
+        msg = decodeURIComponent(flash.message);
+      } catch {
+        msg = flash.message;
+      }
+    }
+    flashBlock = `<div class="alert alert-error" role="alert">
+    <strong>Login failed.</strong> ${escapeHtml(msg)}
+  </div>`;
+  } else if (flash.loginSuccess && user) {
+    flashBlock = `<div class="alert alert-success" role="status">
+    You have successfully logged in.
+  </div>`;
+  }
+
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -440,16 +527,19 @@ function getGateHtml(baseUrl: string): string {
     .card { border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
     .btn { display: inline-block; background: #5865F2; color: white; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; margin: 0.25rem 0.25rem 0 0; }
     .btn:hover { background: #4752C4; }
+    .btn-secondary { background: #666; }
+    .btn-secondary:hover { background: #555; }
     .muted { color: #666; font-size: 0.9rem; }
+    .alert { border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+    .alert-error { background: #fee; border: 1px solid #c00; color: #c00; }
+    .alert-success { background: #efe; border: 1px solid #080; color: #080; }
   </style>
 </head>
 <body>
   <h1>WinPodiums</h1>
   <p class="muted">Phase 1 — Gate</p>
-  <div class="card">
-    <p><strong>Log in with Discord</strong> to link your account and get the plugin.</p>
-    <p><a href="${loginUrl}" class="btn">Log in with Discord</a></p>
-  </div>
+  ${flashBlock}
+  ${loginBlock}
   <div class="card">
     <p><strong>Plugin</strong></p>
     <p>After logging in, <a href="${baseUrl}/auth/token">generate a one-time token</a> and paste it in the SimHub plugin, or use the in-plugin browser login.</p>
@@ -459,7 +549,35 @@ function getGateHtml(baseUrl: string): string {
 </html>`;
 }
 
-function getTokenPageHtml(baseUrl: string): string {
+function gateErrorLabel(error: string): string {
+  switch (error) {
+    case "missing_params":
+      return "Missing code or state from Discord. Please try again from the Gate page.";
+    case "config":
+      return "Server configuration is incomplete. Please try again later.";
+    case "auth":
+      return "Discord authentication failed. Please try again.";
+    default:
+      return "Something went wrong. Please try again.";
+  }
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function getTokenPageHtml(
+  baseUrl: string,
+  user: { discordId: string; discordUsername?: string | null } | null = null
+): string {
+  const logoutUrl = `${baseUrl}/auth/logout`;
+  const userLine = user
+    ? `<p class="muted">Logged in${user.discordUsername ? ` as <strong>${escapeHtml(user.discordUsername)}</strong>` : " (Discord)"}. <a href="${logoutUrl}">Log out</a></p>`
+    : `<p class="muted">You must be logged in to generate a token. <a href="${baseUrl}/gate">Back to Gate</a></p>`;
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -478,7 +596,7 @@ function getTokenPageHtml(baseUrl: string): string {
 </head>
 <body>
   <h1>Plugin token</h1>
-  <p class="muted">Generate a one-time token to paste in the SimHub plugin. You must be logged in.</p>
+  ${userLine}
   <div class="card">
     <button class="btn" id="gen">Generate token</button>
     <p id="out" style="margin-top: 0.75rem;"></p>

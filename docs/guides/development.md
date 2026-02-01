@@ -18,6 +18,20 @@
 - **`apps/api/`** — Cloudflare Worker (API + static Gate). Run via Docker; tests run against the Dockerized API.
 - **`apps/plugin/`** — SimHub plugin (C# / .NET Framework 4.8). Build and run on host; no container yet.
 
+## Quick start for SimHub testing
+
+1. **Start Docker Desktop** (Windows/Mac) so the Docker engine is running.
+2. Ensure **`apps/api/.dev.vars`** exists (copy from `apps/api/.dev.vars.example` and set Discord + SESSION_SECRET).
+3. From repo root, start the API:
+   ```bash
+   node scripts/dev-up.js
+   ```
+   Or manually: `docker compose build` then `docker compose up -d`.
+4. API is at **http://localhost:8787**. Point the SimHub plugin at this URL (SetApiBaseUrl or plugin settings).
+5. Open SimHub and test: Link to Discord (browser PKCE) or generate a token at http://localhost:8787/auth/token and paste in the plugin; then Send heartbeat.
+
+**Stop:** `docker compose down`. **Logs:** `docker compose logs -f api`.
+
 ## Running the API (Docker)
 
 1. Create secrets file so Docker and Worker config match:
@@ -32,8 +46,9 @@
    ```
 3. API: **http://localhost:8787**
    - Health: **http://localhost:8787/health** or **http://localhost:8787/api/health**
-   - Gate: **http://localhost:8787/** or **http://localhost:8787/gate**
+   - Gate: **http://localhost:8787/** or **http://localhost:8787/gate** — shows login state (Logged in as … or Log in with Discord) and **Log out** when logged in.
    - **API docs (Swagger):** **http://localhost:8787/api-docs** — each endpoint is documented in Swagger; spec source is `docs/api/openapi.yaml`.
+   - **Logout:** **GET /auth/logout** — clears session cookie and redirects to Gate.
 4. Live reload: edits under `apps/api/src/` are reflected (volume mount). Config in `wrangler.toml` is baked into the image; rebuild to change it.
 
 Compose uses `env_file: ./apps/api/.dev.vars` so the container gets the same secrets the Worker expects. The Dockerfile sets `CLOUDFLARE_INCLUDE_PROCESS_ENV=true` so Wrangler passes those env vars into the Worker (config match). Wrangler is started with `--ip 0.0.0.0` so the API is reachable from the host (port 8787) for tests and the plugin.
@@ -66,6 +81,8 @@ If the API is not running, `npm test` will fail with a clear message: "Start Doc
 `apps/api/test/smoke.js` runs against the Dockerized API and validates: (1) Docker and Worker config match — `GET /api/health` returns `{ ok: true, env: "dev" }`; (2) error shapes — 404 for unknown routes (`GET /api/nonexistent`) and 401 for protected routes without auth (`POST /api/plugin/verify`); (3) **API documentation loads** — `GET /api-docs` and `GET /api-docs/openapi.yaml` are reachable (Swagger UI and valid OpenAPI 3 spec). Each API endpoint is documented in `docs/api/openapi.yaml` and surfaced in Swagger.
 
 **Local checks**: Run API smoke and unit tests locally (Docker + `npm test` / `npm run test:unit`). We **recommend** adding GitHub Actions under `.github/workflows/` for CI (typecheck, lint, plugin build, lockfile, OpenAPI, security) on push/PR; see [Recommended GitHub Actions](#recommended-github-actions) below.
+
+**Manual Gate + logout**: With the API running, open Gate (`/` or `/gate`) — when not logged in you see "Log in with Discord". After logging in via `/auth/discord`, Gate shows "Logged in as …" (or "Logged in (Discord)") and "Log out". Visit `/auth/logout` (or click Log out) — cookie is cleared and you are redirected to Gate, which again shows "Log in with Discord".
 
 ### API quality checks (typecheck, lint)
 
@@ -126,7 +143,8 @@ Schema SQL lives in `apps/api/migrations/`. See [database schema](../design/data
 ## Phase 1 auth (Worker)
 
 - **Secrets** (in `apps/api/.dev.vars`): `DISCORD_CLIENT_ID`, `DISCORD_CLIENT_SECRET`, `SESSION_SECRET` (min 32 chars for JWT). Copy from `apps/api/.dev.vars.example`.
-- **Web flow**: Visit `/auth/discord` → Discord → callback → session cookie. Gate at `/` or `/gate`.
+- **Web flow**: Visit `/auth/discord` → Discord → callback → session cookie. Gate at `/` or `/gate` shows login state (username when available) and **Log out**; token page at `/auth/token` also shows login state and logout.
+- **Logout**: **GET /auth/logout** clears the session cookie and redirects to Gate.
 - **Plugin auth**: Primary flow is browser (PKCE). Manual token is **debug-only** (feature-flagged): when enabled, log in on web, open `/auth/token`, generate token, paste in plugin; plugin calls `POST /api/auth/token-exchange` then `POST /api/plugin/heartbeat`.
 
 ## Alternative: run API on host (no Docker)

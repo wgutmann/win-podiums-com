@@ -44,6 +44,20 @@ paths:
                     example: dev
                 required:
                   - ok
+  /auth/logout:
+    get:
+      tags:
+        - Authentication
+      summary: Log out (web)
+      description: Clears the session cookie and redirects to the Gate. Browser-only; call with same-origin or include cookies to clear the web session.
+      responses:
+        "302":
+          description: Redirect to Gate. Set-Cookie clears wp_session.
+          headers:
+            Location:
+              schema:
+                type: string
+                example: "https://winpodiums.com/gate"
   /auth/discord/callback:
     post:
       tags:

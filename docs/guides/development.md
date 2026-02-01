@@ -63,9 +63,18 @@ If the API is not running, `npm test` will fail with a clear message: "Start Doc
 
 ### Smoke test
 
-`apps/api/test/smoke.js` validates (1) Docker and Worker config match — `GET /api/health` returns `{ ok: true, env: "dev" }` — and (2) **API documentation loads**: `GET /api-docs` and `GET /api-docs/openapi.yaml` are reachable and return Swagger UI and a valid OpenAPI 3 spec. Each API endpoint is documented in `docs/api/openapi.yaml` and surfaced in Swagger.
+`apps/api/test/smoke.js` runs against the Dockerized API and validates: (1) Docker and Worker config match — `GET /api/health` returns `{ ok: true, env: "dev" }`; (2) error shapes — 404 for unknown routes (`GET /api/nonexistent`) and 401 for protected routes without auth (`POST /api/plugin/verify`); (3) **API documentation loads** — `GET /api-docs` and `GET /api-docs/openapi.yaml` are reachable (Swagger UI and valid OpenAPI 3 spec). Each API endpoint is documented in `docs/api/openapi.yaml` and surfaced in Swagger.
 
 **CI**: GitHub Actions runs the same test on push/PR to `main` when `apps/api/`, Dockerfile, or compose change (`.github/workflows/worker-test.yml`): build Docker, start API, run smoke test.
+
+### API quality checks (typecheck, lint)
+
+In `apps/api` you can run:
+
+- **Typecheck**: `npm run typecheck` — runs `tsc --noEmit` to catch type errors.
+- **Lint**: `npm run lint` — runs ESLint on `src/**/*.ts` (config in `apps/api/.eslintrc.cjs`).
+
+**CI**: The workflow `.github/workflows/ci.yml` runs typecheck, lint, plugin build, lockfile check, and OpenAPI validation on push/PR to `main` when `apps/api/`, `apps/plugin/`, or `docs/api/` change. See [CI](#ci-workflows) below.
 
 ## Config alignment (Docker and Worker)
 
@@ -139,7 +148,23 @@ After connecting ContextStream, run **project(action="ingest_local")** once so t
 After ContextStream is connected, you can bootstrap project memory once so new sessions have context:
 
 1. In a Cursor chat, run **session_init** with `folder_path` = repo root and a short `context_hint` (e.g. "WinPodiums Phase 1 MVP: Worker + SimHub plugin; Docker and Worker 1:1").
-2. Use **session(action="capture", event_type="decision", ...)** to capture a few key decisions, e.g.: Discord OAuth as sole identity provider; D1 for state, KV for cache; Terraform out of scope until explicitly introduced; Worker and Docker same config (wrangler.toml + .dev.vars). Point to [docs/architecture/decisions/](../architecture/decisions/) and [AGENTS.md](../../AGENTS.md) in the content.
+2. Use **session(action="capture", event_type="decision", ...)** to capture key decisions. Point to the doc path in the content so ContextStream can relate decisions to code.
+
+**Suggested decisions to capture** (one per capture, include file path in content):
+
+| Decision | One-line summary | Doc path |
+|----------|------------------|----------|
+| ADR-001 | Cloudflare stack (Workers, D1, R2, KV) | [001-cloudflare-stack.md](../architecture/decisions/001-cloudflare-stack.md) |
+| ADR-002 | Discord OAuth as sole identity provider | [002-discord-oauth.md](../architecture/decisions/002-discord-oauth.md) |
+| ADR-003 | Hybrid auth paths (web-first + plugin-first) | [003-hybrid-auth-paths.md](../architecture/decisions/003-hybrid-auth-paths.md) |
+| ADR-004 | Cloudflare-only architecture | [004-cloudflare-only-architecture.md](../architecture/decisions/004-cloudflare-only-architecture.md) |
+| ADR-005 | Cost-optimized Cloudflare | [005-cost-optimized-cloudflare.md](../architecture/decisions/005-cost-optimized-cloudflare.md) |
+| Worker = Docker | Same codebase and config (wrangler.toml + .dev.vars); tests run against Docker | [AGENTS.md](../../AGENTS.md) |
+| Terraform out of scope | Not part of default workflow until explicitly introduced | [AGENTS.md](../../AGENTS.md) |
+| Phase 1 scope | Auth, minimal Worker, basic plugin, static Gate, D1/KV; single env first | [phase-1-mvp-scope.md](../product/phase-1-mvp-scope.md) |
+| Phase 1 out of scope | Full Telemetry Proof, luxury UI, Discord roles, leaderboards, full anti-cheat LLD deferred to Phase 2+ | [phase-1-mvp-scope.md](../product/phase-1-mvp-scope.md) |
+| Free Cloudflare security only | Use only free security features (DDoS, SSL, WAF, Bot Fight); no paid add-ons for baseline | [001-free-cloudflare-security.md](../product/cloudflare-security/001-free-cloudflare-security.md) |
+| Never commit secrets | Do not commit .dev.vars, .env, or tokens; rotate if ever exposed | [AGENTS.md](../../AGENTS.md), [SECURITY.md](../../SECURITY.md) |
 
 This is optional; do it once per workspace if you want shared memory from day one.
 
@@ -160,6 +185,16 @@ A Cursor rule in `.cursor/rules/` tells the AI to use ContextStream when availab
 - **Pro integrations:** Pro users can connect GitHub and Slack so `context_smart` surfaces relevant issues, PRs, and discussions (see [contextstream.io](https://contextstream.io)).
 
 ContextStream is **optional** for contributors and is not required for CI or build.
+
+## CI workflows
+
+GitHub Actions run on push and pull requests to `main` (path filters apply so only relevant jobs run):
+
+| Workflow | Purpose |
+|----------|---------|
+| **worker-test** (`.github/workflows/worker-test.yml`) | Build Docker, start API, run smoke test (health, 404, 401, API docs). Triggered when `apps/api/`, Dockerfile, or compose change. |
+| **security** (`.github/workflows/security.yml`) | Secret scanning (TruffleHog), npm and .NET dependency audits, CodeQL (TypeScript + C#). |
+| **CI** (`.github/workflows/ci.yml`) | TypeScript typecheck, ESLint, plugin build (.NET), lockfile check (`apps/api/package-lock.json`), OpenAPI validation (Spectral). Triggered when `apps/api/`, `apps/plugin/`, or `docs/api/` change. |
 
 ## TBD
 

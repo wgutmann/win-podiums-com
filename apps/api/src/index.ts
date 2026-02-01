@@ -196,7 +196,7 @@ export default {
         } catch {
           return errorResponse("bad_request", "Invalid JSON body", 400);
         }
-        const { code, state, redirect_uri } = body;
+        const { code, redirect_uri } = body;
         if (!code || !redirect_uri || !env.DISCORD_CLIENT_ID || !env.DISCORD_CLIENT_SECRET || !env.DB) {
           return errorResponse("bad_request", "Missing code, redirect_uri, or server config", 400);
         }

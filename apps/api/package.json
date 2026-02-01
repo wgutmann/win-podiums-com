@@ -7,10 +7,15 @@
     "predev": "node scripts/inline-openapi.js ../../docs/api/openapi.yaml src/openapi-spec.ts",
     "deploy": "wrangler deploy",
     "cf-typegen": "wrangler types",
-    "test": "node test/smoke.js"
+    "test": "node test/smoke.js",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241127.0",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
+    "@typescript-eslint/parser": "^7.0.0",
+    "eslint": "^8.57.0",
     "typescript": "^5.3.3",
     "wrangler": "^4.61.1"
   }

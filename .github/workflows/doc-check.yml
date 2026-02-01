@@ -1,0 +1,78 @@
+# Doc check: markdown lint, internal link check, Mermaid diagram validation.
+# Ensures docs have no syntax/formatting errors and diagrams/READMEs load.
+name: Doc check
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "README.md"
+      - "AGENTS.md"
+      - "CONTRIBUTING.md"
+      - "SECURITY.md"
+      - ".markdownlint.jsonc"
+      - ".lycheeignore"
+      - ".github/workflows/doc-check.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "docs/**"
+      - "README.md"
+      - "AGENTS.md"
+      - "CONTRIBUTING.md"
+      - "SECURITY.md"
+      - ".markdownlint.jsonc"
+      - ".lycheeignore"
+      - ".github/workflows/doc-check.yml"
+
+jobs:
+  markdown-lint:
+    name: Markdown lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Lint markdown
+        run: npx markdownlint-cli@latest "docs/**/*.md" "README.md" "AGENTS.md" "CONTRIBUTING.md" "SECURITY.md" "apps/plugin/README.md" "infra/terraform/README.md" --config .markdownlint.jsonc
+
+  link-check:
+    name: Link check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Link checker
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --verbose --no-progress --cache --cache-max-age 1d "./docs/**/*.md" "./README.md" "./AGENTS.md" "./CONTRIBUTING.md" "./SECURITY.md" "./apps/plugin/README.md" "./infra/terraform/README.md"
+          fail: true
+
+  mermaid-validate:
+    name: Mermaid diagrams
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Validate Mermaid (.mmd)
+        run: |
+          npx @mermaid-js/mermaid-cli@latest --version
+          for f in docs/architecture/diagrams/data-flow.mmd docs/architecture/diagrams/system-overview.mmd docs/design/diagrams/entity-relationship.mmd; do
+            echo "Validating $f ..."
+            npx @mermaid-js/mermaid-cli@latest -i "$f" -o /tmp/mermaid-out.svg
+          done
+
+  openapi-docs:
+    name: OpenAPI (docs)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate OpenAPI spec
+        run: npx @stoplight/spectral-cli@latest lint docs/api/openapi.yaml --fail-severity=error

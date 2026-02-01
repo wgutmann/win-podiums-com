@@ -13,6 +13,7 @@ on:
       - "Dockerfile"
       - "compose.yaml"
       - ".github/workflows/worker-test.yml"
+  workflow_dispatch:
 
 jobs:
   test:
@@ -39,9 +40,13 @@ jobs:
             sleep 2
           done
 
+      - name: Run unit tests
+        run: |
+          cd apps/api && npm ci && npm run test:unit
+
       - name: Run smoke test
         run: |
-          cd apps/api && npm ci && npm test
+          cd apps/api && npm test
 
       - name: Show API logs on failure
         if: failure()

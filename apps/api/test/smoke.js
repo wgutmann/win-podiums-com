@@ -54,7 +54,28 @@ async function main() {
     process.exit(1);
   }
 
-  console.log('Smoke test passed: API health ok, env=%s, API documentation loads', data.env);
+  // Protected routes must return 401 without auth (security-sensitive)
+  res = await fetch(`${API_BASE}/api/profile/me`);
+  if (res.status !== 401) {
+    console.error('GET /api/profile/me without auth: expected 401, got', res.status);
+    process.exit(1);
+  }
+  res = await fetch(`${API_BASE}/api/plugin/heartbeat`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+  if (res.status !== 401) {
+    console.error('POST /api/plugin/heartbeat without auth: expected 401, got', res.status);
+    process.exit(1);
+  }
+  res = await fetch(`${API_BASE}/api/auth/token-exchange`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: 'invalid' }),
+  });
+  if (res.status !== 401) {
+    console.error('POST /api/auth/token-exchange with invalid token: expected 401, got', res.status);
+    process.exit(1);
+  }
+
+  console.log('Smoke test passed: API health ok, env=%s, API docs load, protected routes return 401 without auth', data.env);
 }
 
 main();

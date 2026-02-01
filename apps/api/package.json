@@ -7,11 +7,14 @@
     "predev": "node scripts/inline-openapi.js ../../docs/api/openapi.yaml src/openapi-spec.ts",
     "deploy": "wrangler deploy",
     "cf-typegen": "wrangler types",
-    "test": "node test/smoke.js"
+    "test": "node test/smoke.js",
+    "test:unit": "vitest run",
+    "test:all": "npm run test:unit && node test/smoke.js"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20241127.0",
     "typescript": "^5.3.3",
+    "vitest": "^2.1.0",
     "wrangler": "^4.61.1"
   }
 }

@@ -13,25 +13,27 @@
 | Area | Status | Notes |
 |------|--------|--------|
 | **Architecture** | ✅ Strong | HLD (draft), ADRs 001–005 (Cloudflare, Discord, hybrid auth, cost), cost-optimization summary |
-| **Design** | ✅ Good | Database schema (D1 + KV), Discord integration LLD, SimHub plugin LLD |
-| **Product** | ✅ Good | Telemetry Proof System PRDs (001–005): heartbeat, validation, race submission, continuity, challenge-response |
+| **Design** | ✅ Good | Database schema (D1 + KV), Discord integration LLD, SimHub plugin LLD, security-anticheat LLD |
+| **Product** | ✅ Good | Phase 1 scope doc; Telemetry Proof System PRDs (001–005): heartbeat, validation, race submission, continuity, challenge-response |
 | **Tech plans** | ✅ Good | Telemetry Proof System tech plans (001–005), traceable to PRDs |
-| **API** | ⚠️ Partial | OpenAPI spec (`openapi.yaml`) exists; API README links to missing `authentication.md`, `plugin.md`, `user-profile.md` |
+| **API** | ✅ Good | OpenAPI spec (`openapi.yaml`), API README, `authentication.md`, `plugin.md`, `user-profile.md` |
+| **Guides** | ✅ Present | `docs/guides/development.md`, `docs/guides/deployment.md` |
 | **Brand** | ✅ Present | Design system doc |
 | **Infrastructure (Terraform)** | ✅ Ready | D1, R2, KV, optional routes for winpodiums.com; GitHub Actions for plan/apply |
-| **Repo governance** | ⚠️ Partial | AGENTS.md, .gitignore; no CONTRIBUTING, SECURITY, CHANGELOG, LICENSE; Terraform run locally only |
+| **Repo governance** | ✅ Present | AGENTS.md, .gitignore, CONTRIBUTING.md, SECURITY.md, CHANGELOG.md (stubs); Terraform plan/validate only until deploy-ready |
+| **Repo structure** | ✅ Done | Worker in `apps/api/` (wrangler.toml wired to Terraform outputs), SimHub plugin in `apps/plugin/` |
+| **Minimal Worker** | ✅ Present | Health, Gate (static), auth stubs, profile stub (`GET /api/profile/me`); bindings for D1/R2/KV in wrangler.toml |
+| **Plugin scaffold** | ✅ Present | C#/.NET 4.8 project in `apps/plugin/WinPodiums.Plugin/` |
 
-### What Does Not Exist Yet
+### What Is Not Done Yet
 
 | Area | Gap |
 |------|-----|
-| **Application code** | No Cloudflare Worker app (no `workers/` or app-level `wrangler.toml`), no SimHub plugin project |
-| **Guides** | No `docs/guides/development.md`, `docs/guides/deployment.md` (referenced in HLD and design docs) |
-| **API sub-docs** | No `docs/api/authentication.md`, `plugin.md`, `user-profile.md` (linked from API README) |
-| **Security LLD** | No `docs/design/security-anticheat.md` (referenced in HLD) |
-| **Repo docs** | No CONTRIBUTING.md, SECURITY.md, CHANGELOG.md, LICENSE |
+| **Phase 1 implementation** | Real Discord OAuth (web + plugin flows), D1 migrations, plugin auth (browser/manual) + one verification API call or stub |
+| **Deployment** | Terraform not applied; Worker not deployed to Terraform-created D1/R2/KV; no live routes |
+| **Repo docs** | No LICENSE; CONTRIBUTING/SECURITY/CHANGELOG are stubs (full content as implementation progresses) |
 
-So: **we have solid planning and infra-as-code, but no app to run on that infra.** Deploying Terraform now would create D1, R2, KV, and routes that nothing uses.
+So: **docs, scope, repo structure, and a minimal Worker + plugin scaffold are in place.** The next focus is **Phase 1 implementation** (real auth, D1, plugin flows); then deploy infra and Worker.
 
 ---
 
@@ -49,10 +51,10 @@ The documented sequence is: **finalize docs → set up repo structure → Phase 
 
 **Do not run `terraform apply` (and do not rely on GitHub Actions to apply) until:**
 
-1. You have a minimal Worker app that can bind to D1, R2, and KV and serve at least one route (e.g. health or auth stub).
-2. You are ready to run D1 migrations (per database-schema doc) and attach that Worker to the Terraform-created resources.
+1. You are ready to run D1 migrations (per database-schema doc) and attach the Worker in `apps/api/` to the Terraform-created D1/R2/KV.
+2. You are ready to deploy the Worker (e.g. `wrangler deploy`) and optionally attach routes (e.g. winpodiums.com).
 
-Terraform and the workflow are **ready**: use them for **plan** and **validate** on PRs, and keep `apply` for when the above is in place.
+A minimal Worker already exists and can bind to D1/R2/KV. Terraform and the workflow are **ready**: use them for **plan** and **validate** on PRs; use `apply` when you are ready to deploy.
 
 ---
 
@@ -60,7 +62,7 @@ Terraform and the workflow are **ready**: use them for **plan** and **validate**
 
 Follow the order below so that design, scope, and code stay aligned and infra is deployed only when useful.
 
-### Step 1: Finalize Documentation (No Code Yet)
+### Step 1: Finalize Documentation — ✅ Done
 
 - **Close doc gaps** (so implementation isn’t blocked by broken links or missing specs):
   - Add `docs/guides/development.md` and `docs/guides/deployment.md` (stubs are fine: “TBD – follow HLD and tech plans”).
@@ -70,7 +72,7 @@ Follow the order below so that design, scope, and code stay aligned and infra is
 
 **Outcome**: No broken doc links; clear entry points for developers; security/anti-cheat either specified or explicitly deferred.
 
-### Step 2: Define Phase 1 Scope Explicitly
+### Step 2: Define Phase 1 Scope — ✅ Done
 
 - **Write a short Phase 1 scope doc** (e.g. `docs/product/phase-1-mvp-scope.md` or a section in the HLD):
   - In scope: Discord OAuth2 (web + plugin browser/QR/manual), minimal Worker (auth + one or two API stubs), basic SimHub plugin (position detection, one verified flow), static landing, member state (pending/verified).
@@ -79,15 +81,13 @@ Follow the order below so that design, scope, and code stay aligned and infra is
 
 **Outcome**: Clear “minimum shippable” set and no confusion about whether Terraform + D1/R2/KV are for Phase 1 or later.
 
-### Step 3: Set Up Repository Structure
+### Step 3: Set Up Repository Structure — ✅ Done
 
-- **Worker app**: Add a minimal Cloudflare Workers project (e.g. `workers/` or `apps/api/`) with its own `wrangler.toml` that references **names/IDs from Terraform outputs** (D1 database name, R2 bucket name, KV namespace id). No need to deploy yet; just structure and config.
-- **SimHub plugin**: Add a minimal C#/.NET Framework 4.8 SimHub plugin project (e.g. `plugin/` or `src/WinPodiumsPlugin/`) per simhub-plugin LLD and Discord integration LLD.
-- **Monorepo layout**: Decide and document where Workers, plugin, and Terraform live (e.g. `infra/terraform/`, `apps/worker/`, `apps/plugin/` or similar) and update README and `.cursor/docs/index.md`.
+- Worker: `apps/api/` with `wrangler.toml` referencing Terraform outputs (D1, R2, KV).
+- SimHub plugin: `apps/plugin/WinPodiums.Plugin/` (C#/.NET Framework 4.8).
+- Minimal Worker serves health, Gate, auth stubs, profile stub; bindings ready for D1/R2/KV.
 
-**Outcome**: A place for Worker and plugin code that matches the docs and is ready to bind to Terraform-managed resources.
-
-### Step 4: Implement Phase 1 (Minimal Path)
+### Step 4: Implement Phase 1 (Current Focus)
 
 - **Worker**: Implement auth endpoints (per OpenAPI + Discord LLD) and at least one non-auth endpoint (e.g. health or `GET /api/profile/me` stub) using D1/KV. Apply D1 migrations (Wrangler) against the Terraform-created D1 database (local or a single dev environment).
 - **Plugin**: Implement minimal auth (e.g. browser or manual token first), position detection, and one call to the verification API (or a stub) per tech plans and SimHub LLD.

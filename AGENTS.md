@@ -4,8 +4,8 @@ Project-level guidance for AI agents working in this repo.
 
 ## Current phase
 
-- **Phase**: Planning & Design (pre-MVP). No application code yet — no Worker app, no SimHub plugin project.
-- **Do not run `terraform apply`** until a minimal Cloudflare Worker exists that can bind to D1/R2/KV. Use Terraform for plan/validate only. See [docs/architecture/next-steps.md](docs/architecture/next-steps.md) for recommended order of work.
+- **Phase**: Phase 1 MVP. Minimal Worker in `apps/api/` and SimHub plugin scaffold in `apps/plugin/` exist; stubs for health, Gate, auth, profile. **Current focus**: Implement Phase 1 (real Discord OAuth, D1 migrations, plugin auth + verification flow).
+- **Do not run `terraform apply`** until you are ready to deploy the Worker to Terraform-created D1/R2/KV and run D1 migrations. Use Terraform for plan/validate only. See [docs/architecture/next-steps.md](docs/architecture/next-steps.md) for recommended order of work.
 
 ## Stack and scope
 
@@ -15,11 +15,11 @@ Project-level guidance for AI agents working in this repo.
 - **Discord**: Auth and integrations; use the discord-authentication skill when relevant.
 - **Docker**: Dev environment and parity; use the docker-dev-environment skill when relevant.
 - **GitHub**: Change control, PRs, and secrets; use the github-change-control skill when relevant.
-- **Terraform**: Infra lives in `infra/terraform/`. Plan and validate only until a minimal Worker exists; see next-steps above.
+- **Terraform**: Infra lives in `infra/terraform/`. Plan and validate only until you are ready to deploy; see next-steps above.
 
 ## Conventions
 
 - Prefer skills in `.cursor/skills` for domain-specific tasks.
 - **Documentation**: Use the cursor-project-docs skill for repo docs, PRDs, tech plans, and `.cursor/docs/`. Follow PRD → HLD → Tech Plan; canonical docs live in `docs/` (see [docs/standards/documentation-standards.md](docs/standards/documentation-standards.md)).
-- **Implementation order**: When adding code, follow the sequence in [docs/architecture/next-steps.md](docs/architecture/next-steps.md) (doc gaps → Phase 1 scope → repo structure → Phase 1 implementation → then Terraform apply and deploy). Do not invent `workers/` or `plugin/` paths until the repo structure step is done; align with the documented layout.
+- **Implementation order**: Follow the sequence in [docs/architecture/next-steps.md](docs/architecture/next-steps.md). Use the documented layout: `apps/api/` (Worker), `apps/plugin/` (SimHub plugin), `infra/terraform/`. Current step: Phase 1 implementation (real auth, D1, plugin flows); then Terraform apply and deploy.
 - Do not commit secrets, tokens, or `.dev.vars` / `.env` files with credentials.

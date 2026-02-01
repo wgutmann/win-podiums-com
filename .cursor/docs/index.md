@@ -74,13 +74,13 @@ Project rules in [.cursor/rules/](.cursor/rules/) apply when editing matching fi
 
 ## Status
 
-**Phase**: Planning & Design (Pre-MVP)  
+**Phase**: Phase 1 MVP (structure + minimal API + plugin scaffold)  
 **Version**: 0.1.0-alpha  
 **Last Updated**: 2026-01-31
 
-**Next steps:**
-1. ~~Close doc gaps~~ (guides, API sub-docs, security LLD done)
+**Next steps:** ([full sequence](../../docs/architecture/next-steps.md))
+1. ~~Close doc gaps~~ (guides, API sub-docs, security LLD)
 2. ~~Define Phase 1 scope~~ ([phase-1-mvp-scope.md](../../docs/product/phase-1-mvp-scope.md))
 3. ~~Set up repo structure~~ (Worker in `apps/api/`, plugin in `apps/plugin/`, wrangler.toml wired to Terraform outputs)
-4. Implement Phase 1 (auth + health + profile stub in Worker; plugin scaffold in place)
-5. Then apply Terraform and deploy Worker (and plugin) — see [Next Steps](../../docs/architecture/next-steps.md)
+4. **Implement Phase 1** — real Discord OAuth, D1 migrations, plugin auth + one verification flow (Worker stubs and Gate already in place)
+5. Then apply Terraform and deploy Worker (and plugin)

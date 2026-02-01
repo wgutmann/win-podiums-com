@@ -44,11 +44,11 @@ Start here:
 
 ## Contributing
 
-Guidelines will be added in `CONTRIBUTING.md`.
+See [CONTRIBUTING.md](CONTRIBUTING.md) (stub; full guidelines as implementation progresses).
 
 ## Security
 
-Security policy will be added in `SECURITY.md`.
+See [SECURITY.md](SECURITY.md) (stub; full policy before production).
 
 ## License
 

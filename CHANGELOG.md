@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 
 - `.cursor/docs/index.md`: clarified repo docs links and status; added cloudflare-workers skill.
+- **Documentation refresh (2026-01-31)**: [docs/architecture/next-steps.md](docs/architecture/next-steps.md) updated for current state — Steps 1–3 (doc gaps, Phase 1 scope, repo structure) marked done; Step 4 (Implement Phase 1) is current focus. README, AGENTS.md, CONTRIBUTING.md, and .cursor/docs/index.md aligned with same; CONTRIBUTING/SECURITY linked from README.
 
 ---
 

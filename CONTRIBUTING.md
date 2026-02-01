@@ -4,7 +4,7 @@ Guidelines for contributing to this repository. **Status: stub** — full guidel
 
 ## Current phase
 
-The project is in **Planning & Design (pre-MVP)**. There is no application code yet (no Worker app, no SimHub plugin project). See [README](README.md) and [docs/architecture/next-steps.md](docs/architecture/next-steps.md).
+The project is in **Phase 1 MVP**. A minimal Worker (`apps/api/`) and SimHub plugin scaffold (`apps/plugin/`) exist; current focus is implementing Phase 1 (real Discord OAuth, D1 migrations, plugin auth and verification). See [README](README.md) and [docs/architecture/next-steps.md](docs/architecture/next-steps.md).
 
 ## What you can do now
 

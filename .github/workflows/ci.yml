@@ -92,9 +92,10 @@ jobs:
           cache-dependency-path: apps/api/package-lock.json
 
       - name: Install and verify lockfile
-        run: |
-          npm ci
-          git diff --exit-code apps/api/package-lock.json
+        run: npm ci
+      - name: Verify lockfile unchanged
+        run: git diff --exit-code apps/api/package-lock.json
+        working-directory: ${{ github.workspace }}
 
   openapi-validate:
     name: OpenAPI validation

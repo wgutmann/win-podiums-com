@@ -1,0 +1,47 @@
+# Worker test: build Docker, start API, run smoke test against it.
+# Validates that Docker and Worker config match (health ok, env=dev).
+name: Worker test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    paths:
+      - "apps/api/**"
+      - "Dockerfile"
+      - "compose.yaml"
+      - ".github/workflows/worker-test.yml"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Create .dev.vars for CI
+        run: |
+          # Compose needs apps/api/.dev.vars to exist (env_file). Use placeholders; health check doesn't need real secrets.
+          cp apps/api/.dev.vars.example apps/api/.dev.vars || true
+          if [ ! -f apps/api/.dev.vars ]; then
+            printf 'DISCORD_CLIENT_ID=\nDISCORD_CLIENT_SECRET=\nSESSION_SECRET=ci-placeholder-at-least-32-chars-here\n' > apps/api/.dev.vars
+          fi
+
+      - name: Start API (Docker)
+        run: |
+          docker compose up -d --build
+          # Wait for API to be ready
+          n=0
+          until curl -sf http://localhost:8787/api/health >/dev/null; do
+            n=$((n+1))
+            [ $n -ge 30 ] && { echo "API did not become ready"; docker compose logs api; exit 1; }
+            sleep 2
+          done
+
+      - name: Run smoke test
+        run: |
+          cd apps/api && npm ci && npm test
+
+      - name: Show API logs on failure
+        if: failure()
+        run: docker compose logs api

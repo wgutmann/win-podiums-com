@@ -64,6 +64,8 @@ If the API is not running, `npm test` will fail with a clear message: "Start Doc
 
 `apps/api/test/smoke.js` fetches `GET /api/health` and asserts `{ ok: true, env: "dev" }`. It ensures the Worker in Docker is up and that `ENVIRONMENT` matches `wrangler.toml` (Docker and Worker config 1:1).
 
+**CI**: GitHub Actions runs the same test on push/PR to `main` when `apps/api/`, Dockerfile, or compose change (`.github/workflows/worker-test.yml`): build Docker, start API, run smoke test.
+
 ## Config alignment (Docker and Worker)
 
 | Source | Purpose |

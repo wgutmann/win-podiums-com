@@ -1,0 +1,97 @@
+# Validate Mermaid diagram files (.mmd and .md with Mermaid blocks).
+# On merge to main: intended behavior is to delete changed diagrams from ContextStream
+# and re-create them. ContextStream does not yet expose an API for diagram list/delete/create;
+# when it does, uncomment or add the sync step and set CONTEXTSTREAM_API_KEY in repo secrets.
+name: Diagrams
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "docs/architecture/diagrams/**"
+      - "docs/design/diagrams/**"
+      - ".github/workflows/diagrams.yml"
+  pull_request:
+    branches: [main]
+    paths:
+      - "docs/architecture/diagrams/**"
+      - "docs/design/diagrams/**"
+      - ".github/workflows/diagrams.yml"
+
+concurrency:
+  group: diagrams-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate Mermaid diagrams
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate .mmd files
+        run: |
+          for f in docs/architecture/diagrams/*.mmd docs/design/diagrams/*.mmd; do
+            [ -f "$f" ] || continue
+            echo "Validating $f"
+            docker run --rm -v "$PWD:/data" minlag/mermaid-cli mmdc -i "/data/$f" -o /data/out.svg -b transparent
+            rm -f out.svg
+          done
+
+      - name: Validate .md files (Mermaid blocks)
+        run: |
+          for md in docs/architecture/diagrams/*.md docs/design/diagrams/*.md; do
+            [ -f "$md" ] || continue
+            echo "Checking $md"
+            sed -n '/^```mermaid$/,/^```$/p' "$md" | sed '1d;$d' > /tmp/extracted.mmd
+            if [ -s /tmp/extracted.mmd ]; then
+              docker run --rm -v "$PWD:/data" -v /tmp/extracted.mmd:/tmp/extracted.mmd minlag/mermaid-cli mmdc -i /tmp/extracted.mmd -o /data/out.svg -b transparent
+              rm -f out.svg
+            fi
+          done
+
+  # On merge to main: sync diagrams to ContextStream (delete changed ones, re-create).
+  # Blocked: ContextStream has no public API for diagram list/delete/create.
+  # When available: add CONTEXTSTREAM_API_KEY and CONTEXTSTREAM_DIAGRAM_API_URL (or equivalent)
+  # in repo secrets, then for each CHANGED_DIAGRAMS: call API to delete by id/path, then create.
+  sync-contextstream-diagrams:
+    name: Sync diagrams to ContextStream (delete changed, re-create)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: validate
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Get changed diagram files (merge base -> HEAD)
+        id: changed
+        run: |
+          # Diagram paths we care about (.mmd and .md with Mermaid)
+          PATHS="docs/architecture/diagrams/ docs/design/diagrams/"
+          CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }} -- $PATHS 2>/dev/null || true)
+          if [ -z "$CHANGED" ]; then
+            echo "changed_count=0" >> $GITHUB_OUTPUT
+            echo "No diagram files changed in this push."
+            exit 0
+          fi
+          echo "changed_count=$(echo "$CHANGED" | wc -l)" >> $GITHUB_OUTPUT
+          echo "changed<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGED" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+          echo "Changed diagram files:"
+          echo "$CHANGED"
+
+      - name: ContextStream diagram sync (placeholder)
+        run: |
+          if [ "${{ steps.changed.outputs.changed_count }}" = "0" ]; then
+            echo "No diagram changes; nothing to sync."
+            exit 0
+          fi
+          echo "Intended: for each changed file, call ContextStream API to delete diagram then re-create."
+          echo "ContextStream does not yet expose a public API for diagram list/delete/create."
+          echo "When it does: add a step here that uses CONTEXTSTREAM_API_KEY to:"
+          echo "  1. List or identify diagrams by path/name"
+          echo "  2. Delete the diagrams that changed"
+          echo "  3. Create new diagram entries from the changed files"
+          echo "See: https://contextstream.io/docs (API reference when available)."

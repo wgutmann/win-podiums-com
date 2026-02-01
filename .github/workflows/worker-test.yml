@@ -13,6 +13,11 @@ on:
       - "Dockerfile"
       - "compose.yaml"
       - ".github/workflows/worker-test.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: worker-test-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
@@ -39,9 +44,16 @@ jobs:
             sleep 2
           done
 
+      - name: Run unit tests (in container)
+        run: docker compose exec -T api npm run test:unit
+
+      - name: Setup Node for smoke test
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
       - name: Run smoke test
-        run: |
-          cd apps/api && npm ci && npm test
+        run: node apps/api/test/smoke.js
 
       - name: Show API logs on failure
         if: failure()

@@ -8,6 +8,8 @@
     "deploy": "wrangler deploy",
     "cf-typegen": "wrangler types",
     "test": "node test/smoke.js",
+    "test:unit": "vitest run",
+    "test:all": "npm run test:unit && node test/smoke.js",
     "typecheck": "tsc --noEmit",
     "lint": "eslint src --ext .ts"
   },
@@ -17,6 +19,7 @@
     "@typescript-eslint/parser": "^7.0.0",
     "eslint": "^8.57.0",
     "typescript": "^5.3.3",
+    "vitest": "^2.1.0",
     "wrangler": "^4.61.1"
   }
 }

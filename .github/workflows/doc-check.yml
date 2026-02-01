@@ -1,0 +1,67 @@
+# doc-check: Markdown lint, Lychee link check, Mermaid .mmd validation, OpenAPI (Spectral).
+# Runs when docs, key READMEs, or configs change.
+# See docs/guides/development.md#recommended-github-actions and docs/standards/documentation-standards.md
+
+name: doc-check
+
+on:
+  pull_request:
+    branches: ["**"]
+
+concurrency:
+  group: doc-check-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  paths:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+      contents: read
+    outputs:
+      doc_check: ${{ steps.filter.outputs.doc_check }}
+    steps:
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            doc_check:
+              - 'docs/**'
+              - 'README.md'
+              - 'apps/plugin/README.md'
+              - 'infra/terraform/README.md'
+              - '.markdownlint.jsonc'
+              - '.lycheeignore'
+              - '.spectral.yaml'
+              - '.github/workflows/doc-check.yml'
+
+  doc-check:
+    needs: paths
+    if: needs.paths.outputs.doc_check == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Markdown lint
+        run: |
+          npx markdownlint-cli@latest 'docs/**/*.md' 'README.md' 'apps/plugin/README.md' 'infra/terraform/README.md' -c .markdownlint.jsonc
+
+      - name: Link check
+        uses: lycheeverse/lychee-action@v2
+        with:
+          args: --verbose ./docs/ ./README.md ./apps/plugin/README.md ./infra/terraform/README.md
+          fail: true
+
+      - name: Validate Mermaid
+        run: |
+          for f in $(find docs/architecture/diagrams docs/design/diagrams -name '*.mmd' 2>/dev/null); do
+            npx @mermaid-js/mermaid-cli@latest -i "$f" -o /tmp/mermaid-out.svg || exit 1
+          done
+
+      - name: OpenAPI validation
+        run: npx @stoplight/spectral-cli@latest lint docs/api/openapi.yaml --fail-severity=error --ruleset .spectral.yaml

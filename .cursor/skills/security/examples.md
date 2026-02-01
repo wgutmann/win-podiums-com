@@ -36,7 +36,7 @@ Concrete scenarios for applying the security skill and ADR-006.
 
 ## 3. CI failed: TruffleHog found a secret
 
-**Scenario**: Security workflow fails with "Secret detected".
+**Scenario**: If you added a security workflow, it fails with "Secret detected".
 
 **Steps**:
 
@@ -52,7 +52,7 @@ Concrete scenarios for applying the security skill and ADR-006.
 
 ## 4. CI failed: npm audit or dotnet vulnerable packages
 
-**Scenario**: Security workflow fails on dependency audit.
+**Scenario**: If you added a security workflow, it fails on dependency audit.
 
 **Steps**:
 
@@ -72,7 +72,7 @@ Concrete scenarios for applying the security skill and ADR-006.
 
 1. **API**: Smoke test should hit health and, if possible, at least one auth-related path (e.g. redirect or stub). Add a smoke test for new auth or heartbeat endpoints: e.g. `GET /api/health`, `POST /api/plugin/heartbeat` with a placeholder token (expect 401 or 200 depending on design). See [smoke.js](../../../apps/api/test/smoke.js); run locally with Docker and `npm test`.
 2. **Plugin**: For token storage or API client, add unit tests that mock the API and assert correct headers, retries, or error handling. Prefer tests for any code that handles tokens or secrets.
-3. **CI**: Ensure `npm test` (API) and Security/CI workflows pass. Do not merge without running tests locally.
+3. **Local checks**: Ensure `npm test` (API) and local pre-push checks pass. If you added GitHub Actions (Security/CI workflows), they should pass before merge. Do not merge without running tests locally.
 
 **Do not**: Merge auth or heartbeat changes with no tests; assume "manual testing is enough."
 

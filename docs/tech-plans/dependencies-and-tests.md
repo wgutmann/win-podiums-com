@@ -9,7 +9,7 @@
 
 | Check | Result |
 |-------|--------|
-| **npm audit** | 0 vulnerabilities (high/critical). CI: `npm audit --audit-level=high` in security workflow. |
+| **npm audit** | 0 vulnerabilities (high/critical). Recommended: run `npm audit --audit-level=high` in a security workflow if you add one under `.github/workflows/`. |
 | **Lockfile** | `package-lock.json` present; CI uses `npm ci` for reproducible installs. |
 | **Outdated** | Optional: run `npm outdated` periodically. Wrangler and TypeScript are kept current via semver ranges. |
 
@@ -19,7 +19,7 @@ No blocking dependency issues. Keep running `npm audit` and `npm ci` in CI.
 
 | Check | Result |
 |-------|--------|
-| **dotnet list package --vulnerable** | CI runs this in security workflow; fails if any vulnerable packages. |
+| **dotnet list package --vulnerable** | Recommended: run in a security workflow if you add one; fail if any vulnerable packages. |
 | **Newtonsoft.Json** | 13.0.3 in use; CVE-2024-21907 fixed in 13.0.1+. No known vuln for 13.0.3. Bump to 13.0.4 when convenient. |
 
 No blocking dependency issues. Dependabot may suggest minor bumps (e.g. Newtonsoft.Json 13.0.4); apply when appropriate.
@@ -36,7 +36,7 @@ No root `package.json`; monorepo is app-scoped (`apps/api`, `apps/plugin`). No r
 
 | Area | What exists | Gap |
 |------|-------------|-----|
-| **API smoke** | `apps/api/test/smoke.js`: GET /api/health, GET /api-docs, GET /api-docs/openapi.yaml. Run locally with `npm test`; no CI workflow. | No coverage of auth/profile/heartbeat behavior. |
+| **API smoke** | `apps/api/test/smoke.js`: GET /api/health, GET /api-docs, GET /api-docs/openapi.yaml. Run locally with `npm test`; repo does not ship GitHub Actions by default. | No coverage of auth/profile/heartbeat behavior. |
 | **API unit** | Vitest in `test/required/` (response, session JWT) and `test/optional/`. Run order: required first; optional only if all required pass (`npm run test:unit`). | Add optional tests for non-critical or slower checks as needed. |
 | **Plugin** | No test project. | Token storage, API client, auth flows untested. |
 

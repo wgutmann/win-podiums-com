@@ -16,13 +16,13 @@ If you believe you have found a security vulnerability:
 
 We will acknowledge receipt and work with you to understand and address the issue.
 
-## CI security checks
+## Recommended security automation
 
-The repository runs automated security checks on every push and pull request (see [.github/workflows/security.yml](.github/workflows/security.yml)):
+The repository does **not** ship GitHub Actions by default. We **recommend** adding a security workflow under `.github/workflows/` for teams that want automated checks on push/PR:
 
-- **Secret scanning**: TruffleHog scans commits and the working tree for leaked credentials; the workflow fails if verified secrets are found.
-- **Dependency audits**: `npm audit` (API) and `dotnet list package --vulnerable` (plugin) run in CI; high/critical or known-vulnerable packages fail the build.
-- **Code scanning (SAST)**: CodeQL analyzes TypeScript and C# for security issues; results appear in the Security tab and on pull requests.
+- **Secret scanning**: e.g. TruffleHog to scan commits and the working tree for leaked credentials.
+- **Dependency audits**: `npm audit` (API) and `dotnet list package --vulnerable` (plugin); fail on high/critical or known-vulnerable packages.
+- **Code scanning (SAST)**: e.g. CodeQL for TypeScript and C#; results in the Security tab and on pull requests.
 
 [Dependabot](.github/dependabot.yml) opens PRs for npm, NuGet, and GitHub Actions updates on a weekly schedule.
 

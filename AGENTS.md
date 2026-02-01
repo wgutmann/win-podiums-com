@@ -28,6 +28,7 @@ Project-level guidance for AI agents working in this repo.
 
 ## Conventions
 
+- **Git branch agnostic:** Do not assume or depend on the user's current git branch. Do not run `git branch`, `git status`, or infer branch for context unless the user explicitly asks. Treat branch as unspecified; give branch-neutral advice (e.g. "before pushing" not "before pushing to main").
 - Prefer skills in `.cursor/skills` for domain-specific tasks.
 - **ContextStream (when MCP enabled):** (1) **Every new session (mandatory):** first action must be `session_init` then `context_smart`; on every later message, call `context_smart` at the start of your turn—do not skip. (2) **Before Grep/Read:** use ContextStream `search` (hybrid/semantic) first for code or docs. (3) **Decisions:** recall or capture via session/memory tools; after significant choices, capture with file path. (4) **Refactors:** use `graph(dependencies|impact)` before changing code. (5) **Lessons:** use `capture_lesson` when the user corrects a mistake. If ContextStream is unavailable, fall back to [AGENTS.md](AGENTS.md) and [docs/architecture/next-steps.md](docs/architecture/next-steps.md). See [development guide](docs/guides/development.md#ai-tooling-optional) and `.cursor/rules/contextstream.mdc`.
 - **Documentation**: Use the cursor-project-docs skill; canonical docs in `docs/`. Follow PRD → HLD → Tech Plan.

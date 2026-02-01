@@ -37,10 +37,12 @@ jobs:
   filter:
     name: Path filter
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     outputs:
       api: ${{ steps.paths.outputs.api }}
       plugin: ${{ steps.paths.outputs.plugin }}
       code: ${{ steps.paths.outputs.code }}
+      codeql_languages: ${{ steps.codeql-languages.outputs.codeql_languages }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -59,18 +61,37 @@ jobs:
             code:
               - 'apps/api/**'
               - 'apps/plugin/**'
+            api_code:
+              - 'apps/api/**'
+            plugin_code:
+              - 'apps/plugin/**'
+
+      - id: codeql-languages
+        run: |
+          A="${{ steps.paths.outputs.api_code }}"
+          P="${{ steps.paths.outputs.plugin_code }}"
+          if [ "$A" = "true" ] && [ "$P" = "true" ]; then
+            echo "codeql_languages=[\"javascript-typescript\",\"csharp\"]" >> $GITHUB_OUTPUT
+          elif [ "$A" = "true" ]; then
+            echo "codeql_languages=[\"javascript-typescript\"]" >> $GITHUB_OUTPUT
+          elif [ "$P" = "true" ]; then
+            echo "codeql_languages=[\"csharp\"]" >> $GITHUB_OUTPUT
+          else
+            echo "codeql_languages=[]" >> $GITHUB_OUTPUT
+          fi
 
   # --- Secret scanning (commits and working tree) ---
   secrets:
     name: Secret scan
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     steps:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
       - name: TruffleHog (secrets)
-        uses: trufflesecurity/trufflehog@main
+        uses: trufflesecurity/trufflehog@v3.92.5
         with:
           path: ./
           extra_args: --only-verified
@@ -79,6 +100,7 @@ jobs:
   deps-npm:
     name: npm audit
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: [filter]
     if: needs.filter.outputs.api == 'true'
     steps:
@@ -99,6 +121,7 @@ jobs:
   deps-dotnet:
     name: .NET vulnerable packages
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     needs: [filter]
     if: needs.filter.outputs.plugin == 'true'
     steps:
@@ -127,8 +150,9 @@ jobs:
   codeql:
     name: CodeQL
     runs-on: ubuntu-latest
+    timeout-minutes: 45
     needs: [filter]
-    if: needs.filter.outputs.code == 'true' && (github.event_name != 'pull_request' || github.event.pull_request.draft != true)
+    if: needs.filter.outputs.code == 'true' && needs.filter.outputs.codeql_languages != '[]' && (github.event_name != 'pull_request' || github.event.pull_request.draft != true)
     permissions:
       security-events: write
       actions: read
@@ -136,7 +160,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [javascript-typescript, csharp]
+        language: ${{ fromJson(needs.filter.outputs.codeql_languages) }}
     steps:
       - uses: actions/checkout@v6
 
@@ -167,6 +191,7 @@ jobs:
   revert-on-failure:
     name: Open revert PR
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     needs: [secrets, deps-npm, deps-dotnet, codeql]
     if: failure() && github.ref == 'refs/heads/main' && github.event_name == 'push'
     permissions:

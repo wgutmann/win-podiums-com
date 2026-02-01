@@ -1,4 +1,5 @@
-# CI: typecheck, lint, plugin build, lockfile check, OpenAPI validation.
+# CI: required checks first (each step reports as soon as it completes), then optional tests if all required pass.
+# Required: typecheck, lint, lockfile, OpenAPI, required unit tests. Optional: optional unit tests.
 # Workflow runs when api/plugin/docs-api change; each job runs only when its paths change.
 # Concurrency cancels in-progress runs when new commits are pushed (saves minutes).
 name: CI
@@ -6,6 +7,11 @@ name: CI
 on:
   push:
     branches: [main]
+    paths:
+      - "apps/api/**"
+      - "apps/plugin/**"
+      - "docs/api/**"
+      - ".github/workflows/ci.yml"
   pull_request:
     branches: [main]
     paths:
@@ -42,7 +48,7 @@ jobs:
   api-validate:
     needs: paths
     if: needs.paths.outputs.api == 'true'
-    name: API (typecheck, lint, lockfile, OpenAPI)
+    name: API (required then optional tests)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -62,6 +68,7 @@ jobs:
           npm ci
           node scripts/inline-openapi.js ../../docs/api/openapi.yaml src/openapi-spec.ts
 
+      # --- Required: each step reports as soon as it completes; job fails on first failure ---
       - name: Typecheck
         run: npm run typecheck
 
@@ -76,6 +83,13 @@ jobs:
         run: npx @stoplight/spectral-cli@latest lint docs/api/openapi.yaml --fail-severity=error
         working-directory: ${{ github.workspace }}
 
+      - name: Required unit tests
+        run: npm run test:required
+
+      # --- Optional: runs only if all required steps passed ---
+      - name: Optional unit tests
+        run: npm run test:optional
+
   plugin-build:
     name: Plugin build
     needs: paths
@@ -88,6 +102,8 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "8.0.x"
+          cache: "nuget"
+          cache-dependency-path: apps/plugin/WinPodiums.Plugin/WinPodiums.Plugin.csproj
 
       - name: Restore and build
         run: |

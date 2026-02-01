@@ -6,27 +6,49 @@
  */
 const API_BASE = process.env.API_BASE || 'http://localhost:8787';
 
+// #region agent log
+function agentLog(location, message, data, hypothesisId) {
+  const payload = { location, message, data: data || {}, hypothesisId, timestamp: Date.now(), sessionId: 'debug-session' };
+  fetch('http://127.0.0.1:7242/ingest/1d72bcc7-cc87-407b-8d82-421bf27576d3', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).catch(() => {});
+}
+// #endregion
+
 async function main() {
+  // #region agent log
+  agentLog('smoke.js:main', 'smoke started', { API_BASE }, 'A,B');
+  // #endregion
   let res;
   try {
     res = await fetch(`${API_BASE}/api/health`);
   } catch (err) {
+    // #region agent log
+    agentLog('smoke.js:health-fetch', 'health fetch threw', { error: String(err && err.message), API_BASE }, 'A,B');
+    // #endregion
     console.error('Cannot reach API at', API_BASE);
     console.error('Start Docker first: docker compose up -d');
     process.exit(1);
   }
 
+  // #region agent log
+  agentLog('smoke.js:health-response', 'health response', { status: res.status, statusText: res.statusText, ok: res.ok }, 'A,B,C');
+  // #endregion
   if (!res.ok) {
     console.error('Health check failed:', res.status, res.statusText);
     process.exit(1);
   }
 
   const data = await res.json();
+  // #region agent log
+  agentLog('smoke.js:health-json', 'health body', { dataOk: data?.ok, dataEnv: data?.env, fullData: data }, 'C');
+  // #endregion
   if (data.ok !== true) {
     console.error('Expected { ok: true }, got:', data);
     process.exit(1);
   }
   if (data.env !== 'dev') {
+    // #region agent log
+    agentLog('smoke.js:env-check-fail', 'env not dev', { dataEnv: data.env }, 'C');
+    // #endregion
     console.error('Expected env "dev" (Docker/Worker config match), got:', data.env);
     process.exit(1);
   }
@@ -99,6 +121,9 @@ async function main() {
     process.exit(1);
   }
 
+  // #region agent log
+  agentLog('smoke.js:done', 'smoke passed', { env: data.env }, 'A,B,C');
+  // #endregion
   console.log('Smoke test passed: API health ok, env=%s, API docs load, protected routes return 401 without auth', data.env);
 }
 

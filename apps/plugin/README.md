@@ -23,7 +23,7 @@ SimHub plugin for WinPodiums: monitors telemetry, detects podium finishes, and s
 
 1. Add reference to SimHub plugin SDK/assemblies from the SimHub install directory: `C:\Program Files (x86)\SimHub` (see [SimHub Plugin LLD](../../docs/design/components/simhub-plugin.md)).
 2. From this directory: `dotnet build WinPodiums.Plugin/WinPodiums.Plugin.csproj`
-3. Deploy the built DLL to `C:\Program Files (x86)\SimHub\Plugins` and restart SimHub.
+3. Deploy the built DLL to `C:\Program Files (x86)\SimHub\Plugins` and restart SimHub. (Official SimHub docs sometimes refer to the install root; this repo uses the Plugins subfolder unless your SimHub version requires otherwise.)
 
 ## Phase 1: manual token + heartbeat
 

@@ -87,7 +87,7 @@ Do not commit `.dev.vars`. Create it from `.dev.vars.example`.
 
 ## SimHub plugin (no Docker)
 
-The plugin targets .NET Framework 4.8 and SimHub on Windows. Build and run on the host (Visual Studio or MSBuild). Deploy the built DLL to `C:\Program Files (x86)\SimHub\Plugins`. Point the plugin at `http://localhost:8787` when the API is running in Docker. See `apps/plugin/README.md`.
+The plugin targets .NET Framework 4.8 and SimHub on Windows. Build and run on the host (Visual Studio or MSBuild). Deploy the built DLL to `C:\Program Files (x86)\SimHub\Plugins`. Point the plugin at `http://localhost:8787` when the API is running in Docker. See `apps/plugin/README.md`. Official SimHub docs sometimes refer to the SimHub install root for plugin DLLs; this repo uses the `Plugins` subfolder unless your SimHub version requires otherwise.
 
 ## Wrangler bindings (D1, R2, KV)
 

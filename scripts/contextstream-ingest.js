@@ -369,11 +369,16 @@ async function uploadDocument({ content, metadata }) {
     body = contentStream;
   }
 
-  const response = await fetch(CONFIG.knowledgeApiUrl, {
+  const fetchOptions = {
     method: 'POST',
     headers: contentType ? { ...headers, 'Content-Type': contentType } : headers,
     body,
-  });
+  };
+  // Node.js 18+ requires duplex: 'half' when body is a Readable stream.
+  if (CONFIG.uploadMode === 'stream') {
+    fetchOptions.duplex = 'half';
+  }
+  const response = await fetch(CONFIG.knowledgeApiUrl, fetchOptions);
 
   if (!response.ok) {
     const text = await response.text();

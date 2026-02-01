@@ -68,7 +68,7 @@ infra/terraform/
 
 ## CI
 
-GitHub Actions run **security** (secrets, dependency audits, CodeQL) and **CI** (typecheck, lint, plugin build, lockfile check, OpenAPI validation). See [Development Guide](../../docs/guides/development.md#ci-workflows).
+GitHub Actions run **security** (secret scanning) and **tests** (API unit tests). See [Development Guide](../../docs/guides/development.md#ci-workflows).
 
 Terraform is **not** run in GitHub Actions. Run `terraform plan` and `terraform apply` locally with `CLOUDFLARE_API_TOKEN` (and optionally `CLOUDFLARE_ACCOUNT_ID`, `CLOUDFLARE_ZONE_ID`) in your environment. See [infra/terraform/README.md](../../infra/terraform/README.md).
 

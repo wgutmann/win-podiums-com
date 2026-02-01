@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Changed
 
 - `.cursor/docs/index.md`: clarified repo docs links and status; added cloudflare-workers skill.
+- **CI simplified (2026-02-01)**: GitHub Actions trimmed to API unit tests (`.github/workflows/ci.yml`) and secret scanning only (`.github/workflows/security.yml`). Pre-push checks and docs updated to match.
 - **Documentation refresh (2026-01-31)**: [docs/architecture/next-steps.md](docs/architecture/next-steps.md) updated for current state — Steps 1–3 (doc gaps, Phase 1 scope, repo structure) marked done; Step 4 (Implement Phase 1) is current focus. README, AGENTS.md, CONTRIBUTING.md, and .cursor/docs/index.md aligned with same; CONTRIBUTING/SECURITY linked from README.
 - **Worker/Docker 1:1, Terraform out of scope (2026-01-31)**: README, AGENTS.md, next-steps.md, development.md, deployment.md, wrangler.toml, phase-1-mvp-scope.md, infrastructure.md, .cursor/docs/index.md, and cloudflare-workers skill updated so that (1) Worker and Docker are documented as 1:1 (same app, same config), and (2) Terraform is ignored until explicitly introduced as a feature; all Terraform-based deploy steps removed from the default workflow.
 - **Run and test with Docker (2026-01-31)**: Dockerfile added (Node 20 Bookworm, Wrangler with `--ip 0.0.0.0`); compose uses `env_file: ./apps/api/.dev.vars` and Docker/Worker config aligned via `CLOUDFLARE_INCLUDE_PROCESS_ENV`. Smoke test `apps/api/test/smoke.js` runs against Docker API and asserts `{ ok: true, env: "dev" }`. All docs updated: local run and testing use Docker; start API with `docker compose up`, run tests with `docker compose up -d && cd apps/api && npm test`.
@@ -24,7 +25,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Removed
 
-- **Worker test workflow (2026-01-31)**: `.github/workflows/worker-test.yml` removed. API smoke and unit tests are run locally (Docker + `npm test` / `npm run test:unit`); CI runs typecheck, lint, plugin build, lockfile check, OpenAPI validation, and security checks only.
+- **Doc workflows (2026-02-01)**: `.github/workflows/doc-check.yml` and `.github/workflows/diagrams.yml` removed to keep CI minimal during Phase 1.
+- **Worker test workflow (2026-01-31)**: `.github/workflows/worker-test.yml` removed. API smoke and unit tests are run locally (Docker + `npm test` / `npm run test:unit`); CI coverage is documented in [development guide](docs/guides/development.md#ci-workflows).
 
 ---
 

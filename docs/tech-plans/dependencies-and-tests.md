@@ -1,7 +1,7 @@
 # Dependencies and Test Coverage
 
 **Status**: Living doc  
-**Last updated**: 2026-01-31
+**Last updated**: 2026-02-01
 
 ## Dependency status
 
@@ -9,17 +9,17 @@
 
 | Check | Result |
 |-------|--------|
-| **npm audit** | 0 vulnerabilities (high/critical). CI: `npm audit --audit-level=high` in security workflow. |
+| **npm audit** | Run manually when needed (`npm audit --audit-level=high`). CI does not run audits yet. |
 | **Lockfile** | `package-lock.json` present; CI uses `npm ci` for reproducible installs. |
 | **Outdated** | Optional: run `npm outdated` periodically. Wrangler and TypeScript are kept current via semver ranges. |
 
-No blocking dependency issues. Keep running `npm audit` and `npm ci` in CI.
+No blocking dependency issues. CI uses `npm ci`; run `npm audit` manually when needed.
 
 ### Plugin (`apps/plugin`)
 
 | Check | Result |
 |-------|--------|
-| **dotnet list package --vulnerable** | CI runs this in security workflow; fails if any vulnerable packages. |
+| **dotnet list package --vulnerable** | Run manually when needed; CI does not run audits yet. |
 | **Newtonsoft.Json** | 13.0.3 in use; CVE-2024-21907 fixed in 13.0.1+. No known vuln for 13.0.3. Bump to 13.0.4 when convenient. |
 
 No blocking dependency issues. Dependabot may suggest minor bumps (e.g. Newtonsoft.Json 13.0.4); apply when appropriate.
@@ -71,8 +71,8 @@ This avoids running optional tests when required ones already failed, saving tim
 
 ## CI
 
-- **security.yml**: TruffleHog, npm audit, dotnet vulnerable packages, CodeQL. No change needed for tests.
-- New test scripts (e.g. `test:unit`) should be run in CI so that merge is blocked if tests fail.
+- **security.yml**: TruffleHog secret scanning (verified only).
+- **ci.yml**: API unit tests (`npm run test:unit`).
 
 ---
 

@@ -50,17 +50,17 @@ Concrete scenarios for applying the security skill and ADR-006.
 
 ---
 
-## 4. CI failed: npm audit or dotnet vulnerable packages
+## 4. Manual dependency audit (optional)
 
-**Scenario**: Security workflow fails on dependency audit.
+**Scenario**: You want to spot-check dependencies before a release or security review.
 
 **Steps**:
 
-1. Run locally: `cd apps/api && npm audit` or `cd apps/plugin/WinPodiums.Plugin && dotnet list package --vulnerable --include-transitive`. Fix by upgrading or replacing the vulnerable package.
-2. If a fix is not yet available: Document the exception (e.g. in a ticket or ADR) and add a temporary override only if the risk is accepted and tracked. Prefer upgrading or removing the dependency.
-3. Re-run CI after updating dependencies.
+1. Run locally: `cd apps/api && npm audit --audit-level=high` and/or `cd apps/plugin/WinPodiums.Plugin && dotnet list package --vulnerable --include-transitive`.
+2. Fix by upgrading or replacing vulnerable packages; document any accepted exceptions.
+3. Re-run the audit after updating dependencies.
 
-**Do not**: Disable the audit step; ignore high/critical vulnerabilities without a documented exception.
+**Do not**: Treat audits as CI gates during Phase 1; use them as manual checks when needed.
 
 ---
 
@@ -72,7 +72,7 @@ Concrete scenarios for applying the security skill and ADR-006.
 
 1. **API**: Smoke test should hit health and, if possible, at least one auth-related path (e.g. redirect or stub). Add a smoke test for new auth or heartbeat endpoints: e.g. `GET /api/health`, `POST /api/plugin/heartbeat` with a placeholder token (expect 401 or 200 depending on design). See [smoke.js](../../../apps/api/test/smoke.js); run locally with Docker and `npm test`.
 2. **Plugin**: For token storage or API client, add unit tests that mock the API and assert correct headers, retries, or error handling. Prefer tests for any code that handles tokens or secrets.
-3. **CI**: Ensure `npm test` (API) and Security/CI workflows pass. Do not merge without running tests locally.
+3. **CI**: Ensure API unit tests and secret scan pass. Do not merge without running tests locally.
 
 **Do not**: Merge auth or heartbeat changes with no tests; assume "manual testing is enough."
 

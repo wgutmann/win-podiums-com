@@ -281,12 +281,12 @@ Each directory must have a `README.md` that:
 
 ## Automation
 
-**CI (Doc check)**: [.github/workflows/doc-check.yml](../../.github/workflows/doc-check.yml) runs on push/PR when `docs/`, key READMEs, or the workflow change. It:
+**Doc checks (manual in Phase 1)**: Documentation validation is run manually as needed to keep CI minimal. Recommended checks:
 
-- **Markdown lint**: Syntax and formatting for `docs/**/*.md`, root READMEs, plugin and Terraform READMEs (config: [.markdownlint.jsonc](../../.markdownlint.jsonc)).
-- **Link check**: [lychee](https://github.com/lycheeverse/lychee-action) validates links in those files; fails on broken links.
-- **Mermaid diagrams**: Validates `.mmd` files in `docs/architecture/diagrams/` and `docs/design/diagrams/` so diagrams render.
-- **OpenAPI**: Validates `docs/api/openapi.yaml` (Spectral, fail on error).
+- **Markdown lint**: `npx markdownlint-cli@latest "docs/**/*.md" "README.md" "AGENTS.md" "CONTRIBUTING.md" "SECURITY.md" "apps/plugin/README.md" "infra/terraform/README.md" --config .markdownlint.jsonc`
+- **Link check**: `npx lychee --verbose --no-progress --cache --max-cache-age 1d --exclude-all-private "./docs/**/*.md" "./README.md" "./AGENTS.md" "./CONTRIBUTING.md" "./SECURITY.md" "./apps/plugin/README.md" "./infra/terraform/README.md"`
+- **Mermaid diagrams**: Validate `.mmd` files in `docs/architecture/diagrams/` and `docs/design/diagrams/` (use `minlag/mermaid-cli` in Docker as needed).
+- **OpenAPI**: `npx @stoplight/spectral-cli@latest lint docs/api/openapi.yaml --fail-severity=error`
 
 ### Future Enhancements
 - Automated PRD → Technical Plan → Implementation tracking

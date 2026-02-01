@@ -3,7 +3,7 @@
 **Doc type**: ADR | **ID**: ADR-006 | **Related**: [Phase 1 scope](../../product/phase-1-mvp-scope.md), [PRD-006 Free Cloudflare Security](../../product/cloudflare-security/001-free-cloudflare-security.md), [Security & Anti-Cheat LLD](../../design/security-anticheat.md)
 
 **Status**: Accepted  
-**Date**: 2026-01-31  
+**Date**: 2026-02-01  
 **Deciders**: Architecture Team  
 **Related**: [SECURITY.md](../../../SECURITY.md), [ADR-002 Discord OAuth](002-discord-oauth.md), [ADR-005 Cost-Optimized](005-cost-optimized-cloudflare.md), [API README](../../api/README.md), [.github/workflows/security.yml](../../../.github/workflows/security.yml)
 
@@ -37,27 +37,26 @@ We adopt the following security choices and test-coverage expectations.
 ### 4. CI security
 
 - **Secret scanning**: [.github/workflows/security.yml](../../../.github/workflows/security.yml) runs TruffleHog (verified only) on push/PR to main; blocks merge if secrets are detected.
-- **Dependency audits**: `npm audit --audit-level=high` for API; `dotnet list package --vulnerable` for plugin. CI fails when high/critical or vulnerable packages are reported.
-- **SAST**: CodeQL (security-extended) for JavaScript/TypeScript and C#. Required for merge on main.
+- **Dependency audits and SAST**: Deferred in Phase 1 to keep CI minimal; run manually when needed (see [Dependencies and Test Coverage](../../tech-plans/dependencies-and-tests.md)).
 
 ### 5. Test coverage
 
-- **API**: Smoke test against running API (Docker or wrangler). [apps/api/test/smoke.js](../../../apps/api/test/smoke.js) and `npm test`; run locally. New API routes or auth flows must be covered by smoke or unit tests; do not merge without tests for security-sensitive paths (auth, token exchange, profile, heartbeat).
+- **API**: Unit tests are required for security-sensitive code (`npm run test:unit`); smoke test against a running API (Docker or wrangler) remains local (`npm test`). New API routes or auth flows must be covered by unit or smoke tests; do not merge without coverage for security-sensitive paths (auth, token exchange, profile, heartbeat).
 - **Plugin**: Unit tests and integration tests as the plugin grows; Phase 1 may have minimal automated tests but security-sensitive code (token storage, API client) should have tests before production.
-- **Coverage goal**: Critical paths (auth, token handling, profile, heartbeat) must have test coverage; expand to broader coverage as we add features. CI must pass (Security + CI workflows) before merge.
+- **Coverage goal**: Critical paths (auth, token handling, profile, heartbeat) must have test coverage; expand to broader coverage as we add features. CI must pass (Tests + Security workflows) before merge.
 
 ## Rationale
 
 - **Secrets**: Single policy (never commit, rotate if exposed) keeps risk low and aligns with GitHub and Cloudflare best practices.
 - **Free Cloudflare only**: Aligns with [ADR-005](005-cost-optimized-cloudflare.md); PRD-006 defines the exact free features we use.
 - **OAuth least-privilege**: Reduces scope creep and attack surface ([ADR-002](002-discord-oauth.md)).
-- **CI security**: Automated secret scan, dependency audit, and SAST catch issues before merge.
+- **CI security**: Automated secret scan catches leaked credentials before merge; heavier checks are deferred to keep CI light in Phase 1.
 - **Test coverage**: Smoke tests validate that the API runs and critical endpoints respond; requiring tests for security-sensitive code prevents regressions and gives confidence for deploy.
 
 ## Consequences
 
 - **Positive**: Clear, single document for security choices; contributors and AI agents can align to it. Test expectations are explicit so coverage stays in mind.
-- **Negative**: Stricter CI (security + tests) can block merge until issues are fixed; this is intended.
+- **Negative**: Even minimal CI can block merge until issues are fixed; this is intended.
 - **Ongoing**: When we add Phase 2+ security (anti-cheat, Telemetry Proof), update this ADR and the Security & Anti-Cheat LLD.
 
 ## Related

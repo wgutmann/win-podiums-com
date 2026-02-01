@@ -18,11 +18,11 @@ We will acknowledge receipt and work with you to understand and address the issu
 
 ## CI security checks
 
-The repository runs automated security checks on every push and pull request (see [.github/workflows/security.yml](.github/workflows/security.yml)):
+The repository runs automated secret scanning on every push and pull request (see [.github/workflows/security.yml](.github/workflows/security.yml)):
 
 - **Secret scanning**: TruffleHog scans commits and the working tree for leaked credentials; the workflow fails if verified secrets are found.
-- **Dependency audits**: `npm audit` (API) and `dotnet list package --vulnerable` (plugin) run in CI; high/critical or known-vulnerable packages fail the build.
-- **Code scanning (SAST)**: CodeQL analyzes TypeScript and C# for security issues; results appear in the Security tab and on pull requests.
+
+Dependency audits and SAST are handled manually during Phase 1 as needed (see [docs/tech-plans/dependencies-and-tests.md](docs/tech-plans/dependencies-and-tests.md)).
 
 [Dependabot](.github/dependabot.yml) opens PRs for npm, NuGet, and GitHub Actions updates on a weekly schedule.
 

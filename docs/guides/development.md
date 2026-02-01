@@ -1,6 +1,6 @@
 # Development Guide
 
-**Last Updated**: 2026-01-31
+**Last Updated**: 2026-02-01
 
 ## Overview
 
@@ -65,16 +65,16 @@ If the API is not running, `npm test` will fail with a clear message: "Start Doc
 
 `apps/api/test/smoke.js` runs against the Dockerized API and validates: (1) Docker and Worker config match — `GET /api/health` returns `{ ok: true, env: "dev" }`; (2) error shapes — 404 for unknown routes (`GET /api/nonexistent`) and 401 for protected routes without auth (`POST /api/plugin/verify`); (3) **API documentation loads** — `GET /api-docs` and `GET /api-docs/openapi.yaml` are reachable (Swagger UI and valid OpenAPI 3 spec). Each API endpoint is documented in `docs/api/openapi.yaml` and surfaced in Swagger.
 
-**CI**: GitHub Actions runs typecheck, lint, plugin build, lockfile check, OpenAPI validation, and security checks on push/PR to `main`. Run API smoke and unit tests locally (Docker + `npm test` / `npm run test:unit`).
+**CI**: GitHub Actions runs **API unit tests** and **secret scanning** on push/PR to `main`. Run API smoke and unit tests locally (Docker + `npm test` / `npm run test:unit`).
 
-### API quality checks (typecheck, lint)
+### API quality checks (optional)
 
 In `apps/api` you can run:
 
 - **Typecheck**: `npm run typecheck` — runs `tsc --noEmit` to catch type errors.
 - **Lint**: `npm run lint` — runs ESLint on `src/**/*.ts` (config in `apps/api/.eslintrc.cjs`).
 
-**CI**: The workflow `.github/workflows/ci.yml` runs typecheck, lint, plugin build, lockfile check, and OpenAPI validation on push/PR to `main` when `apps/api/`, `apps/plugin/`, or `docs/api/` change. See [CI](#ci-workflows) below.
+These are local quality checks and are not required by CI right now. See [CI](#ci-workflows) below.
 
 ## Config alignment (Docker and Worker)
 
@@ -192,8 +192,8 @@ GitHub Actions run on push and pull requests to `main` (path filters apply so on
 
 | Workflow | Purpose |
 |----------|---------|
-| **security** (`.github/workflows/security.yml`) | Secret scanning (TruffleHog), npm and .NET dependency audits, CodeQL (TypeScript + C#). |
-| **CI** (`.github/workflows/ci.yml`) | TypeScript typecheck, ESLint, plugin build (.NET), lockfile check (`apps/api/package-lock.json`), OpenAPI validation (Spectral). Triggered when `apps/api/`, `apps/plugin/`, or `docs/api/` change. |
+| **security** (`.github/workflows/security.yml`) | Secret scanning (TruffleHog, verified only). |
+| **tests** (`.github/workflows/ci.yml`) | API unit tests (`npm run test:unit`) for `apps/api/`. Triggered when `apps/api/` changes. |
 
 ## Run tests before push
 
@@ -201,15 +201,12 @@ GitHub Actions run on push and pull requests to `main` (path filters apply so on
 
 Run the same checks CI runs (from repo root unless noted):
 
-1. **API typecheck** — `cd apps/api && npm ci && node scripts/inline-openapi.js ../../docs/api/openapi.yaml src/openapi-spec.ts && npm run typecheck`
-2. **API lint** — `cd apps/api && npm ci && node scripts/inline-openapi.js ../../docs/api/openapi.yaml src/openapi-spec.ts && npm run lint`
-3. **Plugin build** — `cd apps/plugin/WinPodiums.Plugin && dotnet restore && dotnet build --configuration Release --no-restore`
-4. **Worker smoke** — `docker compose up -d` (wait for `http://localhost:8787/api/health`), then `cd apps/api && npm ci && npm test`
-5. **OpenAPI validation** — `npx @stoplight/spectral-cli@latest lint docs/api/openapi.yaml --fail-severity=error`
+1. **API unit tests** — `cd apps/api && npm ci && npm run test:unit`
+2. **Optional API smoke** — if the API is already running at `http://localhost:8787`, run `cd apps/api && npm test`
 
-Optional: lockfile check — after `npm ci` in `apps/api`, run `git diff --exit-code apps/api/package-lock.json` from repo root. Doc check (markdown lint, Mermaid) — see [CI workflows](#ci-workflows) and `.github/workflows/doc-check.yml`.
+Optional manual checks (run when relevant): typecheck (`npm run typecheck`), lint (`npm run lint`), OpenAPI validation (`npx @stoplight/spectral-cli@latest lint docs/api/openapi.yaml --fail-severity=error`), plugin build (`dotnet build`).
 
-Count passing steps vs total run; require ≥80% (e.g. 4 of 5, or 5 of 6 if including lockfile) before pushing.
+Count passing steps vs total run; require ≥80% (e.g. 1 of 1, or 2 of 2 if smoke is run) before pushing.
 
 ### Enforce with a git hook (blocks push until 80% pass)
 
@@ -220,7 +217,7 @@ git config core.hooksPath .githooks
 ```
 
 - **Hook:** `.githooks/pre-push` runs `node scripts/pre-push-check.js` from the repo root.
-- **Checks:** API typecheck, API lint, plugin build, OpenAPI validation, and (if the API is already up at `http://localhost:8787`) worker smoke. If the API is not up, only the first four run; you need all four to pass.
+- **Checks:** API unit tests, and (if the API is already up at `http://localhost:8787`) API smoke. If the API is not up, only unit tests run.
 - **Skip hook once:** `git push --no-verify` (use only when necessary; policy is 80% pass before push).
 
 To disable the hook for this repo: `git config --unset core.hooksPath`.

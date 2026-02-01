@@ -15,7 +15,7 @@ Use this skill when the user asks about **security**, **secrets**, **auth**, **r
 
 ## Scope
 
-- **In scope**: Secrets and credentials hygiene, OAuth and auth security, Cloudflare free security (PRD-006), rate limiting, CI security (secret scan, dependency audit, SAST), test coverage for security-sensitive paths.
+- **In scope**: Secrets and credentials hygiene, OAuth and auth security, Cloudflare free security (PRD-006), rate limiting, CI security (secret scan), test coverage for security-sensitive paths.
 - **Out of scope**: Full anti-cheat and Telemetry Proof (Phase 2+); see [Security & Anti-Cheat LLD](../../../docs/design/security-anticheat.md). Branch protection and PR governance (see github-change-control skill).
 
 ## Canonical Security Document
@@ -25,7 +25,7 @@ Use this skill when the user asks about **security**, **secrets**, **auth**, **r
 1. **Secrets and credentials** — Never commit; .gitignore; rotate if exposed; CI placeholders only.
 2. **Edge and application security** — Cloudflare free only (proxy, SSL, WAF, Bot Fight, Security Level); rate limiting in Workers; HTTPS only; OAuth least-privilege.
 3. **Deferred (Phase 2+)** — Full anti-cheat, Telemetry Proof.
-4. **CI security** — TruffleHog, npm/dotnet audits, CodeQL.
+4. **CI security** — Secret scanning only (TruffleHog). Audits/SAST are manual in Phase 1.
 5. **Test coverage** — Smoke tests for API; tests required for auth, token, profile, heartbeat; CI must pass.
 
 When in doubt, align to ADR-006. When you add a new security choice, update ADR-006 (and SECURITY.md or PRD-006 if applicable).
@@ -52,7 +52,7 @@ When in doubt, align to ADR-006. When you add a new security choice, update ADR-
 
 ### CI and merge
 
-- [ ] [.github/workflows/security.yml](../../../.github/workflows/security.yml) runs: TruffleHog (secrets), npm audit (API), dotnet vulnerable packages (plugin), CodeQL (JS/TS + C#). Do not disable these for convenience.
+- [ ] [.github/workflows/security.yml](../../../.github/workflows/security.yml) runs: TruffleHog (secrets, verified only). Do not disable for convenience.
 - [ ] If CI fails on secrets: remove the secret from history and rotate the key; do not “fix” by excluding paths unless justified and documented.
 
 ## Test Coverage Checklist
@@ -60,7 +60,7 @@ When in doubt, align to ADR-006. When you add a new security choice, update ADR-
 - [ ] **API**: Smoke test exists ([apps/api/test/smoke.js](../../../apps/api/test/smoke.js), `npm test`). Run locally with Docker. New security-sensitive routes (auth, token exchange, profile, heartbeat) must be covered by smoke or unit tests.
 - [ ] **Plugin**: Security-sensitive code (token storage, API client, auth flows) should have unit or integration tests before production. Phase 1 may have minimal tests; add as we add features.
 - [ ] **Do not merge** without tests for new auth, token, or profile/heartbeat logic. CI (Security + CI workflows) must pass.
-- [ ] **Before pushing to a remote branch:** Run local tests; **at least 80% of tests must pass** before pushing. Run locally: `docker compose up -d && cd apps/api && npm test` plus typecheck, lint, plugin build, OpenAPI validation per [Run tests before push](../../../docs/guides/development.md#run-tests-before-push). Block or warn on push if the threshold is not met.
+- [ ] **Before pushing to a remote branch:** Run local tests; **at least 80% of tests must pass** before pushing. Run locally: `cd apps/api && npm run test:unit` and (if the API is already running) `npm test` per [Run tests before push](../../../docs/guides/development.md#run-tests-before-push). Block or warn on push if the threshold is not met.
 
 ## Related Docs and Skills
 
@@ -73,12 +73,12 @@ When in doubt, align to ADR-006. When you add a new security choice, update ADR-
 | [ADR-002 Discord OAuth](../../../docs/architecture/decisions/002-discord-oauth.md) | OAuth as sole identity provider |
 | [github-change-control](../../github-change-control/SKILL.md) | Secret hygiene, .gitignore, PR governance |
 | [discord-authentication](../../discord-authentication/SKILL.md) | OAuth2 implementation, scopes |
-| [.github/workflows/security.yml](../../../.github/workflows/security.yml) | CI: secret scan, deps, CodeQL |
+| [.github/workflows/security.yml](../../../.github/workflows/security.yml) | CI: secret scan (TruffleHog, verified only) |
 
 ## Anti-Patterns
 
 - **Do not commit secrets** to fix a failing local run; use `.dev.vars` or env and keep it out of git.
-- **Do not disable** TruffleHog, npm audit, or CodeQL to unblock merge; fix the underlying issue.
+- **Do not disable** TruffleHog to unblock merge; fix the underlying issue.
 - **Do not add** security-sensitive API or auth code without corresponding tests.
 - **Do not rely** on paid Cloudflare security add-ons for baseline without explicit approval (PRD-006 is free-only for baseline).
 

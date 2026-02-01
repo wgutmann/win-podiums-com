@@ -22,7 +22,7 @@ Project-level guidance for AI agents working in this repo.
 
 ## Pre-push: run tests locally
 
-- **Before pushing to a remote branch**, run local tests; **at least 80% of tests must pass** before pushing. See [Run tests before push](docs/guides/development.md#run-tests-before-push) in the development guide for commands (CI-equivalent typecheck, lint, plugin build, worker smoke, OpenAPI validation). Agents must run or advise running these checks and block or warn on push if the pass threshold is not met.
+- **Before pushing to a remote branch**, run local tests; **at least 80% of tests must pass** before pushing. See [Run tests before push](docs/guides/development.md#run-tests-before-push) in the development guide for commands (API unit tests and optional smoke if the API is already running). Agents must run or advise running these checks and block or warn on push if the pass threshold is not met.
 - **Enforce with a git hook:** Contributors can run `git config core.hooksPath .githooks` once per clone so git (and Cursor) blocks push until the pre-push check passes (≥80%). Hook runs `scripts/pre-push-check.js`.
 
 ## Conventions

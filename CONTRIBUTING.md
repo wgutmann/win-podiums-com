@@ -14,7 +14,7 @@ The project is in **Phase 1 MVP**. A minimal Worker (`apps/api/`) and SimHub plu
 
 ## Before you push
 
-**Run local tests before pushing to a remote branch.** At least **80% of tests must pass** before pushing. See [Run tests before push](docs/guides/development.md#run-tests-before-push) in the development guide for the exact commands (typecheck, lint, plugin build, worker smoke, OpenAPI validation).
+**Run local tests before pushing to a remote branch.** At least **80% of tests must pass** before pushing. See [Run tests before push](docs/guides/development.md#run-tests-before-push) in the development guide for the exact commands (API unit tests and optional smoke if the API is already running).
 
 **Enforce with a git hook (blocks push until 80% pass):** Run once per clone: `git config core.hooksPath .githooks`. Then every push (including from Cursor) runs the pre-push check and blocks if &lt;80% pass. To skip once: `git push --no-verify`.
 

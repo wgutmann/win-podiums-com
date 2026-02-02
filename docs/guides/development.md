@@ -120,7 +120,7 @@ To confirm POC completion, run the full flow from the SimHub UI only (no code ch
 
 **Prerequisites:**
 
-- For browser PKCE, the **Discord app** must have redirect URI `http://127.0.0.1:54321/callback` (canonical port). Add it in the Discord Developer Portal under your application → OAuth2 → Redirects.
+- For **web** login: add redirect URI **`http://localhost:8787/auth/callback`** in the Discord Developer Portal (OAuth2 → Redirects). For **plugin** "Link to Discord" (browser PKCE), the plugin uses a loopback; add **`http://127.0.0.1:54321/callback`** as well in Discord so the plugin can receive the callback.
 - For heartbeat to succeed, the API must be running (e.g. `docker compose up`). For local testing, use `http://localhost:8787`; the plugin uses the default API base URL unless you set it (e.g. via `SetApiBaseUrl` programmatically; UI for base URL is optional for POC).
 
 **Steps:**
@@ -131,9 +131,11 @@ To confirm POC completion, run the full flow from the SimHub UI only (no code ch
 4. **Confirm initial state** — You should see "Link to Discord" and status "Not linked".
 5. **Link to Discord** — Click "Link to Discord". A browser opens to Discord OAuth; sign in and authorize. After redirect, the plugin shows "Linked" (and optionally your Discord ID).
 6. **Send heartbeat** — Click "Send heartbeat". Status should show "Heartbeat OK" (or "Heartbeat failed" if the API is down or unreachable).
-7. **Optional (local API)** — To test against a local API: ensure the API is running (`docker compose up`), set the plugin API base URL to `http://localhost:8787` if exposed (e.g. in a future UI or via programmatic `SetApiBaseUrl`), then repeat steps 5–6.
+7. **Optional (local API)** — The plugin defaults to `http://localhost:8787`. Ensure the API is running (`docker compose up`); no need to set base URL for local testing. For production, call `SetApiBaseUrl("https://winpodiums.com")` (or use a future UI setting).
 
 **Troubleshooting (plugin not in left menu):** If WinPodiums does not appear in the left feature menu after install, enable the plugin in SimHub settings and ensure any "show in sidebar" option is turned on. Check SimHub logs for load or assembly errors; ensure the DLL (and Newtonsoft.Json.dll if needed) is in `C:\Program Files (x86)\SimHub\` (install root).
+
+**Troubleshooting (Discord auth from SimHub not working):** (1) **API must expose GET /api/auth/config** — the plugin calls this first to get the Discord client ID; if it returns 404, "Link to Discord" fails immediately. (2) **Plugin defaults to http://localhost:8787** — ensure the API is running in Docker (`docker compose up -d`) so the plugin can reach it. (3) **Discord Developer Portal** — for local dev the canonical redirect URI is **`http://localhost:8787/auth/callback`** (API callback for web login). For plugin "Link to Discord" you must also add **`http://127.0.0.1:54321/callback`** (plugin loopback). Add both under your app → OAuth2 → Redirects. (4) **Secrets** — `apps/api/.dev.vars` must set `DISCORD_CLIENT_ID` and `DISCORD_CLIENT_SECRET`; the container reads them via `env_file` in compose. For production, use `SetApiBaseUrl("https://winpodiums.com")` (or a future UI setting).
 
 **Validation checklist (build/deploy workflow):** (1) Close SimHub completely. (2) Build plugin from repo root: `dotnet build apps/plugin/WinPodiums.Plugin/WinPodiums.Plugin.csproj --configuration Release`. (3) Copy `WinPodiums.Plugin.dll` (and `Newtonsoft.Json.dll` if needed) from `apps/plugin/WinPodiums.Plugin/bin/Release/net48/` to `C:\Program Files (x86)\SimHub\` (install root). (4) Restart SimHub. (5) Enable the plugin and show in sidebar if required by SimHub. (6) In the left feature menu, click **WinPodiums**. (7) Confirm the panel shows Link to Discord, Send heartbeat, and status (Linked/Not linked, Heartbeat OK/failed).
 

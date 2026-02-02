@@ -67,7 +67,7 @@ After installation, open SimHub → in the **left feature menu** click **WinPodi
 ## Development
 
 - Build and run on Windows host (no Docker for plugin yet).
-- API base URL configurable via `SetApiBaseUrl` (e.g. `http://localhost:8787` when using Docker for the API).
+- API base URL defaults to `http://localhost:8787` so local Docker works without changes; use `SetApiBaseUrl("https://winpodiums.com")` for production (or a future UI setting).
 
 ## Related
 

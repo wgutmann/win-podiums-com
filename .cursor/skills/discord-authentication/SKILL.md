@@ -1,6 +1,6 @@
 ---
 name: discord-authentication
-description: Implement Discord authentication for SimHub plugins in C#/.NET Framework 4.8 (WPF). Use when the user mentions Discord auth, OAuth2, login, tokens, scopes, or Discord developer portal setup, and prioritize least-privilege access.
+description: Implements Discord authentication for SimHub plugins in C#/.NET Framework 4.8 (WPF). Use when the user mentions Discord auth, OAuth2, login, tokens, scopes, redirect URI, Discord developer portal, or "log in with Discord"; prioritize least-privilege access.
 ---
 
 # Discord Authentication (SimHub / C# WPF)

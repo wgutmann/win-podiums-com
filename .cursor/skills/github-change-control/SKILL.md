@@ -1,6 +1,6 @@
 ---
 name: github-change-control
-description: Provides GitHub change control, repo management, documentation, gitignore, and secret hygiene best practices. Use when the user asks about change control, branch protections, PR review standards, repository governance, documentation updates, .gitignore changes, or preventing/handling secrets in git.
+description: Provides GitHub change control, repo management, gitignore, and secret hygiene best practices. Use when the user asks about change control, branch protections, PR template, traceability, labels, .gitignore, or preventing/handling secrets in git.
 ---
 
 # GitHub Change Control

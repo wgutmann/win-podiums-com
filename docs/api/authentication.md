@@ -10,6 +10,7 @@ All auth flows use **Discord OAuth2**. Web uses session cookies; plugin uses Bea
 
 | Method | Path | Summary |
 |--------|------|---------|
+| GET | `/api/auth/config` | Public auth config (Discord client ID for plugin PKCE) |
 | POST | `/api/auth/discord/callback` | Web OAuth2 callback |
 | POST | `/api/auth/discord/exchange` | Plugin token exchange (PKCE) |
 | GET | `/api/auth/qr-status/:sessionId` | QR code polling |

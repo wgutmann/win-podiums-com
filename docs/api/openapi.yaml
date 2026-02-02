@@ -44,6 +44,28 @@ paths:
                     example: dev
                 required:
                   - ok
+  /auth/config:
+    get:
+      tags:
+        - Authentication
+      summary: Public auth config (plugin)
+      description: Returns Discord client ID for plugin PKCE authorize URL. No auth required.
+      responses:
+        "200":
+          description: Auth config.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      discordClientId:
+                        type: string
+                        description: Discord OAuth2 client ID (public).
+                required:
+                  - data
   /auth/discord/callback:
     post:
       tags:

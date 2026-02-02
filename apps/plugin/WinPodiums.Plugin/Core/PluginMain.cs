@@ -22,7 +22,7 @@ namespace WinPodiums.Plugin.Core
     public class PluginMain : IPlugin, IDataPlugin, IWPFSettingsV2
     {
         private ApiClient? _apiClient;
-        private string _apiBaseUrl = "https://winpodiums.com";
+        private string _apiBaseUrl = "http://localhost:8787";
 
         /// <summary>Instance of the current plugin manager (set by SimHub).</summary>
         public PluginManager PluginManager { get; set; } = null!;
@@ -57,7 +57,7 @@ namespace WinPodiums.Plugin.Core
         /// </summary>
         public void SetApiBaseUrl(string baseUrl)
         {
-            _apiBaseUrl = baseUrl?.TrimEnd('/') ?? "https://winpodiums.com";
+            _apiBaseUrl = baseUrl?.TrimEnd('/') ?? "http://localhost:8787";
             _apiClient = new ApiClient(_apiBaseUrl);
         }
 

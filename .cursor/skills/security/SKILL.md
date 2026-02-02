@@ -1,6 +1,6 @@
 ---
 name: security
-description: Applies security-minded thinking and test-coverage expectations for WinPodiums. Use when implementing auth, handling secrets, adding API endpoints, configuring Cloudflare security, writing or reviewing CI, or ensuring tests cover security-sensitive code. References ADR-006 (security choices), SECURITY.md, PRD-006; GitHub Actions are recommended, not shipped by default.
+description: Applies security-minded thinking and test-coverage expectations for WinPodiums. Use when implementing auth, handling secrets, adding API endpoints, rate limiting, OAuth flows, ADR-006, SECURITY.md, or ensuring tests cover security-sensitive code. References ADR-006 (security choices), SECURITY.md, PRD-006; GitHub Actions are recommended, not shipped by default.
 ---
 
 # Security and Test Coverage

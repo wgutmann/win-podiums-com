@@ -16,7 +16,7 @@ namespace WinPodiums.Plugin.Services
         private readonly string _baseUrl;
         private readonly HttpClient _http;
 
-        public ApiClient(string baseUrl = "https://winpodiums.com")
+        public ApiClient(string baseUrl = "http://localhost:8787")
         {
             _baseUrl = baseUrl.TrimEnd('/');
             _http = new HttpClient { Timeout = TimeSpan.FromSeconds(15) };

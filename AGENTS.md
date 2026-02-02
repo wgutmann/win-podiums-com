@@ -34,7 +34,7 @@ Project-level guidance for AI agents working in this repo.
 
 ## Conventions
 
-
+- **Skills:** For domain tasks (Docker, Workers, auth, docs, SimHub, GitHub, security, product), **read the corresponding `.cursor/skills/<name>/SKILL.md` at the start of your turn** before editing or advising. See [.cursor/rules/skills-first.mdc](.cursor/rules/skills-first.mdc) for the intent → skill mapping.
 - **Leveragable lessons:** See [docs/guides/leveragable-lessons.md](docs/guides/leveragable-lessons.md) for the 12 project lessons. Apply them when making changes.
 - Prefer skills in `.cursor/skills` for domain-specific tasks.
 - **ContextStream (when MCP enabled):** See [.cursor/rules/contextstream.mdc](.cursor/rules/contextstream.mdc) for bootstrap, search-first, decisions, graph, and lessons. If ContextStream is unavailable, fall back to this file and [docs/architecture/next-steps.md](docs/architecture/next-steps.md). See [development guide](docs/guides/development.md#ai-tooling-optional).

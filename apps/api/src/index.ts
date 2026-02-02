@@ -211,6 +211,12 @@ export default {
     if (path.startsWith("/api/")) {
       const rest = path.slice(5).replace(/\/$/, "");
 
+      // GET /api/auth/config — public auth config for plugin (Discord client ID for PKCE). No auth required.
+      if (method === "GET" && rest === "auth/config") {
+        const clientId = env.DISCORD_CLIENT_ID ?? "";
+        return jsonResponse({ data: { discordClientId: clientId } });
+      }
+
       // POST /api/auth/discord/callback — server-side web callback (if frontend posts code)
       // Discord auth succeeds if exchange + get user work; DB save failure returns success with warning.
       if (method === "POST" && rest === "auth/discord/callback") {

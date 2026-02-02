@@ -1,6 +1,6 @@
 ---
 name: simhub-plugin-deploy
-description: Build and deploy the WinPodiums SimHub plugin to the SimHub install root. Use when the user asks to build and deploy the plugin, deploy the plugin to SimHub, or run the plugin deploy script.
+description: Builds and deploys the WinPodiums SimHub plugin to the SimHub install root. Use when the user asks to deploy the plugin, copy plugin to SimHub, copy DLL to SimHub, run plugin deploy, or "put plugin in SimHub".
 ---
 
 # SimHub Plugin Deploy

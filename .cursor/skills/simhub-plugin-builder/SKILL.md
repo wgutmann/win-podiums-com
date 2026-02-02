@@ -1,6 +1,6 @@
 ---
 name: simhub-plugin-builder
-description: Build SimHub plugins with C#/.NET: scaffold projects, set up build/debug, package and deploy. Use when the user mentions SimHub, plugins, telemetry, or C#/.NET plugin development.
+description: Builds SimHub plugins with C#/.NET: scaffold projects, set up build/debug, package and deploy. Use when the user mentions SimHub, plugin scaffold, C# plugin, SimHub DLL, telemetry, or .NET plugin development.
 ---
 
 # SimHub Plugin Builder

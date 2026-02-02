@@ -1,6 +1,6 @@
 ---
 name: cursor-project-docs
-description: Defines how the repository is documented - maintains GitHub repo docs (README, CONTRIBUTING, SECURITY, CHANGELOG), product requirements (PRDs), high-level design (HLD), tech plans (detailed implementation specs), and populates Cursor's doc section from those. Use when the user asks to document the repo, create PRDs, create tech plans, update repo docs, refresh the doc section, or apply documentation best practices.
+description: Defines how the repository is documented — maintains README, CONTRIBUTING, SECURITY, CHANGELOG, PRDs, HLD, tech plans, and Cursor's doc section. Use when the user asks to document the repo, create or update PRD/HLD/tech plan, refresh the doc section, or apply documentation best practices.
 ---
 
 # Cursor Project Docs

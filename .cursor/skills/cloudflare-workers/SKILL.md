@@ -1,6 +1,6 @@
 ---
 name: cloudflare-workers
-description: Implements and configures Cloudflare Workers, D1, R2, KV, and Wrangler. Use when building or configuring Workers apps, D1 databases, R2 buckets, KV namespaces, wrangler.toml, bindings, or deploying with Wrangler. Prefer Cloudflare docs and MCP/Context7 for current APIs.
+description: Implements and configures Cloudflare Workers, D1, R2, KV, and Wrangler. Use when building or configuring Workers apps, D1 databases, R2 buckets, KV namespaces, wrangler.toml, bindings, wrangler dev, D1 migrations, .dev.vars, or deploying with Wrangler. Prefer Cloudflare docs and MCP/Context7 for current APIs.
 ---
 
 # Cloudflare Workers Skill

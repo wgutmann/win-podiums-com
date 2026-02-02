@@ -45,7 +45,8 @@ flowchart LR
 
 ### SimHub UI Integration
 
-- **Surfaces**: Plugin must appear in SimHub’s plugin list/settings and be usable from the SimHub UI (per NFR-001). Use SimHub SDK UI hooks (e.g. properties, actions, or settings panel) as required by the SDK so the plugin is discoverable and the above controls are accessible.
+- **Surfaces**: Plugin must appear in SimHub’s **left feature menu** when enabled and be usable from the SimHub UI (per NFR-001). Use SimHub SDK UI hooks (e.g. IWPFSettingsV2, LeftMenuTitle, GetWPFSettingsControl) as required by the SDK so the plugin is discoverable and the above controls are accessible. Clicking the plugin in the left menu opens the WPF settings control with Discord auth (Link to Discord, Unlink, Send heartbeat, status).
+- **Deployment path**: Deploy plugin DLL to **`C:\Program Files (x86)\SimHub\`** (SimHub install root) only; no Plugins subfolder. After install, if the plugin does not appear in the left menu, enable the plugin in SimHub settings and ensure any "show in sidebar" option is turned on (see [development guide — Manual E2E](../../guides/development.md#manual-e2e--simhub-plugin-poc)).
 - **Technology**: WPF or SimHub-supported UI mechanism per [SimHub Plugin LLD](../../design/components/simhub-plugin.md). POC: minimal controls and status only; no full Scrutineering Panel layout or polish.
 
 ### Brand voice (post-POC)
@@ -95,7 +96,8 @@ flowchart LR
 - User can trigger “Link to Discord” from the plugin UI; browser PKCE flow runs; on success, linked status is shown.
 - User can trigger “Send heartbeat” from the plugin UI; heartbeat is sent; success or failure is shown.
 - Status is visible (Linked/Not linked, Heartbeat OK/failed or last result) so the user can confirm the flow without consulting logs.
-- Plugin appears in SimHub’s plugin list/settings and is usable from the SimHub UI.
+- Plugin appears in SimHub’s **left feature menu** when enabled; clicking it opens the WPF control with Discord auth (Link to Discord, heartbeat, status). Plugin is usable from the SimHub UI without consulting code or logs.
+- Deployment path is **`C:\Program Files (x86)\SimHub\`** (install root) only; enable/visibility steps are documented in the plugin README and development guide.
 
 ## Related Documentation
 

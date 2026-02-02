@@ -7,7 +7,7 @@
 
 SimHub plugin for WinPodiums: monitors telemetry, detects podium finishes, and submits verified results to the API. Phase 1 scope: position detection deferred; minimal auth (browser primary; manual token **debug-only, feature-flagged**), one verification API call (heartbeat).
 
-**How to install:** Build the plugin, copy `WinPodiums.Plugin.dll` to SimHub's Plugins folder, then restart SimHub. See [Installation](#installation) below for the full steps.
+**How to install:** Build the plugin, copy `WinPodiums.Plugin.dll` to the SimHub install root (`C:\Program Files (x86)\SimHub\`), then restart SimHub. See [Installation](#installation) below for the full steps.
 
 ## Layout
 
@@ -30,12 +30,18 @@ SimHub plugin for WinPodiums: monitors telemetry, detects podium finishes, and s
 
 ## Installation
 
-To install the WinPodiums plugin in SimHub: build the plugin, copy the DLL to SimHub's Plugins folder, and restart SimHub.
+To install the WinPodiums plugin in SimHub: build the plugin, copy the DLL to the SimHub install root, and restart SimHub.
 
-1. **Copy** only `WinPodiums.Plugin.dll` from `WinPodiums.Plugin/bin/Release/net48/` to `C:\Program Files (x86)\SimHub\Plugins`. Writing to that folder usually requires elevation (e.g. run as Administrator).
-2. **Restart SimHub** (or start it if not running). SimHub loads plugins from the Plugins folder and invokes `IPlugin.Init(PluginManager)`.
-3. **Confirm** the plugin appears in SimHub’s plugin list/settings as **WinPodiums** (see [SimHub Plugin LLD](../../docs/design/components/simhub-plugin.md)).
-4. **Troubleshooting:** If the plugin fails to load with a `FileNotFoundException` (or "Could not load file or assembly 'Newtonsoft.Json'"), copy `Newtonsoft.Json.dll` from the same build output folder (`WinPodiums.Plugin/bin/Release/net48/`) into `C:\Program Files (x86)\SimHub\Plugins` and restart SimHub. SimHub usually provides Newtonsoft.Json from its own folder, so this is only needed in some setups.
+1. **Before building:** Close SimHub completely (locks plugin DLLs).
+2. **Build** from repo root: `dotnet build apps/plugin/WinPodiums.Plugin/WinPodiums.Plugin.csproj --configuration Release` (or Debug).
+3. **Before deploying:** Ensure SimHub is stopped so the install folder is not locked.
+4. **Copy** `WinPodiums.Plugin.dll` (and `Newtonsoft.Json.dll` from the same output folder if SimHub reports a missing assembly) from `WinPodiums.Plugin/bin/Release/net48/` to `C:\Program Files (x86)\SimHub\` (SimHub install root; the only deploy path this repo supports). Writing to Program Files usually requires elevation (e.g. run PowerShell as Administrator).
+5. **Restart SimHub** (or start it if not running). SimHub loads plugins from the install root and invokes `IPlugin.Init(PluginManager)`.
+6. **Confirm** the plugin appears in SimHub’s plugin list/settings as **WinPodiums** (see [SimHub Plugin LLD](../../docs/design/components/simhub-plugin.md)).
+
+**If the plugin does not appear in SimHub:** Open SimHub → go to plugin list/settings → find WinPodiums → enable it and ensure it is visible in the left sidebar. Then click **WinPodiums** in the left feature menu to open the Discord auth UI.
+
+**Troubleshooting (load/assembly errors):** If the plugin fails to load with a `FileNotFoundException` (e.g. Newtonsoft.Json), copy `Newtonsoft.Json.dll` from the same build output folder into `C:\Program Files (x86)\SimHub\` and restart SimHub. Check SimHub logs for load or assembly errors. If the plugin is loaded but not in the left menu, enable the plugin and any "show in sidebar" option in SimHub settings.
 
 ## Phase 1: browser auth (PKCE) + heartbeat
 
@@ -53,6 +59,10 @@ plugin.SetApiBaseUrl("http://localhost:8787");  // or https://winpodiums.com
 bool ok = await plugin.AuthenticateWithBrowserAsync();  // or AuthenticateWithManualTokenAsync(token) if debug
 if (ok) await plugin.SendHeartbeatAsync("1.0.0");
 ```
+
+## Using the plugin
+
+After installation, open SimHub → in the **left feature menu** click **WinPodiums** → the settings panel shows **Link to Discord**, **Send heartbeat**, and status (Linked/Not linked, Heartbeat OK/failed). Use "Link to Discord" to authenticate with Discord (browser PKCE); use "Send heartbeat" to verify the API connection.
 
 ## Development
 

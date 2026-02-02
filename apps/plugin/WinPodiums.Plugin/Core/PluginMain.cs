@@ -27,7 +27,7 @@ namespace WinPodiums.Plugin.Core
         /// <summary>Instance of the current plugin manager (set by SimHub).</summary>
         public PluginManager PluginManager { get; set; } = null!;
 
-        /// <summary>Left menu icon (24x24). Null uses default.</summary>
+        /// <summary>Left menu icon (24x24). Null uses SimHub default; optional 24x24 bitmap can be set for POC+.</summary>
         public ImageSource? PictureIcon => null;
 
         /// <summary>Short title in SimHub left menu.</summary>

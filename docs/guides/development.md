@@ -100,7 +100,7 @@ Do not commit `.dev.vars`. Create it from `.dev.vars.example`.
 
 ## SimHub plugin (no Docker)
 
-The plugin targets .NET Framework 4.8 and SimHub on Windows. Build and run on the host (Visual Studio or MSBuild). **To install the plugin** (build, copy DLL to SimHub Plugins folder, restart SimHub), see [Installation](../apps/plugin/README.md#installation) in the plugin README. Deploy the built DLL to `C:\Program Files (x86)\SimHub\Plugins` (the only SimHub deploy path this repo supports). Point the plugin at `http://localhost:8787` when the API is running in Docker.
+The plugin targets .NET Framework 4.8 and SimHub on Windows. Build and run on the host (Visual Studio or MSBuild). **To install the plugin** (build, copy DLL to SimHub install root, restart SimHub), see [Installation](../apps/plugin/README.md#installation) in the plugin README. Deploy the built DLL to `C:\Program Files (x86)\SimHub\` (SimHub install root; the only SimHub deploy path this repo supports). Point the plugin at `http://localhost:8787` when the API is running in Docker.
 
 ### SimHub Plugin POC — development handoff
 
@@ -126,12 +126,16 @@ To confirm POC completion, run the full flow from the SimHub UI only (no code ch
 **Steps:**
 
 1. **Build plugin DLL** — From repo root: `dotnet build apps/plugin/WinPodiums.Plugin/WinPodiums.Plugin.csproj --configuration Release`. Output: `apps/plugin/WinPodiums.Plugin/bin/Release/net48/WinPodiums.Plugin.dll`.
-2. **Install in SimHub** — Stop SimHub if running. Copy `WinPodiums.Plugin.dll` (and `Newtonsoft.Json.dll` from the same output folder if SimHub reports a missing assembly) to `C:\Program Files (x86)\SimHub\Plugins` (the only SimHub deploy path this repo supports). Start SimHub.
-3. **Open plugin settings** — In SimHub, open the plugin list/settings and select WinPodiums. Open the plugin settings panel (WPF control with "Link to Discord", "Send heartbeat", status).
+2. **Install in SimHub** — Stop SimHub if running. Copy `WinPodiums.Plugin.dll` (and `Newtonsoft.Json.dll` from the same output folder if SimHub reports a missing assembly) to `C:\Program Files (x86)\SimHub\` (SimHub install root). Start SimHub.
+3. **Open plugin settings** — In SimHub's **left feature menu**, click **WinPodiums**. If it is not there, enable the plugin in SimHub settings and ensure it is set to show in the sidebar. The settings panel shows the WPF control with "Link to Discord", "Send heartbeat", and status.
 4. **Confirm initial state** — You should see "Link to Discord" and status "Not linked".
 5. **Link to Discord** — Click "Link to Discord". A browser opens to Discord OAuth; sign in and authorize. After redirect, the plugin shows "Linked" (and optionally your Discord ID).
 6. **Send heartbeat** — Click "Send heartbeat". Status should show "Heartbeat OK" (or "Heartbeat failed" if the API is down or unreachable).
 7. **Optional (local API)** — To test against a local API: ensure the API is running (`docker compose up`), set the plugin API base URL to `http://localhost:8787` if exposed (e.g. in a future UI or via programmatic `SetApiBaseUrl`), then repeat steps 5–6.
+
+**Troubleshooting (plugin not in left menu):** If WinPodiums does not appear in the left feature menu after install, enable the plugin in SimHub settings and ensure any "show in sidebar" option is turned on. Check SimHub logs for load or assembly errors; ensure the DLL (and Newtonsoft.Json.dll if needed) is in `C:\Program Files (x86)\SimHub\` (install root).
+
+**Validation checklist (build/deploy workflow):** (1) Close SimHub completely. (2) Build plugin from repo root: `dotnet build apps/plugin/WinPodiums.Plugin/WinPodiums.Plugin.csproj --configuration Release`. (3) Copy `WinPodiums.Plugin.dll` (and `Newtonsoft.Json.dll` if needed) from `apps/plugin/WinPodiums.Plugin/bin/Release/net48/` to `C:\Program Files (x86)\SimHub\` (install root). (4) Restart SimHub. (5) Enable the plugin and show in sidebar if required by SimHub. (6) In the left feature menu, click **WinPodiums**. (7) Confirm the panel shows Link to Discord, Send heartbeat, and status (Linked/Not linked, Heartbeat OK/failed).
 
 ## Wrangler bindings (D1, R2, KV)
 

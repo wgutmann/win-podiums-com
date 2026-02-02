@@ -118,9 +118,9 @@ When building and deploying the SimHub plugin DLL on the host (no Docker for the
 
 1. **Before building**: Close SimHub completely. If SimHub is running, it may lock plugin DLLs and cause build or copy issues.
 2. **Build**: From repo root, run `dotnet build apps/plugin/WinPodiums.Plugin/WinPodiums.Plugin.csproj` (or use your IDE).
-3. **Before deploying**: Ensure SimHub is stopped. If SimHub is open, the plugin file in the SimHub Plugins folder will be locked and the copy will fail (cannot overwrite).
-4. **Deploy**: Once SimHub is stopped, copy the built DLL (e.g. from `apps/plugin/WinPodiums.Plugin/bin/Debug/net48/` or `Release`) to `C:\Program Files (x86)\SimHub\Plugins` (the only SimHub deploy path this repo supports).
-5. **Verify**: Start SimHub and confirm the plugin appears in the plugin list.
+3. **Before deploying**: Ensure SimHub is stopped. If SimHub is open, the plugin file in the SimHub install folder will be locked and the copy will fail (cannot overwrite).
+4. **Deploy**: Once SimHub is stopped, copy the built DLL (e.g. from `apps/plugin/WinPodiums.Plugin/bin/Debug/net48/` or `Release`) to `C:\Program Files (x86)\SimHub\` (SimHub install root; the only SimHub deploy path this repo supports). Copying to Program Files usually requires running PowerShell as Administrator.
+5. **Verify**: Start SimHub and confirm the plugin appears in the plugin list and (when enabled) in the left feature menu.
 
 Include this sequence in any local deployment setup or runbook that involves the SimHub plugin.
 
@@ -158,7 +158,7 @@ Include this sequence in any local deployment setup or runbook that involves the
 ### Stack-specific
 - **.NET**: Run `dotnet test` inside the built container to match runtime.
 - **Cloudflare Workers**: Run `npm test` or `wrangler test` in a Node-based image.
-- **SimHub plugin (host)**: Close SimHub before building the plugin DLL; stop SimHub before copying the DLL to the Plugins folder (file lock). See [Local deployment — SimHub plugin](#6-local-deployment--simhub-plugin-host-only).
+- **SimHub plugin (host)**: Close SimHub before building the plugin DLL; stop SimHub before copying the DLL to the SimHub install root (file lock). See [Local deployment — SimHub plugin](#6-local-deployment--simhub-plugin-host-only).
 - Use Compose-based integration tests only when dependencies are required.
 
 ## Output Expectations

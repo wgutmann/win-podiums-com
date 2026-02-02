@@ -38,8 +38,9 @@ Prefer normalized properties (e.g. SpeedKmh). Avoid relying on undocumented or r
 ## SDK Location and Target
 
 - **Demo projects:** `C:\Program Files (x86)\SimHub\PluginSdk` (e.g. User.PluginSdkDemo, User.DeviceExtensionDemo, User.LedEditorEffect).
+- **User.PluginSdkDemo:** Reference implementation for IWPFSettingsV2 and left-menu visibility. If the plugin does not appear in the left feature menu after deploy, compare our `PluginMain` and `GetWPFSettingsControl` with the demo's implementation (e.g. Control.xaml / Settings) to catch any missing registration or lifecycle step.
 - **Target framework:** .NET Framework 4.8 (required by SimHub SDK).
-- **UI:** WPF; optional Control.xaml / Settings when implementing IWPFSettingsV2.
+- **UI:** WPF; optional Control.xaml / Settings when implementing IWPFSettingsV2. Left menu: `LeftMenuTitle`, `PictureIcon` (24×24; null = default), `GetWPFSettingsControl(PluginManager)`.
 
 ## Documentation
 

@@ -33,14 +33,14 @@ Checklist:
 
 Notes:
 - **Target framework:** .NET Framework 4.8 is required by the SimHub SDK (demos and SimHub.Plugins dependency).
-- **SimHub path (this repo):** Use the canonical path `C:\Program Files (x86)\SimHub` (plugins folder: `C:\Program Files (x86)\SimHub\Plugins`) when referencing the SimHub install or plugins folder in docs and code.
-- **Deployment path:** This repo uses `C:\Program Files (x86)\SimHub\Plugins` for the plugin DLL. Official SimHub docs sometimes state the plugin DLL goes in the **SimHub install root** (`C:\Program Files (x86)\SimHub\`). If the plugin is not loaded, try (1) DLL in `Plugins` first, (2) then copy to install root, (3) check SimHub version and official docs/Discord for current convention.
+- **SimHub path (this repo):** The only path we support is `C:\Program Files (x86)\SimHub\` (plugins folder: `C:\Program Files (x86)\SimHub\Plugins`). Use this path in all docs and code; no other install locations are supported.
+- **Deployment path:** Deploy the plugin DLL to `C:\Program Files (x86)\SimHub\Plugins` only.
 
 ## Build/Debug Workflow
 
 Checklist:
 - [ ] Build in Debug configuration.
-- [ ] Deploy the DLL and any dependencies to `C:\Program Files (x86)\SimHub\Plugins` (or install root if required by your SimHub version).
+- [ ] Deploy the DLL and any dependencies to `C:\Program Files (x86)\SimHub\Plugins` (the only deploy path this repo supports).
 - [ ] Restart SimHub or use its reload capability if available.
 - [ ] Attach a debugger to the SimHub process and set breakpoints.
 - [ ] Validate logs for load errors or missing dependencies.
@@ -66,7 +66,7 @@ See also **reference.md** for a short SimHub SDK reference (interfaces, lifecycl
 ## Guardrails
 
 - Confirm interface names and lifecycle from the SDK before coding: **IPlugin**, **IDataPlugin**, **Init(PluginManager)**, **DataUpdate(PluginManager, ref GameData)**, **End(PluginManager)**. No Start().
-- For this repo, use the canonical SimHub path `C:\Program Files (x86)\SimHub` (plugins: `C:\Program Files (x86)\SimHub\Plugins`); see discord-authentication skill for consistency. If the plugin is not loaded, try deploy to install root and check SimHub docs.
+- For this repo, use the only supported SimHub path `C:\Program Files (x86)\SimHub\` (plugins: `C:\Program Files (x86)\SimHub\Plugins`); see discord-authentication skill for consistency.
 - Prefer step-by-step guidance with checklists.
-- **Discord OAuth in the plugin:** Use the discord-authentication skill; canonical SimHub paths match.
+- **Discord OAuth in the plugin:** Use the discord-authentication skill; SimHub path is `C:\Program Files (x86)\SimHub\` only.
 - **Doc changes:** When adding or editing SimHub PRD/tech plan/LLD content, keep **Related** and **Implements** links and stable IDs (PRD-001, TP-SPOC-001–005) so ContextStream’s knowledge graph stays correct. See [ContextStream mapping](docs/guides/contextstream-mapping.md) and [documentation standards](docs/standards/documentation-standards.md).

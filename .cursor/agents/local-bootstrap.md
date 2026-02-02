@@ -17,7 +17,7 @@ When invoked, follow this checklist in order:
 
 5. **Tests**: With API up, `cd apps/api && npm test` (smoke). Optional: `node scripts/pre-push-check.js` from repo root.
 
-6. **SimHub plugin**: `cd apps/plugin/WinPodiums.Plugin && dotnet restore && dotnet build --configuration Release --no-restore`. Copy built DLL to `C:\Program Files (x86)\SimHub\Plugins`; restart SimHub; point plugin at http://localhost:8787. Auth: browser (PKCE) primary; manual token debug-only via /auth/token.
+6. **SimHub plugin**: `cd apps/plugin/WinPodiums.Plugin && dotnet restore && dotnet build --configuration Release --no-restore`. Copy built DLL to `C:\Program Files (x86)\SimHub\Plugins` (the only SimHub deploy path this repo supports); restart SimHub; point plugin at http://localhost:8787. Auth: browser (PKCE) primary; manual token debug-only via /auth/token.
 
 7. **Pre-push hook (optional)**: `git config core.hooksPath .githooks`.
 

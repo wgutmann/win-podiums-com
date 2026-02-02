@@ -79,12 +79,12 @@ Use **user OAuth2** when the plugin acts on behalf of a signed-in user (e.g. "Lo
 
 ## SimHub path (this repo)
 
-When copying or referencing the SimHub install or plugins path in documentation or code, use this canonical path:
+The only SimHub path this repo supports is `C:\Program Files (x86)\SimHub\`. Use it everywhere:
 
 - **SimHub install root**: `C:\Program Files (x86)\SimHub`
 - **Plugins folder**: `C:\Program Files (x86)\SimHub\Plugins`
 
-Do not use placeholders (e.g. `SIMHUB_INSTALL_DIR`) or other install locations in repo docs and skills.
+Do not use placeholders (e.g. `SIMHUB_INSTALL_DIR`), env overrides, or other install locations in repo docs and skills.
 
 ## Additional Resources
 

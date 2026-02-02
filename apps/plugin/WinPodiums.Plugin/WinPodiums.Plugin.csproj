@@ -14,7 +14,7 @@
     <Reference Include="System.Security" />
     <Reference Include="PresentationCore" />
   </ItemGroup>
-  <!-- SimHub SDK: install root C:\Program Files (x86)\SimHub. Adjust HintPath if your install path differs. -->
+  <!-- SimHub SDK: C:\Program Files (x86)\SimHub (only path this repo supports). -->
   <ItemGroup>
     <Reference Include="SimHub.Plugins">
       <HintPath>C:\Program Files (x86)\SimHub\SimHub.Plugins.dll</HintPath>

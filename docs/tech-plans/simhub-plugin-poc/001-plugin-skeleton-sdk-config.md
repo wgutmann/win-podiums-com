@@ -35,7 +35,7 @@ graph LR
 
 - **Target**: .NET Framework 4.8 class library.
 - **Output**: Single DLL (`WinPodiums.Plugin.dll`) plus dependencies.
-- **Canonical paths**: SimHub install root `C:\Program Files (x86)\SimHub`, plugins folder `C:\Program Files (x86)\SimHub\Plugins`. Document and reference these in code comments and docs.
+- **Only supported paths**: SimHub install root `C:\Program Files (x86)\SimHub\`, plugins folder `C:\Program Files (x86)\SimHub\Plugins`. This repo does not support other SimHub locations; document and reference these in code comments and docs.
 
 **Key files**:
 

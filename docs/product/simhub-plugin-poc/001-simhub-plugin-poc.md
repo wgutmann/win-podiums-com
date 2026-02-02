@@ -112,7 +112,7 @@ Deliver a minimal SimHub plugin (POC) that proves: (1) the plugin loads and runs
 
 - **SimHub SDK**: Required for POC complete. Plugin must reference the SimHub SDK and implement the plugin interface so it loads in SimHub; POC does not implement position detection or telemetry logic (those are separate follow-ups).
 - **.NET Framework 4.8**: Required for SimHub compatibility; no .NET Core–only APIs.
-- **Windows**: SimHub runs on Windows; DPAPI and plugin path assumptions are Windows-specific.
+- **Windows**: SimHub runs on Windows; DPAPI and plugin path assumptions are Windows-specific. The only supported SimHub path is `C:\Program Files (x86)\SimHub\` (plugins in `...\Plugins`).
 - **API contract**: Must align with [docs/api/plugin.md](../../api/plugin.md) and OpenAPI spec for auth and heartbeat.
 
 ## Out of Scope

@@ -100,7 +100,7 @@ Do not commit `.dev.vars`. Create it from `.dev.vars.example`.
 
 ## SimHub plugin (no Docker)
 
-The plugin targets .NET Framework 4.8 and SimHub on Windows. Build and run on the host (Visual Studio or MSBuild). **To install the plugin** (build, copy DLL to SimHub Plugins folder, restart SimHub), see [Installation](../apps/plugin/README.md#installation) in the plugin README. Deploy the built DLL to `C:\Program Files (x86)\SimHub\Plugins`. Point the plugin at `http://localhost:8787` when the API is running in Docker. Official SimHub docs sometimes refer to the SimHub install root for plugin DLLs; this repo uses the `Plugins` subfolder unless your SimHub version requires otherwise.
+The plugin targets .NET Framework 4.8 and SimHub on Windows. Build and run on the host (Visual Studio or MSBuild). **To install the plugin** (build, copy DLL to SimHub Plugins folder, restart SimHub), see [Installation](../apps/plugin/README.md#installation) in the plugin README. Deploy the built DLL to `C:\Program Files (x86)\SimHub\Plugins` (the only SimHub deploy path this repo supports). Point the plugin at `http://localhost:8787` when the API is running in Docker.
 
 ### SimHub Plugin POC — development handoff
 
@@ -126,7 +126,7 @@ To confirm POC completion, run the full flow from the SimHub UI only (no code ch
 **Steps:**
 
 1. **Build plugin DLL** — From repo root: `dotnet build apps/plugin/WinPodiums.Plugin/WinPodiums.Plugin.csproj --configuration Release`. Output: `apps/plugin/WinPodiums.Plugin/bin/Release/net48/WinPodiums.Plugin.dll`.
-2. **Install in SimHub** — Stop SimHub if running. Copy `WinPodiums.Plugin.dll` (and `Newtonsoft.Json.dll` from the same output folder if SimHub reports a missing assembly) to `C:\Program Files (x86)\SimHub\Plugins`. Start SimHub.
+2. **Install in SimHub** — Stop SimHub if running. Copy `WinPodiums.Plugin.dll` (and `Newtonsoft.Json.dll` from the same output folder if SimHub reports a missing assembly) to `C:\Program Files (x86)\SimHub\Plugins` (the only SimHub deploy path this repo supports). Start SimHub.
 3. **Open plugin settings** — In SimHub, open the plugin list/settings and select WinPodiums. Open the plugin settings panel (WPF control with "Link to Discord", "Send heartbeat", status).
 4. **Confirm initial state** — You should see "Link to Discord" and status "Not linked".
 5. **Link to Discord** — Click "Link to Discord". A browser opens to Discord OAuth; sign in and authorize. After redirect, the plugin shows "Linked" (and optionally your Discord ID).

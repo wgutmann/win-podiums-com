@@ -19,11 +19,11 @@ SimHub plugin for WinPodiums: monitors telemetry, detects podium finishes, and s
 ## Prerequisites
 
 - .NET Framework 4.8
-- SimHub installed (default: `C:\Program Files (x86)\SimHub`) — required for SDK reference at build and for running the plugin
+- SimHub installed at `C:\Program Files (x86)\SimHub` (the only path this repo supports) — required for SDK reference at build and for running the plugin
 
 ## Build
 
-1. The project references SimHub SDK from the SimHub install directory: `SimHub.Plugins.dll` and `GameReaderCommon.dll` in `C:\Program Files (x86)\SimHub`. If your SimHub is installed elsewhere, edit the `HintPath` in `WinPodiums.Plugin.csproj`.
+1. The project references SimHub SDK from `C:\Program Files (x86)\SimHub`: `SimHub.Plugins.dll` and `GameReaderCommon.dll` (the only SimHub path this repo supports).
 2. From repo root: `dotnet build apps/plugin/WinPodiums.Plugin/WinPodiums.Plugin.csproj --configuration Release`  
    Or from this directory: `dotnet build WinPodiums.Plugin/WinPodiums.Plugin.csproj --configuration Release`
 3. Output: `WinPodiums.Plugin/bin/Release/net48/WinPodiums.Plugin.dll`

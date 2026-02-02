@@ -23,7 +23,7 @@ Or: `powershell -ExecutionPolicy Bypass -File scripts/deploy-plugin.ps1`
 
 **What it typically does:** Builds the plugin (Release), copies the DLL (and Newtonsoft.Json.dll if present) to the SimHub install folder, prints "Deploy complete. Restart SimHub to load the plugin."
 
-**Default deploy path:** `C:\Program Files (x86)\SimHub` (or Plugins subfolder). Override with `$env:SIMHUB_PLUGINS`. Copying to Program Files usually requires **running PowerShell as Administrator**.
+**Only supported deploy path:** `C:\Program Files (x86)\SimHub\` (plugin DLLs go in `C:\Program Files (x86)\SimHub\Plugins`). This repo does not support other paths. Copying to Program Files usually requires **running PowerShell as Administrator**.
 
 ## Manual build and deploy (no script)
 
@@ -32,10 +32,8 @@ When the deploy script is not present, use the **docker-dev-environment** skill 
 1. **Before building:** Close SimHub completely (locks plugin DLLs).
 2. **Build:** From repo root: `dotnet build apps/plugin/WinPodiums.Plugin/WinPodiums.Plugin.csproj --configuration Release` (or Debug).
 3. **Before deploying:** Ensure SimHub is stopped so the Plugins folder is not locked.
-4. **Deploy:** Copy the built DLL from `apps/plugin/WinPodiums.Plugin/bin/Release/net48/` (or `Debug/net48/`) to the SimHub Plugins folder (e.g. `C:\Program Files (x86)\SimHub\Plugins`).
+4. **Deploy:** Copy the built DLL from `apps/plugin/WinPodiums.Plugin/bin/Release/net48/` (or `Debug/net48/`) to `C:\Program Files (x86)\SimHub\Plugins` (the only deploy path this repo supports).
 5. **Verify:** Start SimHub and confirm the plugin appears in the plugin list.
-
-Override deploy path with `$env:SIMHUB_PLUGINS` (e.g. `C:\path\to\SimHub` or `C:\path\to\SimHub\Plugins`).
 
 ## Build only (no copy)
 

@@ -106,11 +106,9 @@ For this repo's assembly name use `WinPodiums.Plugin`; replace `SimHubPlugin` ab
 # Build
 dotnet build -c Debug
 
-# Deploy to SimHub plugins folder (canonical path for this repo)
+# Deploy to SimHub plugins folder (only path this repo supports)
 $SimHubPlugins = "C:\Program Files (x86)\SimHub\Plugins"
 $PluginOut = "bin\Debug\net48"
 # Use your assembly name, e.g. WinPodiums.Plugin.dll
 Copy-Item "$PluginOut\WinPodiums.Plugin.dll" "$SimHubPlugins\" -Force
 ```
-
-If SimHub does not load the plugin, try copying the DLL to the SimHub install root: `C:\Program Files (x86)\SimHub\`.

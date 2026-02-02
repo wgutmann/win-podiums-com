@@ -119,7 +119,7 @@ When building and deploying the SimHub plugin DLL on the host (no Docker for the
 1. **Before building**: Close SimHub completely. If SimHub is running, it may lock plugin DLLs and cause build or copy issues.
 2. **Build**: From repo root, run `dotnet build apps/plugin/WinPodiums.Plugin/WinPodiums.Plugin.csproj` (or use your IDE).
 3. **Before deploying**: Ensure SimHub is stopped. If SimHub is open, the plugin file in the SimHub Plugins folder will be locked and the copy will fail (cannot overwrite).
-4. **Deploy**: Once SimHub is stopped, copy the built DLL (e.g. from `apps/plugin/WinPodiums.Plugin/bin/Debug/net48/` or `Release`) to the SimHub Plugins folder (e.g. `C:\Program Files (x86)\SimHub\Plugins`).
+4. **Deploy**: Once SimHub is stopped, copy the built DLL (e.g. from `apps/plugin/WinPodiums.Plugin/bin/Debug/net48/` or `Release`) to `C:\Program Files (x86)\SimHub\Plugins` (the only SimHub deploy path this repo supports).
 5. **Verify**: Start SimHub and confirm the plugin appears in the plugin list.
 
 Include this sequence in any local deployment setup or runbook that involves the SimHub plugin.

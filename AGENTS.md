@@ -19,7 +19,7 @@ Project-level guidance for AI agents working in this repo.
 
 - **Cloudflare (web/API)**: Workers (TypeScript), D1, R2, KV. Use the cloudflare-workers skill. Prefer Wrangler for local dev and deployment. Config: `apps/api/wrangler.toml` and `.dev.vars`; never commit secrets.
 - **.NET (SimHub only)**: C#/.NET Framework 4.8 for the SimHub plugin.
-- **SimHub**: Plugin work; use the simhub-plugin-builder skill when relevant.
+- **SimHub**: Plugin work; use the simhub-plugin-builder skill when relevant. **Only supported SimHub path**: `C:\Program Files (x86)\SimHub\` (plugins in `...\Plugins`); no other install locations are supported.
 - **Discord**: Auth and integrations; use the discord-authentication skill when relevant.
 - **Docker**: Dev environment; use the docker-dev-environment skill. Run and test locally with Docker; tests run against the Dockerized API so config stays 1:1.
 - **GitHub**: Change control, PRs, secrets; use the github-change-control skill when relevant. PRs must use the PR template with Traceability, Doc links, and traceability labels (see [CONTRIBUTING](CONTRIBUTING.md) and [ContextStream mapping §1.4](docs/guides/contextstream-mapping.md#14-linking-pull-requests-to-tech-plans-and-prds-graph-visible)). When introducing a new PRD or tech plan, add traceability-mapping and labels in the same PR; labels sync on PR open.

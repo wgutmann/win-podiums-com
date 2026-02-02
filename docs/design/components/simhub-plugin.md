@@ -486,7 +486,7 @@ WPF XAML structure:
 3. User restarts SimHub
 4. Plugin auto-loads, shows first-launch UI
 
-**Canonical SimHub path (this repo)**: Use `C:\Program Files (x86)\SimHub` as the SimHub install root and `C:\Program Files (x86)\SimHub\Plugins` for the plugins folder in all documentation and code references.
+**Only supported SimHub path (this repo)**: `C:\Program Files (x86)\SimHub\` is the only SimHub path we support. Use it as the SimHub install root and `C:\Program Files (x86)\SimHub\Plugins` for the plugins folder in all documentation and code references. No other install locations are supported.
 
 ### Updates
 - Plugin checks for updates on every heartbeat (5 minutes)

@@ -52,7 +52,7 @@ A merit-based luxury community for elite sim racers, verified through real-time 
 ### SimHub Plugin
 - Main entry: `apps/plugin/WinPodiums.Plugin/Core/PluginMain.cs`
 - Project: `apps/plugin/WinPodiums.Plugin/WinPodiums.Plugin.csproj` (.NET Framework 4.8)
-- **Install**: [Plugin installation](../../apps/plugin/README.md#installation) — build, copy `WinPodiums.Plugin.dll` to `C:\Program Files (x86)\SimHub\Plugins`, restart SimHub
+- **Install**: [Plugin installation](../../apps/plugin/README.md#installation) — build, copy `WinPodiums.Plugin.dll` to `C:\Program Files (x86)\SimHub\Plugins` (only supported SimHub path), restart SimHub
 - See [plugin README](../../apps/plugin/README.md) and [SimHub Plugin LLD](../../docs/design/components/simhub-plugin.md)
 - **Development handoff:** [PRD-001 SimHub Plugin POC](../../docs/product/simhub-plugin-poc/001-simhub-plugin-poc.md) and [TP-SPOC-001–005](../../docs/tech-plans/simhub-plugin-poc/README.md); implement in order 001→002→003→004→005. POC complete per [TP-SPOC-005](../../docs/tech-plans/simhub-plugin-poc/005-poc-testing-completion.md). See [Development guide — SimHub Plugin POC](../../docs/guides/development.md#simhub-plugin-poc--development-handoff).
 

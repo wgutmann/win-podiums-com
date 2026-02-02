@@ -35,6 +35,9 @@ export async function exchangeCodeWeb(
   clientId: string,
   clientSecret: string
 ): Promise<DiscordTokenResponse> {
+  // #region agent log
+  fetch("http://127.0.0.1:7242/ingest/1d72bcc7-cc87-407b-8d82-421bf27576d3", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ location: "discord.ts:exchangeCodeWeb", message: "exchangeCodeWeb entry", data: { url: DISCORD_TOKEN_URL }, timestamp: Date.now(), sessionId: "debug-session", hypothesisId: "H1" }) }).catch(() => {});
+  // #endregion
   const body = new URLSearchParams({
     client_id: clientId,
     client_secret: clientSecret,
@@ -42,11 +45,17 @@ export async function exchangeCodeWeb(
     code,
     redirect_uri: redirectUri,
   });
+  // #region agent log
+  fetch("http://127.0.0.1:7242/ingest/1d72bcc7-cc87-407b-8d82-421bf27576d3", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ location: "discord.ts:exchangeCodeWeb", message: "before fetch DISCORD_TOKEN_URL", data: {}, timestamp: Date.now(), sessionId: "debug-session", hypothesisId: "H1" }) }).catch(() => {});
+  // #endregion
   const res = await fetch(DISCORD_TOKEN_URL, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: body.toString(),
   });
+  // #region agent log
+  fetch("http://127.0.0.1:7242/ingest/1d72bcc7-cc87-407b-8d82-421bf27576d3", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ location: "discord.ts:exchangeCodeWeb", message: "after fetch token", data: { ok: res.ok, status: res.status }, timestamp: Date.now(), sessionId: "debug-session", hypothesisId: "H1" }) }).catch(() => {});
+  // #endregion
   if (!res.ok) {
     const err = await res.text();
     throw new Error(`Discord token exchange failed: ${res.status} ${err}`);
@@ -82,6 +91,9 @@ export async function exchangeCodePKCE(
 
 /** Fetch Discord user with access token. */
 export async function getDiscordUser(accessToken: string): Promise<DiscordUser> {
+  // #region agent log
+  fetch("http://127.0.0.1:7242/ingest/1d72bcc7-cc87-407b-8d82-421bf27576d3", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ location: "discord.ts:getDiscordUser", message: "getDiscordUser entry, before fetch", data: { url: DISCORD_ME_URL }, timestamp: Date.now(), sessionId: "debug-session", hypothesisId: "H2" }) }).catch(() => {});
+  // #endregion
   const res = await fetch(DISCORD_ME_URL, {
     headers: { Authorization: `Bearer ${accessToken}` },
   });

@@ -3,6 +3,13 @@
 # Use Debian-based image so Wrangler's workerd binary (linux64) runs correctly
 FROM node:20-bookworm-slim
 
+# workerd TLS uses system/NODE_EXTRA_CA_CERTS; slim may have minimal CAs. Ensure full bundle so
+# outbound HTTPS (e.g. Discord OAuth) succeeds. See cloudflare/workers-sdk#4081.
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates \
+  && rm -rf /var/lib/apt/lists/*
+
+ENV NODE_EXTRA_CA_CERTS=/etc/ssl/certs/ca-certificates.crt
+
 WORKDIR /app
 
 # Copy dependency manifests and install (cache layer)
@@ -22,5 +29,5 @@ ENV CLOUDFLARE_INCLUDE_PROCESS_ENV=true
 
 EXPOSE 8787
 
-# Regenerate openapi-spec at startup so Swagger works with volume-mounted src
-CMD ["sh", "-c", "node scripts/inline-openapi.js openapi.yaml src/openapi-spec.ts && npx wrangler dev --local --port 8787 --ip 0.0.0.0"]
+# Regenerate openapi-spec at startup; apply D1 migrations so local DB has tables; then start Worker
+CMD ["sh", "-c", "node scripts/inline-openapi.js openapi.yaml src/openapi-spec.ts && npx wrangler d1 migrations apply winpodiums-dev-db --local && npx wrangler dev --local --port 8787 --ip 0.0.0.0"]

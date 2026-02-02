@@ -114,6 +114,25 @@ The plugin targets .NET Framework 4.8 and SimHub on Windows. Build and run on th
 
 **Implementation order:** TP-SPOC-001 (skeleton, SDK, config) → 002 (auth PKCE, token storage) → 003 (API client, heartbeat) → 004 (minimal SimHub UI) → 005 (testing, POC completion). Manual E2E and minimum automated tests per TP-005 define “POC complete.”
 
+### Manual E2E — SimHub Plugin POC
+
+To confirm POC completion, run the full flow from the SimHub UI only (no code changes). Documented per [TP-SPOC-005](../tech-plans/simhub-plugin-poc/005-poc-testing-completion.md).
+
+**Prerequisites:**
+
+- For browser PKCE, the **Discord app** must have redirect URI `http://127.0.0.1:54321/callback` (canonical port). Add it in the Discord Developer Portal under your application → OAuth2 → Redirects.
+- For heartbeat to succeed, the API must be running (e.g. `docker compose up`). For local testing, use `http://localhost:8787`; the plugin uses the default API base URL unless you set it (e.g. via `SetApiBaseUrl` programmatically; UI for base URL is optional for POC).
+
+**Steps:**
+
+1. **Build plugin DLL** — From repo root: `dotnet build apps/plugin/WinPodiums.Plugin/WinPodiums.Plugin.csproj --configuration Release`. Output: `apps/plugin/WinPodiums.Plugin/bin/Release/net48/WinPodiums.Plugin.dll`.
+2. **Install in SimHub** — Stop SimHub if running. Copy `WinPodiums.Plugin.dll` (and `Newtonsoft.Json.dll` from the same output folder if SimHub reports a missing assembly) to `C:\Program Files (x86)\SimHub\Plugins`. Start SimHub.
+3. **Open plugin settings** — In SimHub, open the plugin list/settings and select WinPodiums. Open the plugin settings panel (WPF control with "Link to Discord", "Send heartbeat", status).
+4. **Confirm initial state** — You should see "Link to Discord" and status "Not linked".
+5. **Link to Discord** — Click "Link to Discord". A browser opens to Discord OAuth; sign in and authorize. After redirect, the plugin shows "Linked" (and optionally your Discord ID).
+6. **Send heartbeat** — Click "Send heartbeat". Status should show "Heartbeat OK" (or "Heartbeat failed" if the API is down or unreachable).
+7. **Optional (local API)** — To test against a local API: ensure the API is running (`docker compose up`), set the plugin API base URL to `http://localhost:8787` if exposed (e.g. in a future UI or via programmatic `SetApiBaseUrl`), then repeat steps 5–6.
+
 ## Wrangler bindings (D1, R2, KV)
 
 - **D1 and R2**: `apps/api/wrangler.toml` defines bindings for local dev (`winpodiums-dev-db`, `winpodiums-dev-storage`). Docker runs Wrangler with the same config.

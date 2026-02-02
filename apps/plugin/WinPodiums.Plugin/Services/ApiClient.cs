@@ -24,7 +24,62 @@ namespace WinPodiums.Plugin.Services
         }
 
         /// <summary>
-        /// Exchange a one-time manual token for Discord ID and access token.
+        /// Get public auth config (e.g. Discord client ID for PKCE authorize URL). No auth required.
+        /// </summary>
+        public async Task<AuthConfigResult> GetAuthConfigAsync()
+        {
+            var url = $"{_baseUrl}/api/auth/config";
+            var res = await _http.GetAsync(url);
+            var json = await res.Content.ReadAsStringAsync();
+            if (!res.IsSuccessStatusCode)
+            {
+                var err = TryParseError(json);
+                throw new ApiException(err ?? $"HTTP {(int)res.StatusCode}", (int)res.StatusCode);
+            }
+            var obj = JObject.Parse(json);
+            var data = obj["data"];
+            if (data == null)
+                throw new ApiException("Invalid response: missing data", 200);
+            return new AuthConfigResult
+            {
+                DiscordClientId = data["discordClientId"]?.ToString() ?? ""
+            };
+        }
+
+        /// <summary>
+        /// Exchange PKCE authorization code for Discord ID and access token (plugin browser flow).
+        /// </summary>
+        public async Task<TokenExchangeResult> DiscordExchangeAsync(string code, string codeVerifier, string redirectUri)
+        {
+            var url = $"{_baseUrl}/api/auth/discord/exchange";
+            var body = new JObject
+            {
+                ["code"] = code?.Trim(),
+                ["code_verifier"] = codeVerifier?.Trim(),
+                ["redirect_uri"] = redirectUri?.Trim()
+            };
+            var content = new StringContent(body.ToString(), Encoding.UTF8, "application/json");
+            var res = await _http.PostAsync(url, content);
+            var json = await res.Content.ReadAsStringAsync();
+            if (!res.IsSuccessStatusCode)
+            {
+                var err = TryParseError(json);
+                throw new ApiException(err ?? $"HTTP {(int)res.StatusCode}", (int)res.StatusCode);
+            }
+            var obj = JObject.Parse(json);
+            var data = obj["data"];
+            if (data == null)
+                throw new ApiException("Invalid response: missing data", 200);
+            return new TokenExchangeResult
+            {
+                DiscordId = data["discordId"]?.ToString(),
+                AccessToken = data["access_token"]?.ToString(),
+                ExpiresIn = data["expires_in"]?.Value<int>() ?? 0
+            };
+        }
+
+        /// <summary>
+        /// Exchange a one-time manual token for Discord ID and access token (debug only).
         /// </summary>
         public async Task<TokenExchangeResult> TokenExchangeAsync(string tokenCode)
         {
@@ -83,6 +138,11 @@ namespace WinPodiums.Plugin.Services
                 return null;
             }
         }
+    }
+
+    public class AuthConfigResult
+    {
+        public string DiscordClientId { get; set; } = "";
     }
 
     public class TokenExchangeResult

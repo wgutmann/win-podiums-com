@@ -3,6 +3,7 @@
 # Build: docker compose build  |  Test: docker compose up -d && cd apps/api && npm test
 services:
   api:
+    container_name: win-podiums-com-container
     build:
       context: .
       dockerfile: Dockerfile

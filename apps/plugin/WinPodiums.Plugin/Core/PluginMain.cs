@@ -69,7 +69,7 @@ namespace WinPodiums.Plugin.Core
         {
             get
             {
-                var (token, _) = TokenStorage.Load();
+                var (token, _, _) = TokenStorage.Load();
                 return !string.IsNullOrEmpty(token);
             }
         }
@@ -81,10 +81,16 @@ namespace WinPodiums.Plugin.Core
         {
             get
             {
-                var (_, discordId) = TokenStorage.Load();
+                var (_, discordId, _) = TokenStorage.Load();
                 return discordId;
             }
         }
+
+        /// <summary>
+        /// Set when session expired (refresh failed). UI should show "Session expired – please log in again".
+        /// Cleared when user logs in or on next successful operation.
+        /// </summary>
+        public bool SessionExpired { get; private set; }
 
         /// <summary>
         /// Authenticate using browser-launched Discord OAuth (PKCE). Primary auth per PRD-001.
@@ -186,7 +192,11 @@ namespace WinPodiums.Plugin.Core
                 if (string.IsNullOrEmpty(result.AccessToken) || string.IsNullOrEmpty(result.DiscordId))
                     return false;
 
-                TokenStorage.Save(result.AccessToken!, result.DiscordId!);
+                SessionExpired = false;
+                var expiresAt = result.ExpiresIn > 0
+                    ? DateTime.UtcNow.AddSeconds(result.ExpiresIn).ToString("o")
+                    : null;
+                TokenStorage.Save(result.AccessToken!, result.DiscordId!, expiresAt);
                 return true;
             }
             catch
@@ -211,7 +221,11 @@ namespace WinPodiums.Plugin.Core
                 var result = await _apiClient.TokenExchangeAsync(tokenCode);
                 if (string.IsNullOrEmpty(result.AccessToken) || string.IsNullOrEmpty(result.DiscordId))
                     return false;
-                TokenStorage.Save(result.AccessToken!, result.DiscordId!);
+                SessionExpired = false;
+                var expiresAt = result.ExpiresIn > 0
+                    ? DateTime.UtcNow.AddSeconds(result.ExpiresIn).ToString("o")
+                    : null;
+                TokenStorage.Save(result.AccessToken!, result.DiscordId!, expiresAt);
                 return true;
             }
             catch
@@ -221,24 +235,59 @@ namespace WinPodiums.Plugin.Core
         }
 
         /// <summary>
+        /// Execute a protected API call with 401→refresh→retry. On refresh failure, clears storage and sets SessionExpired.
+        /// </summary>
+        private async Task<bool> CallWithAuthAsync(Func<string, Task> apiCall)
+        {
+            var (accessToken, discordId, _) = TokenStorage.Load();
+            if (string.IsNullOrEmpty(accessToken) || _apiClient == null)
+                return false;
+            try
+            {
+                await apiCall(accessToken!);
+                SessionExpired = false;
+                return true;
+            }
+            catch (ApiException ex) when (ex.StatusCode == 401)
+            {
+                var refreshResult = await _apiClient.RefreshAsync(accessToken!);
+                if (refreshResult == null || string.IsNullOrEmpty(refreshResult.AccessToken))
+                {
+                    TokenStorage.Clear();
+                    SessionExpired = true;
+                    return false;
+                }
+                var newExpiresAt = refreshResult.ExpiresIn > 0
+                    ? DateTime.UtcNow.AddSeconds(refreshResult.ExpiresIn).ToString("o")
+                    : null;
+                TokenStorage.Save(
+                    refreshResult.AccessToken!,
+                    refreshResult.DiscordId ?? discordId ?? "",
+                    newExpiresAt);
+                try
+                {
+                    await apiCall(refreshResult.AccessToken!);
+                    return true;
+                }
+                catch
+                {
+                    TokenStorage.Clear();
+                    SessionExpired = true;
+                    return false;
+                }
+            }
+        }
+
+        /// <summary>
         /// Send a heartbeat to the API (one verification flow). Uses stored access token.
+        /// On 401, attempts refresh and retries. On refresh failure, clears storage and sets SessionExpired.
         /// </summary>
         /// <param name="pluginVersion">Plugin version string (e.g. 1.0.0).</param>
         /// <returns>True if heartbeat was accepted.</returns>
         public async Task<bool> SendHeartbeatAsync(string pluginVersion = "1.0.0")
         {
-            var (accessToken, _) = TokenStorage.Load();
-            if (string.IsNullOrEmpty(accessToken) || _apiClient == null)
-                return false;
-            try
-            {
-                await _apiClient.HeartbeatAsync(accessToken!, pluginVersion);
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            return await CallWithAuthAsync(token =>
+                _apiClient!.HeartbeatAsync(token, pluginVersion));
         }
 
         /// <summary>
@@ -247,6 +296,7 @@ namespace WinPodiums.Plugin.Core
         public void Logout()
         {
             TokenStorage.Clear();
+            SessionExpired = false;
         }
 
         /// <summary>

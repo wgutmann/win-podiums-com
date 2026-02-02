@@ -123,6 +123,73 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "404":
           $ref: "#/components/responses/NotFound"
+  /auth/refresh:
+    post:
+      tags:
+        - Authentication
+      summary: Refresh access token
+      description: >
+        Exchanges the current (possibly expired) Bearer token for a new Discord access token.
+        Used by the plugin when a protected call returns 401. Requires Authorization Bearer with
+        the current Discord access token. Returns new access_token, expires_in, and discord_id.
+        Does not return refresh_token.
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Empty body optional
+      responses:
+        "200":
+          description: New token issued.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  data:
+                    type: object
+                    properties:
+                      access_token:
+                        type: string
+                        description: New Discord access token
+                      expires_in:
+                        type: integer
+                        description: Seconds until access_token expires
+                      discord_id:
+                        type: string
+                        description: User Discord ID
+                    required:
+                      - access_token
+                      - expires_in
+                      - discord_id
+                required:
+                  - success
+                  - data
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "429":
+          description: Too many refresh attempts. Include Retry-After header.
+          headers:
+            Retry-After:
+              schema:
+                type: integer
+                example: 60
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "502":
+          description: Discord unavailable or server error.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
   /auth/token-exchange:
     post:
       tags:

@@ -94,6 +94,36 @@ export async function getUserIdByAccessToken(
   return row?.user_id ?? null;
 }
 
+/** Get token row by access_token (including expired). Used for refresh flow; returns same-row refresh_token. */
+export async function getTokenRowByAccessTokenAllowExpired(
+  db: D1Database,
+  accessToken: string
+): Promise<{ user_id: string; token_id: string; refresh_token: string } | null> {
+  const row = await db
+    .prepare(
+      `SELECT user_id, token_id, refresh_token FROM auth_tokens WHERE access_token = ? LIMIT 1`
+    )
+    .bind(accessToken)
+    .first<{ user_id: string; token_id: string; refresh_token: string }>();
+  return row ?? null;
+}
+
+/** Update auth_tokens with new tokens after Discord refresh. */
+export async function updateAuthTokens(
+  db: D1Database,
+  tokenId: string,
+  accessToken: string,
+  refreshToken: string,
+  expiresAt: string
+): Promise<void> {
+  await db
+    .prepare(
+      `UPDATE auth_tokens SET access_token = ?, refresh_token = ?, expires_at = ? WHERE token_id = ?`
+    )
+    .bind(accessToken, refreshToken, expiresAt, tokenId)
+    .run();
+}
+
 /** Create manual token row; return token_code. */
 export async function createManualToken(
   db: D1Database,

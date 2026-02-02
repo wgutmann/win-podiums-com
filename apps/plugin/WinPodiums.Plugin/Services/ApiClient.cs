@@ -106,6 +106,39 @@ namespace WinPodiums.Plugin.Services
         }
 
         /// <summary>
+        /// Refresh access token. POST /api/auth/refresh with current Bearer token.
+        /// Returns RefreshResult on 200, null on 401/429/5xx or network error.
+        /// </summary>
+        public async Task<RefreshResult?> RefreshAsync(string accessToken)
+        {
+            var url = $"{_baseUrl}/api/auth/refresh";
+            using var req = new HttpRequestMessage(HttpMethod.Post, url);
+            req.Headers.TryAddWithoutValidation("Authorization", "Bearer " + accessToken);
+            req.Content = new StringContent("{}", Encoding.UTF8, "application/json");
+            try
+            {
+                var res = await _http.SendAsync(req);
+                if (!res.IsSuccessStatusCode)
+                    return null;
+                var json = await res.Content.ReadAsStringAsync();
+                var obj = JObject.Parse(json);
+                var data = obj["data"];
+                if (data == null)
+                    return null;
+                return new RefreshResult
+                {
+                    AccessToken = data["access_token"]?.ToString(),
+                    ExpiresIn = data["expires_in"]?.Value<int>() ?? 0,
+                    DiscordId = data["discord_id"]?.ToString()
+                };
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Send plugin heartbeat (Bearer token).
         /// </summary>
         public async Task HeartbeatAsync(string accessToken, string pluginVersion = "1.0.0")
@@ -150,6 +183,13 @@ namespace WinPodiums.Plugin.Services
         public string? DiscordId { get; set; }
         public string? AccessToken { get; set; }
         public int ExpiresIn { get; set; }
+    }
+
+    public class RefreshResult
+    {
+        public string? AccessToken { get; set; }
+        public int ExpiresIn { get; set; }
+        public string? DiscordId { get; set; }
     }
 
     public class ApiException : Exception

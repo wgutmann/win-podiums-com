@@ -74,11 +74,26 @@ namespace WinPodiums.Plugin.UI
             try
             {
                 var ok = await _plugin.SendHeartbeatAsync("1.0.0").ConfigureAwait(true);
-                HeartbeatStatusText.Text = ok ? "Heartbeat OK" : "Heartbeat failed";
+                if (ok)
+                {
+                    HeartbeatStatusText.Text = "Heartbeat OK";
+                }
+                else if (_plugin.SessionExpired)
+                {
+                    HeartbeatStatusText.Text = "Session expired – please log in again";
+                    RefreshStatus();
+                }
+                else
+                {
+                    HeartbeatStatusText.Text = "Heartbeat failed";
+                }
             }
             catch
             {
-                HeartbeatStatusText.Text = "Heartbeat failed";
+                HeartbeatStatusText.Text = _plugin.SessionExpired
+                    ? "Session expired – please log in again"
+                    : "Heartbeat failed";
+                RefreshStatus();
             }
             finally
             {

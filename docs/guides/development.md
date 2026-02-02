@@ -139,6 +139,39 @@ To confirm POC completion, run the full flow from the SimHub UI only (no code ch
 
 **Validation checklist (build/deploy workflow):** (1) Close SimHub completely. (2) Build plugin from repo root: `dotnet build apps/plugin/WinPodiums.Plugin/WinPodiums.Plugin.csproj --configuration Release`. (3) Copy `WinPodiums.Plugin.dll` (and `Newtonsoft.Json.dll` if needed) from `apps/plugin/WinPodiums.Plugin/bin/Release/net48/` to `C:\Program Files (x86)\SimHub\` (install root). (4) Restart SimHub. (5) Enable the plugin and show in sidebar if required by SimHub. (6) In the left feature menu, click **WinPodiums**. (7) Confirm the panel shows Login with Discord, Send heartbeat, and status (Linked/Not linked, Heartbeat OK/failed).
 
+### Manual E2E — Long-Lived Tokens (PRD-001)
+
+Per [TP-004 Long-Lived Tokens Testing](../tech-plans/simhub-auth/004-testing-completion.md). Run these scenarios to confirm refresh flow and session handling.
+
+**Happy path**
+
+1. Fresh install or logout (plugin shows "Not linked").
+2. Link to Discord (browser PKCE); send heartbeat → success.
+3. Close SimHub completely.
+4. Reopen SimHub; open plugin; confirm still "Linked".
+5. Send heartbeat → success without re-authenticating.
+6. Repeat steps 4–5 at least once more (e.g. next day or after token would have expired) to verify extended-period behavior. If token would expire before then, either wait or force expiry (see Session expired) to verify refresh path.
+
+**Session expired**
+
+1. Plugin is linked (has stored token).
+2. Invalidate token: revoke in Discord Developer Portal (OAuth2 → your app → revoke), or wait until access token expires and ensure refresh is triggered.
+3. Trigger API call (e.g. click "Send heartbeat").
+4. Expect: "Session expired – please log in again" in UI; plugin not left as "Linked" with silent failure. Optionally expect one refresh attempt before showing session expired if token was expired but refresh token still valid.
+5. Re-auth (Link to Discord again); send heartbeat → success.
+
+**Logout**
+
+1. Plugin is linked.
+2. User clicks Unlink (logout).
+3. Confirm "Not linked"; heartbeat fails until user logs in again.
+4. Log in again; heartbeat → success.
+
+**Security checklist**
+
+- **No tokens in logs**: Grep or code review: no `access_token`, `refresh_token`, or session tokens in log statements in Worker (`apps/api/src/`) or plugin (`apps/plugin/`).
+- **Rate limit**: Refresh endpoint returns 429 under load. To verify: send 10+ `POST /api/auth/refresh` requests per minute with a valid Bearer token; expect 429 with `Retry-After` header.
+
 ## Wrangler bindings (D1, R2, KV)
 
 - **D1 and R2**: `apps/api/wrangler.toml` defines bindings for local dev (`winpodiums-dev-db`, `winpodiums-dev-storage`). Docker runs Wrangler with the same config.
@@ -290,7 +323,7 @@ To disable the hook for this repo: `git config --unset core.hooksPath`.
 
 ### What we test (and what we don't)
 
-- **API (Worker):** Smoke test (`npm test` in `apps/api`) runs against the live API (Docker or wrangler dev): health, GET /api/auth/config (plugin dependency), POST /api/auth/discord/exchange with bad body (400), 404/401 shapes, API docs and OpenAPI spec, protected routes return 401 without auth. Unit tests (Vitest): session JWT and response helpers.
+- **API (Worker):** Smoke test (`npm test` in `apps/api`) runs against the live API (Docker or wrangler dev): health, GET /api/auth/config (plugin dependency), POST /api/auth/discord/exchange with bad body (400), POST /api/auth/refresh without auth (401), 404/401 shapes, API docs and OpenAPI spec, protected routes return 401 without auth. Unit tests (Vitest): session JWT, response helpers, and refresh flow (discord refreshAccessToken, user lib getTokenRowByAccessTokenAllowExpired, rate limit).
 - **Plugin:** Build only (pre-push and CI run `dotnet build`). No C# unit or integration tests in this repo yet; plugin E2E is manual (see [Manual E2E — SimHub Plugin POC](#manual-e2e--simhub-plugin-poc)).
 - **SimHub:** SimHub does **not** expose an HTTP API or automation interface. It is a desktop (WPF) app; plugins run inside it via the SimHub SDK (e.g. DataUpdate, GetPropertyValue). There is no way to "query" or "hit" SimHub from a script or test runner. End-to-end testing of the plugin inside SimHub (open SimHub → WinPodiums → Login with Discord → Send heartbeat) is **manual** and documented in the steps above.
 

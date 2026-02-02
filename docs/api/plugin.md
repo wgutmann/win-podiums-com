@@ -10,6 +10,7 @@ Endpoints for the SimHub plugin: verification, heartbeat, and installer download
 
 | Method | Path | Summary |
 |--------|------|---------|
+| POST | `/api/auth/refresh` | Refresh access token (Bearer required) |
 | POST | `/api/plugin/verify` | Submit race result for verification |
 | POST | `/api/plugin/heartbeat` | Plugin health check |
 | GET | `/api/plugin/download/:type` | Download plugin installer |
@@ -21,6 +22,10 @@ Plugin requests use:
 ```http
 Authorization: Bearer {ACCESS_TOKEN}
 ```
+
+## Refresh
+
+- **POST /api/auth/refresh** — Exchanges current (possibly expired) Bearer token for a new access token. Called by the plugin when a protected request returns 401. Returns `access_token`, `expires_in`, `discord_id`. Returns 401 when refresh token revoked, 429 when rate limited, 502 when Discord unavailable.
 
 ## Verify
 

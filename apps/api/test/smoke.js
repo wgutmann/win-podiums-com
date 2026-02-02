@@ -129,6 +129,22 @@ async function main() {
     process.exit(1);
   }
 
+  // POST /api/auth/refresh without auth or with invalid token — must return 401
+  res = await fetch(`${API_BASE}/api/auth/refresh`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer invalid_token' },
+    body: '{}',
+  });
+  if (res.status !== 401) {
+    console.error('POST /api/auth/refresh with invalid token: expected 401, got', res.status);
+    process.exit(1);
+  }
+  res = await fetch(`${API_BASE}/api/auth/refresh`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+  if (res.status !== 401) {
+    console.error('POST /api/auth/refresh without Authorization: expected 401, got', res.status);
+    process.exit(1);
+  }
+
   console.log('Smoke test passed: API health ok, env=%s, API docs load, protected routes return 401 without auth', data.env);
 }
 

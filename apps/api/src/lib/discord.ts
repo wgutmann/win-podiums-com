@@ -89,6 +89,30 @@ export async function exchangeCodePKCE(
   return (await res.json()) as DiscordTokenResponse;
 }
 
+/** Refresh access token using Discord refresh_token. Requires client_secret. */
+export async function refreshAccessToken(
+  refreshToken: string,
+  clientId: string,
+  clientSecret: string
+): Promise<DiscordTokenResponse> {
+  const body = new URLSearchParams({
+    client_id: clientId,
+    client_secret: clientSecret,
+    grant_type: "refresh_token",
+    refresh_token: refreshToken,
+  });
+  const res = await fetch(DISCORD_TOKEN_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: body.toString(),
+  });
+  if (!res.ok) {
+    const err = await res.text();
+    throw new Error(`Discord token refresh failed: ${res.status} ${err}`);
+  }
+  return (await res.json()) as DiscordTokenResponse;
+}
+
 /** Fetch Discord user with access token. */
 export async function getDiscordUser(accessToken: string): Promise<DiscordUser> {
   // #region agent log

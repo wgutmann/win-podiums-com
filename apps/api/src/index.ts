@@ -9,6 +9,7 @@ import {
   getDiscordUser,
   getAuthorizeUrl,
   generateState,
+  refreshAccessToken,
 } from "./lib/discord";
 import { createSessionJWT, verifySessionJWT } from "./lib/session";
 import {
@@ -16,11 +17,14 @@ import {
   storeAuthToken,
   getAuthTokenForUser,
   getUserIdByAccessToken,
+  getTokenRowByAccessTokenAllowExpired,
+  updateAuthTokens,
   createManualToken,
   consumeManualToken,
   getProfile,
   recordHeartbeat,
 } from "./lib/user";
+import { checkRefreshRateLimit } from "./lib/ratelimit";
 import { openApiYaml } from "./openapi-spec";
 
 export interface Env {
@@ -358,6 +362,71 @@ export default {
               0,
               Math.floor(new Date(stored.expires_at).getTime() / 1000 - Date.now() / 1000)
             ),
+          },
+        });
+      }
+
+      // POST /api/auth/refresh — exchange (possibly expired) Bearer for new access_token
+      if (method === "POST" && rest === "auth/refresh") {
+        const authHeader = request.headers.get("Authorization");
+        const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7).trim() : null;
+        if (!token || !env.DB || !env.DISCORD_CLIENT_ID || !env.DISCORD_CLIENT_SECRET) {
+          return errorResponse("unauthorized", "Invalid or expired token", 401);
+        }
+        const tokenRow = await getTokenRowByAccessTokenAllowExpired(env.DB, token);
+        if (!tokenRow) {
+          return errorResponse("unauthorized", "Invalid or expired token", 401);
+        }
+        const rateResult = await checkRefreshRateLimit(env.CACHE, tokenRow.user_id);
+        if (!rateResult.allowed) {
+          const retryAfter = rateResult.retryAfter ?? 60;
+          return new Response(
+            JSON.stringify({
+              success: false,
+              error: "rate_limited",
+              message: "Too many refresh attempts",
+            }),
+            {
+              status: 429,
+              headers: {
+                "Content-Type": "application/json",
+                "Retry-After": String(retryAfter),
+              },
+            }
+          );
+        }
+        let tokens: Awaited<ReturnType<typeof refreshAccessToken>>;
+        try {
+          tokens = await refreshAccessToken(
+            tokenRow.refresh_token,
+            env.DISCORD_CLIENT_ID,
+            env.DISCORD_CLIENT_SECRET
+          );
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : "";
+          const isDiscord4xx = /(?:400|401)/.test(msg);
+          if (isDiscord4xx) {
+            return errorResponse("unauthorized", "Invalid or expired token", 401);
+          }
+          return errorResponse("bad_gateway", "Discord unavailable", 502);
+        }
+        const expiresAt = new Date(Date.now() + tokens.expires_in * 1000)
+          .toISOString()
+          .replace("T", " ")
+          .slice(0, 19);
+        await updateAuthTokens(
+          env.DB,
+          tokenRow.token_id,
+          tokens.access_token,
+          tokens.refresh_token,
+          expiresAt
+        );
+        return jsonResponse({
+          success: true,
+          data: {
+            access_token: tokens.access_token,
+            expires_in: tokens.expires_in,
+            discord_id: tokenRow.user_id,
           },
         });
       }

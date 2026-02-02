@@ -213,6 +213,14 @@ export default {
     if (path.startsWith("/api/")) {
       const rest = path.slice(5).replace(/\/$/, "");
 
+      // GET /api/auth/config — public config for plugin (Discord client ID for PKCE authorize URL)
+      if (method === "GET" && rest === "auth/config") {
+        return jsonResponse({
+          success: true,
+          data: { discordClientId: env.DISCORD_CLIENT_ID ?? "" },
+        });
+      }
+
       // POST /api/auth/discord/callback — server-side web callback (if frontend posts code)
       if (method === "POST" && rest === "auth/discord/callback") {
         let body: { code?: string; state?: string; redirect_uri?: string };

@@ -1,0 +1,26 @@
+<UserControl x:Class="WinPodiums.Plugin.UI.WinPodiumsSettingsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="280" d:DesignWidth="360">
+  <StackPanel Margin="16">
+    <TextBlock Text="WinPodiums" FontSize="18" FontWeight="SemiBold" Margin="0,0,0,12"/>
+
+    <!-- Auth section -->
+    <TextBlock Text="Authentication" FontWeight="SemiBold" Margin="0,0,0,6"/>
+    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+      <Button x:Name="LinkButton" Content="Link to Discord" Padding="12,6" Margin="0,0,8,0" Click="LinkButton_Click"/>
+      <Button x:Name="UnlinkButton" Content="Unlink" Padding="12,6" Margin="0,0,8,0" Click="UnlinkButton_Click" IsEnabled="False"/>
+    </StackPanel>
+    <TextBlock x:Name="AuthStatusText" Text="Not linked" Margin="0,0,0,16"/>
+
+    <!-- Heartbeat section -->
+    <TextBlock Text="Verification" FontWeight="SemiBold" Margin="0,0,0,6"/>
+    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+      <Button x:Name="HeartbeatButton" Content="Send heartbeat" Padding="12,6" Margin="0,0,8,0" Click="HeartbeatButton_Click" IsEnabled="False"/>
+    </StackPanel>
+    <TextBlock x:Name="HeartbeatStatusText" Text="—" Margin="0,0,0,0"/>
+  </StackPanel>
+</UserControl>

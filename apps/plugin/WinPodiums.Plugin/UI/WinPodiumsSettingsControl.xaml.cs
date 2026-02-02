@@ -6,7 +6,7 @@ using WinPodiums.Plugin.Core;
 namespace WinPodiums.Plugin.UI
 {
     /// <summary>
-    /// Minimal SimHub settings panel: Link to Discord, Send heartbeat, status (TP-SPOC-004).
+    /// Minimal SimHub settings panel: Login with Discord, Send heartbeat, status (TP-SPOC-004).
     /// </summary>
     public partial class WinPodiumsSettingsControl : UserControl
     {
@@ -46,12 +46,14 @@ namespace WinPodiums.Plugin.UI
                 }
                 else
                 {
-                    AuthStatusText.Text = "Link failed";
+                    AuthStatusText.Text = "Not linked";
+                    RefreshStatus();
                 }
             }
             catch
             {
-                AuthStatusText.Text = "Link failed";
+                AuthStatusText.Text = "Not linked";
+                RefreshStatus();
             }
             finally
             {

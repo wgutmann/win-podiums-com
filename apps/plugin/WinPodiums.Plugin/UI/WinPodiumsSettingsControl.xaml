@@ -11,7 +11,7 @@
     <!-- Auth section -->
     <TextBlock Text="Authentication" FontWeight="SemiBold" Margin="0,0,0,6"/>
     <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-      <Button x:Name="LinkButton" Content="Link to Discord" Padding="12,6" Margin="0,0,8,0" Click="LinkButton_Click"/>
+      <Button x:Name="LinkButton" Content="Login with Discord" Padding="12,6" Margin="0,0,8,0" Click="LinkButton_Click"/>
       <Button x:Name="UnlinkButton" Content="Unlink" Padding="12,6" Margin="0,0,8,0" Click="UnlinkButton_Click" IsEnabled="False"/>
     </StackPanel>
     <TextBlock x:Name="AuthStatusText" Text="Not linked" Margin="0,0,0,16"/>

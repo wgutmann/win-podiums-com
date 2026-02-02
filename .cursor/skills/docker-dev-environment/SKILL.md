@@ -9,7 +9,7 @@ description: Standardizes Docker-based development environments using official D
 
 Use this skill when the user asks to create or standardize a **Docker** or **Docker Compose** setup, achieve **local/repo parity** for a **containerized dev environment**, or to **debug**, **monitor**, or validate dev containers locally and in CI.
 
-**Flow**: (1) Detect existing Docker artifacts. (2) Choose minimal setup (Dockerfile-only vs Compose). (3) Ensure local and repo config stay in parity. (4) **When preparing env or running build/up:** tear down **all** Docker API envs first—remove the named container `win-podiums-com-container` (from any worktree), then `docker compose down`, then build and up so only one API container runs (see §3a). (5) **Prepare env also includes building and deploying the SimHub plugin** (see §3c): stop SimHub first (if not stopped, it locks the plugin DLL and deploy fails), then build and copy the plugin to the SimHub install root. (6) Use **container name** `win-podiums-com-container` in Compose so the same name is used everywhere. (7) Provide run/debug/monitor workflows and verify them. (8) Define local and CI tests for Docker stability.
+**Flow**: (1) Detect existing Docker artifacts. (2) Choose minimal setup (Dockerfile-only vs Compose). (3) Ensure local and repo config stay in parity. (4) **When preparing env or running build/up:** tear down **all** Docker API envs first—remove the named container `win-podiums-com-container` (from any worktree), then `docker compose down`, then build and up so only one API container runs (see §3a). (5) **Prepare env also includes building and deploying the SimHub plugin** (see §3c): **actively stop SimHub** (Stop-Process), **verify** it is closed (Get-Process; do not proceed until zero SimHub processes), then build and copy the plugin to the SimHub install root. (6) Use **container name** `win-podiums-com-container` in Compose so the same name is used everywhere. (7) Provide run/debug/monitor workflows and verify them. (8) Define local and CI tests for Docker stability.
 
 **ContextStream (when available):** Before changing Docker/Compose, use ContextStream `search` for "Docker", "compose", "wrangler", "Worker" to find existing setup and parity decisions. After Docker/parity decisions, capture in ContextStream (event_type=decision) with path to Dockerfile, compose.yaml, or docs/guides/development.md.
 
@@ -101,12 +101,21 @@ When **implementing** prepare-env, the sequence is: **tear down all API envs** (
 
 **Prepare env** for this repo also means the SimHub plugin is built and deployed so the full dev environment (API + plugin) is ready.
 
-1. **Stop SimHub first.** If SimHub is not stopped, it locks the existing plugin DLL in the SimHub install folder and the copy will fail (cannot overwrite). Require or remind the user to close SimHub before deploying.
+1. **Stop SimHub first.** If SimHub is not stopped, it locks the existing plugin DLL in the SimHub install folder and the copy will fail (cannot overwrite). Agents must **actively stop** SimHub and **verify** it is closed before deploy (see Agent implementation below).
 2. **Build**: From repo root, run `dotnet build apps/plugin/WinPodiums.Plugin/WinPodiums.Plugin.csproj --configuration Release` (or Debug).
 3. **Deploy**: Copy the built DLL from `apps/plugin/WinPodiums.Plugin/bin/Release/net48/WinPodiums.Plugin.dll` (and `Newtonsoft.Json.dll` from the same folder if the plugin needs it) to `C:\Program Files (x86)\SimHub\` (SimHub install root; the only deploy path this repo supports). Copying to Program Files usually requires running PowerShell as Administrator.
 4. **Verify**: User can start SimHub and confirm the plugin appears in the plugin list and (when enabled) in the left feature menu.
 
-When **implementing** prepare-env including the plugin, after Docker (tear down → build → up): **ensure SimHub is stopped** → build plugin → deploy plugin DLL(s) to SimHub install root. Document that SimHub must be closed before deploy or the file will be locked.
+When **implementing** prepare-env including the plugin, after Docker (tear down → build → up): **ensure SimHub is stopped (stop process, then verify)** → build plugin → deploy plugin DLL(s) to SimHub install root. Do **not** move on from the "SimHub stopped" step until it is verified closed.
+
+**Agent implementation (mandatory):** Before running the plugin copy, you must **ensure SimHub is closed** and **verify** it. Do not proceed to the copy step until verification passes.
+
+1. **Find SimHub process(es):** On Windows, run `Get-Process -Name "SimHub*" -ErrorAction SilentlyContinue` and, if the executable path is available, `Get-Process | Where-Object { $_.Path -like "*SimHub*" }` to catch any process running from the SimHub install folder.
+2. **Stop them:** For each process found, run `Stop-Process -Id <id> -Force` (or `Stop-Process -Name "SimHub*" -Force`). Be aggressive—close SimHub so the DLL is not locked.
+3. **Verify closed:** Re-run the same Get-Process check. If **any** SimHub process still exists, **do not run the copy**. Tell the user: "SimHub is still running (process …). Close it manually (Task Manager if needed), then tell me and I'll run the deploy again." Do not move on from this step until the check shows **zero** SimHub processes.
+4. **Only then deploy:** When verification shows no SimHub process, run the Copy-Item to the SimHub install root.
+
+Never run the copy first and then explain the lock error. The "SimHub stopped" step is **blocking**: you do not proceed to build/deploy the plugin copy until SimHub is verified closed.
 
 ### 4. Debugging
 
@@ -129,8 +138,8 @@ When building and deploying the SimHub plugin DLL on the host (no Docker for the
 
 1. **Before building**: Close SimHub completely. If SimHub is running, it may lock plugin DLLs and cause build or copy issues.
 2. **Build**: From repo root, run `dotnet build apps/plugin/WinPodiums.Plugin/WinPodiums.Plugin.csproj` (or use your IDE).
-3. **Before deploying: stop SimHub.** If SimHub is not stopped, it locks the existing plugin file in the SimHub install folder and the copy will fail (cannot overwrite). This is required—not optional.
-4. **Deploy**: Once SimHub is stopped, copy the built DLL (e.g. from `apps/plugin/WinPodiums.Plugin/bin/Release/net48/` or `Debug/net48/`) and `Newtonsoft.Json.dll` if needed to `C:\Program Files (x86)\SimHub\` (SimHub install root; the only SimHub deploy path this repo supports). Copying to Program Files usually requires running PowerShell as Administrator.
+3. **Before deploying: ensure SimHub is stopped and verified.** Agents must actively stop SimHub (Stop-Process -Force), then re-check with Get-Process; do not run the copy until verification shows zero SimHub processes. See §3c Agent implementation for the exact steps (find → stop → verify → then deploy).
+4. **Deploy**: Once SimHub is verified closed, copy the built DLL (e.g. from `apps/plugin/WinPodiums.Plugin/bin/Release/net48/` or `Debug/net48/`) and `Newtonsoft.Json.dll` if needed to `C:\Program Files (x86)\SimHub\` (SimHub install root; the only SimHub deploy path this repo supports). Copying to Program Files usually requires running PowerShell as Administrator.
 5. **Verify**: Start SimHub and confirm the plugin appears in the plugin list and (when enabled) in the left feature menu.
 
 Include this sequence in any local deployment setup or runbook that involves the SimHub plugin. When **prepare env** includes the plugin (see §3c), always ensure SimHub is stopped before deploy.

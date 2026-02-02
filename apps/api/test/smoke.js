@@ -1,7 +1,9 @@
 /**
  * Smoke test: run against the Dockerized API (docker compose up -d).
  * Validates: (1) Docker and Worker config match (health ok, env dev),
- * (2) error shapes (404, 401), (3) API documentation loads (Swagger UI and OpenAPI spec).
+ * (2) GET /api/auth/config returns 200 and data.discordClientId (plugin dependency),
+ * (3) POST /api/auth/discord/exchange with empty body returns 400,
+ * (4) error shapes (404, 401), (5) API documentation loads (Swagger UI and OpenAPI spec).
  * Run from repo root: docker compose up -d && cd apps/api && npm test
  */
 const API_BASE = process.env.API_BASE || 'http://localhost:8787';
@@ -75,6 +77,34 @@ async function main() {
   const yaml = await res.text();
   if (!yaml.startsWith('openapi: 3')) {
     console.error('OpenAPI spec invalid (expected openapi: 3...)');
+    process.exit(1);
+  }
+
+  // GET /api/auth/config — plugin calls this for Discord client ID; must return 200 and data shape
+  res = await fetch(`${API_BASE}/api/auth/config`);
+  if (!res.ok) {
+    console.error('GET /api/auth/config failed:', res.status, res.statusText);
+    process.exit(1);
+  }
+  const configBody = await res.json();
+  if (!configBody.data || typeof configBody.data.discordClientId !== 'string') {
+    console.error('Expected { data: { discordClientId: string } }, got:', configBody);
+    process.exit(1);
+  }
+
+  // POST /api/auth/discord/exchange with missing body — must return 400 (bad_request)
+  res = await fetch(`${API_BASE}/api/auth/discord/exchange`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({}),
+  });
+  if (res.status !== 400) {
+    console.error('POST /api/auth/discord/exchange with empty body: expected 400, got', res.status);
+    process.exit(1);
+  }
+  const exchangeErr = await res.json().catch(() => ({}));
+  if (exchangeErr.success !== false || exchangeErr.error !== 'bad_request') {
+    console.error('Expected { success: false, error: "bad_request" }, got:', exchangeErr);
     process.exit(1);
   }
 

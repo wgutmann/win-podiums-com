@@ -6,6 +6,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using GameReaderCommon;
 using SimHub.Plugins;
+using Newtonsoft.Json.Linq;
 using WinPodiums.Plugin.Auth;
 using WinPodiums.Plugin.Services;
 using WinPodiums.Plugin.UI;
@@ -97,6 +98,24 @@ namespace WinPodiums.Plugin.Core
 
             const int callbackPort = 54321;
             var redirectUri = $"http://127.0.0.1:{callbackPort}/callback";
+
+            // #region agent log
+            try
+            {
+                var logPath = @"c:\Users\winth\dev\win-podiums-com\.cursor\debug.log";
+                var logObj = new JObject
+                {
+                    ["location"] = "PluginMain.cs:AuthenticateWithBrowserAsync",
+                    ["message"] = "redirect_uri built for Discord",
+                    ["data"] = new JObject { ["redirectUri"] = redirectUri, ["callbackPort"] = callbackPort },
+                    ["timestamp"] = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds(),
+                    ["sessionId"] = "debug-session",
+                    ["hypothesisId"] = "H1"
+                };
+                System.IO.File.AppendAllText(logPath, logObj.ToString() + "\n");
+            }
+            catch { }
+            // #endregion
 
             AuthConfigResult config;
             try
@@ -231,7 +250,7 @@ namespace WinPodiums.Plugin.Core
         }
 
         /// <summary>
-        /// Return the WPF settings control for SimHub (Link to Discord, Send heartbeat, status). TP-SPOC-004.
+        /// Return the WPF settings control for SimHub (Login with Discord, Send heartbeat, status). TP-SPOC-004.
         /// </summary>
         public Control GetWPFSettingsControl(PluginManager pluginManager)
         {

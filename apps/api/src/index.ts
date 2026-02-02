@@ -277,6 +277,9 @@ export default {
           return errorResponse("bad_request", "Invalid JSON body", 400);
         }
         const { code, code_verifier, redirect_uri } = body;
+        // #region agent log
+        fetch("http://127.0.0.1:7242/ingest/1d72bcc7-cc87-407b-8d82-421bf27576d3", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ location: "index.ts:auth/discord/exchange", message: "exchange received redirect_uri", data: { redirect_uri: redirect_uri ?? null, hasCode: !!code, hasVerifier: !!code_verifier }, timestamp: Date.now(), sessionId: "debug-session", hypothesisId: "H4" }) }).catch(() => {});
+        // #endregion
         if (!code || !code_verifier || !redirect_uri || !env.DISCORD_CLIENT_ID || !env.DB) {
           return errorResponse("bad_request", "Missing code, code_verifier, or redirect_uri", 400);
         }

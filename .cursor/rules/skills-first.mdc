@@ -1,0 +1,27 @@
+---
+description: Use project skills by reading them first for domain tasks
+globs: "**/*"
+alwaysApply: true
+---
+
+# Use Skills Efficiently
+
+**For domain-specific tasks, read the relevant skill file at the start of your turn** before editing, advising, or running commands. Do not rely only on the short description; open and follow the full SKILL.md.
+
+**When to read which skill (read first, then follow):**
+
+| User intent / topic | Skill to read |
+|---------------------|---------------|
+| Docker, Compose, prepare env, tear down, "get API running", local dev container, `compose up` | [.cursor/skills/docker-dev-environment/SKILL.md](../../.cursor/skills/docker-dev-environment/SKILL.md). **Prepare env + plugin deploy:** actively stop SimHub (Stop-Process), verify closed (Get-Process), then copy; do not proceed until verified. See skill §3c. |
+| Workers, D1, R2, KV, wrangler.toml, bindings, deploy Worker | [.cursor/skills/cloudflare-workers/SKILL.md](../../.cursor/skills/cloudflare-workers/SKILL.md) |
+| Auth, secrets, API security, OAuth, rate limit, test coverage for security | [.cursor/skills/security/SKILL.md](../../.cursor/skills/security/SKILL.md) |
+| Discord auth, OAuth2, login, tokens, scopes | [.cursor/skills/discord-authentication/SKILL.md](../../.cursor/skills/discord-authentication/SKILL.md) |
+| PRs, branch protection, .gitignore, traceability, PR template | [.cursor/skills/github-change-control/SKILL.md](../../.cursor/skills/github-change-control/SKILL.md) |
+| Docs, PRD, HLD, tech plan, README, CONTRIBUTING | [.cursor/skills/cursor-project-docs/SKILL.md](../../.cursor/skills/cursor-project-docs/SKILL.md) |
+| SimHub plugin build, C# plugin, telemetry | [.cursor/skills/simhub-plugin-builder/SKILL.md](../../.cursor/skills/simhub-plugin-builder/SKILL.md) |
+| Deploy plugin to SimHub, copy DLL to SimHub | [.cursor/skills/simhub-plugin-deploy/SKILL.md](../../.cursor/skills/simhub-plugin-deploy/SKILL.md) |
+| Product review, scope, PRD/HLD alignment, brand voice | [.cursor/skills/product-manager/SKILL.md](../../.cursor/skills/product-manager/SKILL.md) |
+
+If the user’s message clearly matches a row above, **read that skill’s SKILL.md first**, then apply its instructions. For overlapping topics (e.g. Docker + Workers), read both when both apply.
+
+**Confirm this rule is active:** Cursor Settings → Rules → ensure this rule (skills-first) is enabled and not overridden. This file has `alwaysApply: true` and `globs: "**/*"`, so it applies to all files when the project rules are loaded.

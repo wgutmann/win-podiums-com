@@ -62,7 +62,7 @@ if (ok) await plugin.SendHeartbeatAsync("1.0.0");
 
 ## Using the plugin
 
-After installation, open SimHub → in the **left feature menu** click **WinPodiums** → the settings panel shows **Link to Discord**, **Send heartbeat**, and status (Linked/Not linked, Heartbeat OK/failed). Use "Link to Discord" to authenticate with Discord (browser PKCE); use "Send heartbeat" to verify the API connection.
+After installation, open SimHub → in the **left feature menu** click **WinPodiums** → the settings panel shows **Login with Discord**, **Send heartbeat**, and status (Linked/Not linked, Heartbeat OK/failed). Use "Login with Discord" to authenticate with Discord (browser PKCE); use "Send heartbeat" to verify the API connection.
 
 ## Development
 

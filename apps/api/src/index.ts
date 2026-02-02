@@ -86,9 +86,13 @@ export default {
       });
     }
 
-    // Gate (static landing) — enhanced with auth and plugin links
+    // Gate (static landing) — always show a result: success, error, or warning from query params
     if (path === "/" || path === "/gate") {
-      const html = getGateHtml(baseUrl);
+      const success = url.searchParams.get("success") ?? undefined;
+      const error = url.searchParams.get("error") ?? undefined;
+      const message = url.searchParams.get("message") ?? undefined;
+      const warn = url.searchParams.get("warn") ?? undefined;
+      const html = getGateHtml(baseUrl, success, error, message, warn);
       return new Response(html, {
         headers: { "Content-Type": "text/html; charset=utf-8" },
       });
@@ -114,12 +118,7 @@ export default {
         });
       }
       const state = generateState();
-      // In dev, use localhost for redirect_uri so it matches Discord's configured redirect (127.0.0.1 ≠ localhost for OAuth)
-      const authBase =
-        env.ENVIRONMENT === "dev" && url.hostname === "127.0.0.1"
-          ? `http://localhost:${url.port || "8787"}`
-          : baseUrl;
-      const redirectUri = `${authBase}/auth/callback`;
+      const redirectUri = `${baseUrl}/auth/callback`;
       if (env.CACHE) {
         await env.CACHE.put(`auth:state:${state}`, redirectUri, { expirationTtl: 600 });
       }
@@ -133,7 +132,11 @@ export default {
     }
 
     // Web OAuth callback (Discord redirects here with ?code=...&state=...)
+    // Discord auth succeeds if exchange + get user work; DB save failure is a warning, not a hard fail.
     if (method === "GET" && path === "/auth/callback") {
+      // #region agent log
+      fetch("http://127.0.0.1:7242/ingest/1d72bcc7-cc87-407b-8d82-421bf27576d3", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ location: "index.ts:auth/callback", message: "auth callback handler entry", data: { hasCode: !!url.searchParams.get("code") }, timestamp: Date.now(), sessionId: "debug-session", hypothesisId: "H4" }) }).catch(() => {});
+      // #endregion
       const code = url.searchParams.get("code");
       const state = url.searchParams.get("state");
       if (!code || !state) {
@@ -145,14 +148,22 @@ export default {
       if (!env.DISCORD_CLIENT_ID || !env.DISCORD_CLIENT_SECRET || !env.DB) {
         return Response.redirect(`${baseUrl}/gate?error=config`, 302);
       }
+      let tokens: Awaited<ReturnType<typeof exchangeCodeWeb>>;
+      let discordUser: Awaited<ReturnType<typeof getDiscordUser>>;
       try {
-        const tokens = await exchangeCodeWeb(
+        tokens = await exchangeCodeWeb(
           code,
           redirectUri,
           env.DISCORD_CLIENT_ID,
           env.DISCORD_CLIENT_SECRET
         );
-        const discordUser = await getDiscordUser(tokens.access_token);
+        discordUser = await getDiscordUser(tokens.access_token);
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : "Auth failed";
+        return Response.redirect(`${baseUrl}/gate?error=auth&message=${encodeURIComponent(msg)}`, 302);
+      }
+      let warnMessage: string | undefined;
+      try {
         await upsertUser(env.DB, discordUser, "web");
         const expiresAt = new Date(Date.now() + tokens.expires_in * 1000)
           .toISOString()
@@ -165,41 +176,28 @@ export default {
           tokens.refresh_token,
           expiresAt
         );
-        let redirectTo = `${baseUrl}/gate`;
-        if (storedRedirect && storedRedirect !== redirectUri) redirectTo = storedRedirect;
-        if (!env.SESSION_SECRET) {
-          return Response.redirect(redirectTo, 302);
-        }
-        const sessionJwt = await createSessionJWT(
-          discordUser.id,
-          env.SESSION_SECRET,
-          SESSION_MAX_AGE
-        );
-        return new Response(null, {
-          status: 302,
-          headers: {
-            Location: redirectTo,
-            "Set-Cookie": `${SESSION_COOKIE}=${sessionJwt}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${SESSION_MAX_AGE}`,
-          },
-        });
       } catch (e) {
-        // #region agent log
-        fetch("http://127.0.0.1:7242/ingest/1d72bcc7-cc87-407b-8d82-421bf27576d3", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            location: "index.ts:auth/callback catch",
-            message: "callback auth failed",
-            data: { error: e instanceof Error ? e.message : String(e) },
-            timestamp: Date.now(),
-            sessionId: "debug-session",
-            hypothesisId: "A",
-          }),
-        }).catch(() => {});
-        // #endregion
-        const msg = e instanceof Error ? e.message : "Auth failed";
-        return Response.redirect(`${baseUrl}/gate?error=auth&message=${encodeURIComponent(msg)}`, 302);
+        warnMessage = e instanceof Error ? e.message : "Your profile wasn't saved to our system yet.";
       }
+      let redirectTo = `${baseUrl}/gate`;
+      if (storedRedirect && storedRedirect !== redirectUri) redirectTo = storedRedirect;
+      redirectTo += (redirectTo.includes("?") ? "&" : "?") + "success=login";
+      if (warnMessage) redirectTo += "&warn=" + encodeURIComponent(warnMessage);
+      if (!env.SESSION_SECRET) {
+        return Response.redirect(redirectTo, 302);
+      }
+      const sessionJwt = await createSessionJWT(
+        discordUser.id,
+        env.SESSION_SECRET,
+        SESSION_MAX_AGE
+      );
+      return new Response(null, {
+        status: 302,
+        headers: {
+          Location: redirectTo,
+          "Set-Cookie": `${SESSION_COOKIE}=${sessionJwt}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${SESSION_MAX_AGE}`,
+        },
+      });
     }
 
     // POST /api/plugin/verify — stub (match by path so CI/Docker always hit)
@@ -213,15 +211,8 @@ export default {
     if (path.startsWith("/api/")) {
       const rest = path.slice(5).replace(/\/$/, "");
 
-      // GET /api/auth/config — public config for plugin (Discord client ID for PKCE authorize URL)
-      if (method === "GET" && rest === "auth/config") {
-        return jsonResponse({
-          success: true,
-          data: { discordClientId: env.DISCORD_CLIENT_ID ?? "" },
-        });
-      }
-
       // POST /api/auth/discord/callback — server-side web callback (if frontend posts code)
+      // Discord auth succeeds if exchange + get user work; DB save failure returns success with warning.
       if (method === "POST" && rest === "auth/discord/callback") {
         let body: { code?: string; state?: string; redirect_uri?: string };
         try {
@@ -233,14 +224,22 @@ export default {
         if (!code || !redirect_uri || !env.DISCORD_CLIENT_ID || !env.DISCORD_CLIENT_SECRET || !env.DB) {
           return errorResponse("bad_request", "Missing code, redirect_uri, or server config", 400);
         }
+        let tokens: Awaited<ReturnType<typeof exchangeCodeWeb>>;
+        let discordUser: Awaited<ReturnType<typeof getDiscordUser>>;
         try {
-          const tokens = await exchangeCodeWeb(
+          tokens = await exchangeCodeWeb(
             code,
             redirect_uri,
             env.DISCORD_CLIENT_ID,
             env.DISCORD_CLIENT_SECRET
           );
-          const discordUser = await getDiscordUser(tokens.access_token);
+          discordUser = await getDiscordUser(tokens.access_token);
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : "Token exchange failed";
+          return errorResponse("unauthorized", msg, 401);
+        }
+        let warning: string | undefined;
+        try {
           await upsertUser(env.DB, discordUser, "web");
           const expiresAt = new Date(Date.now() + tokens.expires_in * 1000)
             .toISOString()
@@ -253,17 +252,17 @@ export default {
             tokens.refresh_token,
             expiresAt
           );
-          return jsonResponse({
-            success: true,
-            data: { discordId: discordUser.id, state: "pending" },
-          });
         } catch (e) {
-          const msg = e instanceof Error ? e.message : "Token exchange failed";
-          return errorResponse("unauthorized", msg, 401);
+          warning = e instanceof Error ? e.message : "Your profile wasn't saved to our system yet.";
         }
+        return jsonResponse({
+          success: true,
+          data: { discordId: discordUser.id, state: "pending", ...(warning && { warning }) },
+        });
       }
 
       // POST /api/auth/discord/exchange — plugin PKCE
+      // Discord auth succeeds if exchange + get user work; DB save failure returns success with warning.
       if (method === "POST" && rest === "auth/discord/exchange") {
         let body: { code?: string; code_verifier?: string; redirect_uri?: string };
         try {
@@ -275,14 +274,22 @@ export default {
         if (!code || !code_verifier || !redirect_uri || !env.DISCORD_CLIENT_ID || !env.DB) {
           return errorResponse("bad_request", "Missing code, code_verifier, or redirect_uri", 400);
         }
+        let tokens: Awaited<ReturnType<typeof exchangeCodePKCE>>;
+        let discordUser: Awaited<ReturnType<typeof getDiscordUser>>;
         try {
-          const tokens = await exchangeCodePKCE(
+          tokens = await exchangeCodePKCE(
             code,
             redirect_uri,
             code_verifier,
             env.DISCORD_CLIENT_ID
           );
-          const discordUser = await getDiscordUser(tokens.access_token);
+          discordUser = await getDiscordUser(tokens.access_token);
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : "Token exchange failed";
+          return errorResponse("unauthorized", msg, 401);
+        }
+        let warning: string | undefined;
+        try {
           await upsertUser(env.DB, discordUser, "plugin_browser");
           const expiresAt = new Date(Date.now() + tokens.expires_in * 1000)
             .toISOString()
@@ -295,18 +302,18 @@ export default {
             tokens.refresh_token,
             expiresAt
           );
-          return jsonResponse({
-            success: true,
-            data: {
-              discordId: discordUser.id,
-              access_token: tokens.access_token,
-              expires_in: tokens.expires_in,
-            },
-          });
         } catch (e) {
-          const msg = e instanceof Error ? e.message : "Token exchange failed";
-          return errorResponse("unauthorized", msg, 401);
+          warning = e instanceof Error ? e.message : "Your profile wasn't saved to our system yet.";
         }
+        return jsonResponse({
+          success: true,
+          data: {
+            discordId: discordUser.id,
+            access_token: tokens.access_token,
+            expires_in: tokens.expires_in,
+            ...(warning && { warning }),
+          },
+        });
       }
 
       // POST /api/auth/token-exchange — plugin manual token
@@ -453,8 +460,24 @@ export default {
   },
 };
 
-function getGateHtml(baseUrl: string): string {
+function getGateHtml(baseUrl: string, success?: string, error?: string, message?: string, warn?: string): string {
   const loginUrl = `${baseUrl}/auth/discord`;
+  const showSuccess = success === "login";
+  const successAlertHtml =
+    showSuccess
+      ? `<div class="card alert alert-success"><p><strong>Logged in successfully.</strong></p><p>You can use the plugin or generate a token below.</p></div>`
+      : "";
+  const showError = error && (error === "auth" || error === "config" || error === "missing_params");
+  const displayMessage = message ? decodeURIComponent(message) : (showError ? "Something went wrong." : "");
+  const errorAlertHtml =
+    showError && displayMessage
+      ? `<div class="card alert alert-error"><p><strong>Login failed</strong></p><p>${escapeHtml(displayMessage)}</p><p><a href="${baseUrl}/gate">Try again</a></p></div>`
+      : "";
+  const displayWarn = warn ? decodeURIComponent(warn) : "";
+  const warnAlertHtml =
+    displayWarn
+      ? `<div class="card alert alert-warn"><p><strong>Note</strong></p><p>${escapeHtml(displayWarn)}</p><p>You're still logged in. <a href="${baseUrl}/gate">Continue</a></p></div>`
+      : "";
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -465,6 +488,9 @@ function getGateHtml(baseUrl: string): string {
     h1 { font-size: 1.5rem; }
     a { color: #5865F2; }
     .card { border: 1px solid #ddd; border-radius: 8px; padding: 1rem; margin: 1rem 0; }
+    .alert-success { border-color: #059669; background: #ecfdf5; }
+    .alert-error { border-color: #c00; background: #fef2f2; }
+    .alert-warn { border-color: #b45309; background: #fffbeb; }
     .btn { display: inline-block; background: #5865F2; color: white; padding: 0.5rem 1rem; border-radius: 6px; text-decoration: none; margin: 0.25rem 0.25rem 0 0; }
     .btn:hover { background: #4752C4; }
     .muted { color: #666; font-size: 0.9rem; }
@@ -473,6 +499,9 @@ function getGateHtml(baseUrl: string): string {
 <body>
   <h1>WinPodiums</h1>
   <p class="muted">Phase 1 — Gate</p>
+  ${successAlertHtml}
+  ${errorAlertHtml}
+  ${warnAlertHtml}
   <div class="card">
     <p><strong>Log in with Discord</strong> to link your account and get the plugin.</p>
     <p><a href="${loginUrl}" class="btn">Log in with Discord</a></p>
@@ -484,6 +513,15 @@ function getGateHtml(baseUrl: string): string {
   </div>
 </body>
 </html>`;
+}
+
+function escapeHtml(s: string): string {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 function getTokenPageHtml(baseUrl: string): string {

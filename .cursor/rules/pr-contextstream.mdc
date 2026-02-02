@@ -1,0 +1,42 @@
+---
+description: Fill PR description from traceability and link PR to ContextStream (PR ↔ Tech Plan ↔ PRD)
+globs: ".github/**/*"
+alwaysApply: false
+---
+
+# PR and ContextStream Traceability
+
+When creating or filling a **pull request** that implements a PRD or Tech Plan:
+
+## 1. Populate PR description (required)
+
+- Use [.github/PULL_REQUEST_TEMPLATE.md](../../.github/PULL_REQUEST_TEMPLATE.md) and fill:
+  - **Summary** (what changed, why)
+  - **Traceability** section with:
+    - **Implements (Tech Plan):** TP-XXX IDs from [.github/traceability-mapping.yaml](../../.github/traceability-mapping.yaml)
+    - **PRD:** PRD-XXX this work traces to
+    - **Doc links:** Markdown links to PRD and tech plan doc(s) per the traceability mapping
+    - **Labels:** Apply traceability labels from [.github/labels.yaml](../../.github/labels.yaml)
+- If a feature-specific PR description doc exists (e.g. `.github/PR_DESCRIPTION_*.md`), use it to prefill Summary and Traceability; then ensure the PR body still matches the template.
+- Do not skip; fill the PR description before or when opening the PR.
+
+## 2. After PR is opened or merged — ContextStream (when MCP available)
+
+- Capture an **implementation event** so the knowledge graph shows **PR ↔ Tech Plan ↔ PRD**:
+  - Use **session(action=capture, event_type=implementation, ...)** with:
+    - **title:** e.g. `PR #<number>: <short summary> (TP-XXX)`
+    - **content:** `<PR URL>. Implements TP-XXX, PRD-XXX. <one-line summary>.`
+    - **provenance:** `{ "pr_url": "<PR URL>" }`
+    - **code_refs:** array of file paths from the traceability mapping (PRD and TP doc paths)
+- See [ContextStream mapping §1.4](../../docs/guides/contextstream-mapping.md#14-linking-pull-requests-to-tech-plans-and-prds-graph-visible).
+
+## 3. Labels (when opening the PR)
+
+- Add GitHub labels from [.github/labels.yaml](../../.github/labels.yaml) (e.g. `prd:PRD-001`, `tech-plan:TP-SPOC-004`).
+- Labels may be synced automatically when the PR body contains the Traceability section; otherwise add manually or via `gh pr edit --add-label`.
+
+## Reference
+
+- [.github/PULL_REQUEST_TEMPLATE.md](../../.github/PULL_REQUEST_TEMPLATE.md) — PR template
+- [.github/traceability-mapping.yaml](../../.github/traceability-mapping.yaml) — Doc ID → path
+- [docs/guides/contextstream-mapping.md §1.4](../../docs/guides/contextstream-mapping.md#14-linking-pull-requests-to-tech-plans-and-prds-graph-visible) — PR ↔ TP ↔ PRD linking

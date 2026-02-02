@@ -34,6 +34,12 @@ See [reference.md](reference.md) for curated links to specific Docker and Compos
 3. **Need dev tooling, volumes, ports, envs?** Compose is usually better.
 4. **Ambiguous?** Default to Compose with a minimal Dockerfile.
 
+## Local vs remote (Cloudflare)
+
+- **Rebuild and restart** (`docker compose build`, `docker compose up`, `docker compose down` then `up`) are entirely **local**. Nothing is deployed to Cloudflare.
+- **Commands in the container CMD** (e.g. `wrangler d1 migrations apply DB_NAME --local`) run **inside** the dev environment. The **`--local`** flag applies migrations to the **local** D1 database that `wrangler dev` uses (SQLite in the container). That does **not** create or update D1 on Cloudflare.
+- **Deploying to Cloudflare** is a separate step: e.g. `wrangler deploy`, and when you want the remote DB schema, `wrangler d1 migrations apply DB_NAME --remote` (run from host or CI, not necessarily from the dev container). Do not conflate container rebuild/restart or `--local` migrations with deployment.
+
 ---
 
 ## Step-by-Step Workflows

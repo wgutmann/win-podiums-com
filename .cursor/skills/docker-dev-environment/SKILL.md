@@ -9,7 +9,7 @@ description: Standardizes Docker-based development environments using official D
 
 Use this skill when the user asks to create or standardize a **Docker** or **Docker Compose** setup, achieve **local/repo parity** for a **containerized dev environment**, or to **debug**, **monitor**, or validate dev containers locally and in CI.
 
-**Flow**: (1) Detect existing Docker artifacts. (2) Choose minimal setup (Dockerfile-only vs Compose). (3) Ensure local and repo config stay in parity. (4) **When preparing env or running build/up:** check for already-running containers—stop first with `docker compose down` to avoid port conflicts and stale images (see §3a). (5) Provide run/debug/monitor workflows and verify them. (6) Define local and CI tests for Docker stability.
+**Flow**: (1) Detect existing Docker artifacts. (2) Choose minimal setup (Dockerfile-only vs Compose). (3) Ensure local and repo config stay in parity. (4) **When preparing env or running build/up:** tear down **all** Docker API envs first—remove the named container `win-podiums-com-container` (from any worktree), then `docker compose down`, then build and up so only one API container runs (see §3a). (5) Use **container name** `win-podiums-com-container` in Compose so the same name is used everywhere. (6) Provide run/debug/monitor workflows and verify them. (7) Define local and CI tests for Docker stability.
 
 **ContextStream (when available):** Before changing Docker/Compose, use ContextStream `search` for "Docker", "compose", "wrangler", "Worker" to find existing setup and parity decisions. After Docker/parity decisions, capture in ContextStream (event_type=decision) with path to Dockerfile, compose.yaml, or docs/guides/development.md.
 
@@ -69,16 +69,17 @@ See [reference.md](reference.md) for curated links to specific Docker and Compos
 3. **Verify**: Hit a health endpoint or run a minimal CLI command to confirm the app starts.
 4. **Optional**: Use `docker compose up -d` for detached mode; document how to stop (`docker compose down`).
 
-### 3a. Prepare env when a container is already running
+### 3a. Prepare env — tear down all Docker API envs first
 
-A **running** container can cause issues when you prepare the env (rebuild, or start again): port already in use, old image/CMD still in use, or conflicting state. **Always account for already-running containers** when giving "prepare env" or "fresh env" steps.
+A **running** container (from this worktree, another worktree, or a manual run) can cause multiple API containers, port conflicts, or stale state. **Always tear down all API envs** before build/up so only one container runs.
 
-1. **Check**: Run `docker compose ps` (or `docker ps`) to see if this project’s containers are running.
-2. **Stop first**: Before rebuild or a fresh `up`, run `docker compose down` so the next `up` uses the new image and frees the port. Use `docker compose down --volumes` only when you want to wipe local data (e.g. D1 state).
-3. **Then**: Run `docker compose build` (or `docker compose build SERVICE`) and then `docker compose up` (or `docker compose up -d`).
-4. **Document**: In any "prepare fresh environment" or runbook, include: "If a container is already running, run `docker compose down` first, then build and up."
+1. **Named container**: The API service must use **container name** `win-podiums-com-container` in `compose.yaml` so the same name is used everywhere and can be torn down reliably.
+2. **Remove named container**: Run `docker rm -f win-podiums-com-container` (ignore errors if the container does not exist). This stops and removes the container from any worktree or previous run.
+3. **Compose down**: Run `docker compose down` so this project’s stack (network, etc.) is removed. Use `docker compose down --volumes` only when you want to wipe local data (e.g. D1 state).
+4. **Then**: Run `docker compose build` (or `docker compose build SERVICE`) and then `docker compose up` (or `docker compose up -d`).
+5. **Document**: In any "prepare fresh environment" or runbook, include: "Run `docker rm -f win-podiums-com-container`, then `docker compose down`, then build and up."
 
-When **implementing** prepare-env (e.g. in scripts or agent flows), either: (a) run `docker compose down` before build/up, or (b) detect running containers and tell the user to stop first, then build and up.
+When **implementing** prepare-env (e.g. in scripts or agent flows), **always** run in order: (1) `docker rm -f win-podiums-com-container`, (2) `docker compose down`, (3) build, (4) up (prefer `up -d`).
 
 ### 3b. Prepare env includes starting the stack
 
@@ -88,7 +89,7 @@ When **implementing** prepare-env (e.g. in scripts or agent flows), either: (a) 
 2. **Verify**: Optionally hit the health endpoint (e.g. `GET /api/health`) to confirm the service is ready.
 3. **Document**: In "prepare fresh environment" or runbooks, state that the final step is starting the stack (`docker compose up -d`) so the env is ready to use.
 
-When **implementing** prepare-env, the sequence is: down (if running) → secrets/config → build → **up** (prefer `up -d` so the env is running when done).
+When **implementing** prepare-env, the sequence is: **tear down all API envs** (`docker rm -f win-podiums-com-container`, then `docker compose down`) → secrets/config → build → **up** (prefer `up -d` so the env is running when done).
 
 ### 4. Debugging
 
@@ -129,7 +130,7 @@ Include this sequence in any local deployment setup or runbook that involves the
 - [ ] Official base, pinned version; minimal layers; non-root when feasible; healthcheck if applicable.
 
 ### Compose
-- [ ] `compose.yaml` or `docker-compose.yml`; explicit services, ports, volumes, environment; bind mounts for source in dev; `profiles` for optional services; local overrides in gitignored file.
+- [ ] `compose.yaml` or `docker-compose.yml`; explicit services, ports, volumes, environment; **container_name: win-podiums-com-container** for the API service; bind mounts for source in dev; `profiles` for optional services; local overrides in gitignored file.
 
 ## Testing Workflow
 
